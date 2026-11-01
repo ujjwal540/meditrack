@@ -22,7 +22,7 @@ No setup is needed for **demo mode**: medicines, dose logs and family invitation
 4. When the reminder appears choose **Taken**, **Snooze** or **Not yet taken**.
 5. Watch the dashboard counts, history and weekly chart update.
 
-## Connect Supabase (Day 3)
+## Connect Supabase 
 1. Create a project at supabase.com.
 2. Copy the project URL and publishable key into `.env.local`:
    ```env
