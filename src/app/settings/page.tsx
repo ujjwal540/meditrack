@@ -26,10 +26,10 @@ export default function SettingsPage() {
         <Card>
           <h2 className="text-lg font-semibold">Browser notifications</h2>
           <p className="mt-1 text-slate-700">
-            Status: <strong>{notificationPermission}</strong>. Notifications are not guaranteed if the browser is closed or your device blocks them.
+            Status: <strong>{notificationPermission}</strong>. Alerts include a notification, sound, and vibration when supported by your browser and device. The app must remain open.
           </p>
           {notificationPermission === "default" && (
-            <Button className="mt-3" onClick={requestNotifications}>Enable notifications</Button>
+            <Button className="mt-3" onClick={requestNotifications}>Enable alerts</Button>
           )}
         </Card>
       </div>

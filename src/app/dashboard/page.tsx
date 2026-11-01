@@ -30,9 +30,9 @@ export default function DashboardPage() {
         <div className="space-y-6">
           {notificationPermission === "default" && (
             <Card className="flex flex-wrap items-center justify-between gap-3 border-amber-300 bg-amber-50">
-              <p className="text-lg">Turn on notifications so MediTrack can remind you while it is open.</p>
+              <p className="text-lg">Enable alerts so MediTrack can use notifications, sound, and vibration while it is open.</p>
               <button onClick={requestNotifications} className="min-h-12 rounded-xl bg-secondary px-5 font-semibold text-white">
-                Enable notifications
+                Enable alerts
               </button>
             </Card>
           )}
