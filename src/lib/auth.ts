@@ -6,15 +6,26 @@ export interface AuthResult {
   demo?: boolean;
 }
 
+export type AccountType = "patient" | "caregiver";
+
 const NOT_CONFIGURED: AuthResult = {
   ok: false,
   demo: true,
   error: "Supabase is not configured yet, so MediTrack is running in demo mode.",
 };
 
-export async function signUp(name: string, email: string, password: string): Promise<AuthResult> {
+export async function signUp(
+  name: string,
+  email: string,
+  password: string,
+  accountType: AccountType = "patient",
+): Promise<AuthResult> {
   if (!supabase) return NOT_CONFIGURED;
-  const { error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { name, role: accountType } },
+  });
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 

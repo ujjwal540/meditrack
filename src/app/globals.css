@@ -17,3 +17,23 @@ body {
   outline: 3px solid var(--color-secondary);
   outline-offset: 2px;
 }
+
+@keyframes auth-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-auth-float {
+  animation: auth-float 5s ease-in-out infinite;
+}
+
+.animate-auth-float-delayed {
+  animation: auth-float 5s ease-in-out 1.4s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-auth-float,
+  .animate-auth-float-delayed {
+    animation: none;
+  }
+}
