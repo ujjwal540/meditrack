@@ -1,17 +1,8 @@
-import { createBrowserClient } from "@supabase/ssr";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/client";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const publishableKey =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-export const isSupabaseConfigured = Boolean(url && publishableKey);
-
-/** null while running in demo mode (no .env.local values yet). */
-export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createBrowserClient(url as string, publishableKey as string)
-  : null;
+export const supabase: SupabaseClient | null = createClient();
+export const isSupabaseConfigured = Boolean(supabase);
 
 let authInitialization: Promise<Session | null> | null = null;
 
