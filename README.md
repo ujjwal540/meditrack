@@ -31,8 +31,8 @@ No setup is needed for **demo mode**: medicines, dose logs and family invitation
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-sb-publishable-key
    ```
    The older `NEXT_PUBLIC_SUPABASE_ANON_KEY` name is also supported.
-3. Run `supabase/migrations/001_initial_schema.sql` in the SQL Editor (tables + Row Level Security).
-4. Create a private storage bucket `prescriptions`.
+3. Run migrations `001_initial_schema.sql` through `005_security_hardening.sql` in order in the SQL Editor. They create the tables, Row Level Security policies, family support, private prescription storage, and lock the scheduler RPC to `service_role`.
+4. Confirm the `prescriptions` storage bucket is private. Migration 005 creates it and applies per-user object policies.
 5. Replace the localStorage code in `src/services/*` with Supabase queries – the pages and hooks don't need to change.
 
 ## Notifications and background reminders
@@ -57,7 +57,15 @@ VAPID_SUBJECT=mailto:alerts@example.com
 CRON_SECRET=your-long-random-secret
 ```
 
-Generate a VAPID pair with `npx web-push generate-vapid-keys`. Never commit the private key or service-role key. Run migrations `001`, `002`, and `003` in Supabase. Vercel Hobby does not allow the every-minute schedule required for timely medicine reminders, so this project does not declare a Vercel Cron job by default. On Hobby, invoke `/api/push/dispatch-due` every minute from a trusted external scheduler with `Authorization: Bearer $CRON_SECRET`, or upgrade to a Vercel plan that supports that schedule before adding a Cron configuration.
+Generate a VAPID pair with `npx web-push generate-vapid-keys`. Never commit the private key or service-role key. Run migrations `001` through `005` in Supabase. Vercel Hobby does not allow the every-minute schedule required for timely medicine reminders, so this project does not declare a Vercel Cron job by default. On Hobby, invoke `/api/push/dispatch-due` every minute from a trusted external scheduler with `Authorization: Bearer $CRON_SECRET`, or upgrade to a Vercel plan that supports that schedule before adding a Cron configuration.
+
+### Supabase Auth production settings
+
+- Configure a custom SMTP provider under **Authentication → SMTP Settings** to avoid the low shared email limit. Do not repeatedly retry signup or recovery emails while rate-limited.
+- Set **Authentication → URL Configuration → Site URL** to the deployed Vercel URL.
+- Add the deployed URL and local URL to **Redirect URLs**, for example `https://your-app.vercel.app/**` and `http://localhost:3000/**`.
+- Keep email confirmation enabled for production. A user must confirm their email before signing in when confirmation is required.
+- Keep `SUPABASE_SERVICE_ROLE_KEY`, `VAPID_PRIVATE_KEY`, and `CRON_SECRET` server-only Vercel variables. Only the Supabase URL, publishable key, and VAPID public key may be exposed to the browser.
 
 Closed-browser delivery depends on operating-system support. iOS requires an installed Home Screen web app and user permission; desktop and Android support varies by browser. If a capability is unavailable, the UI reports it instead of claiming success. Family caregiver alerts still require a real authenticated Supabase account and a granted caregiver connection; demo mode remains local-only.
 
