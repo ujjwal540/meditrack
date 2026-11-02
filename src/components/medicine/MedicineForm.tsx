@@ -157,7 +157,7 @@ export function MedicineForm({
               {preview.isPdf ? (
                 <p className="flex items-center gap-2"><FileText className="h-5 w-5" aria-hidden="true" /> {preview.name} (PDF selected)</p>
               ) : (
-                <img src={preview.url} alt="Prescription preview" className="max-h-64 rounded-lg border" />
+                <img src={preview.url} alt="Prescription preview" className="block h-auto max-h-64 max-w-full rounded-lg border object-contain" />
               )}
               <label className="mt-3 flex items-start gap-2">
                 <input type="checkbox" className="mt-1 h-5 w-5" checked={verified} onChange={(e) => setVerified(e.target.checked)} />

@@ -140,7 +140,7 @@ export default function FamilyPage() {
     <PageShell title="Family Care" subtitle="Stay connected with the people who care about you.">
       <div className="section-gap">
         {error && <p role="alert" className="rounded-2xl border-2 border-red-200 bg-red-50 p-4 font-semibold text-red-800">{error}</p>}
-        <section className="hero-section relative p-6 md:p-8">
+        <section className="hero-section relative p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
           <div className="relative z-10 max-w-2xl">
             <div className="mb-5 flex items-center gap-3">
               <span className="icon-badge bg-white"><Heart className="h-6 w-6 fill-current text-[#78947b]" aria-hidden="true" /></span>
@@ -150,7 +150,9 @@ export default function FamilyPage() {
             <p className="mt-3 text-lg text-[#4f6857]">Invite someone you trust and decide exactly what they can see.</p>
           </div>
           <Sparkles className="absolute right-8 top-8 h-16 w-16 text-[#78947b]/50" aria-hidden="true" />
-          <Image src="/images/illustrations/family-care.png" alt="Family members caring for one another" width={1212} height={792} className="illustration absolute bottom-0 right-0 hidden h-40 w-56 md:block" />
+          <div className="mt-6 flex justify-center md:mt-0 md:shrink-0">
+            <Image src="/images/illustrations/family-care.png" alt="Family members caring for one another" width={1212} height={792} className="illustration h-auto w-56 max-w-full" />
+          </div>
         </section>
 
         <Card>
