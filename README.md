@@ -43,7 +43,7 @@ The Settings page keeps browser notifications, sound, volume, and vibration inde
 - Sound starts only after a user interaction because of autoplay policies.
 - Vibration is enabled only when the device exposes the Vibration API.
 - Foreground reminders use the existing schedule engine and refresh when the tab becomes visible.
-- Background reminders use `/public/sw.js`, Web Push subscriptions, a Supabase timezone-aware due-reminder function, and the Vercel Cron route in `vercel.json`.
+- Background reminders use `/public/sw.js`, Web Push subscriptions, and a Supabase timezone-aware due-reminder function. The secured `/api/push/dispatch-due` endpoint can be called by Vercel Cron on plans that support the required schedule or by another trusted scheduler.
 
 For push subscriptions and background delivery, add these environment variables to Vercel and local development. Only the `NEXT_PUBLIC_*` values are sent to browsers:
 
@@ -57,7 +57,7 @@ VAPID_SUBJECT=mailto:alerts@example.com
 CRON_SECRET=your-long-random-secret
 ```
 
-Generate a VAPID pair with `npx web-push generate-vapid-keys`. Never commit the private key or service-role key. Run migrations `001`, `002`, and `003` in Supabase. Vercel Cron must be available on the selected plan; otherwise invoke `/api/push/dispatch-due` every minute from a trusted scheduler with `Authorization: Bearer $CRON_SECRET`.
+Generate a VAPID pair with `npx web-push generate-vapid-keys`. Never commit the private key or service-role key. Run migrations `001`, `002`, and `003` in Supabase. Vercel Hobby does not allow the every-minute schedule required for timely medicine reminders, so this project does not declare a Vercel Cron job by default. On Hobby, invoke `/api/push/dispatch-due` every minute from a trusted external scheduler with `Authorization: Bearer $CRON_SECRET`, or upgrade to a Vercel plan that supports that schedule before adding a Cron configuration.
 
 Closed-browser delivery depends on operating-system support. iOS requires an installed Home Screen web app and user permission; desktop and Android support varies by browser. If a capability is unavailable, the UI reports it instead of claiming success. Family caregiver alerts still require a real authenticated Supabase account and a granted caregiver connection; demo mode remains local-only.
 
@@ -66,8 +66,8 @@ Closed-browser delivery depends on operating-system support. iOS requires an ins
 2. Import the repository in Vercel and keep the default Next.js build settings.
 3. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` under Vercel **Project Settings → Environment Variables** for Production, Preview, and Development.
 4. Add the server-only push variables above for Production.
-5. Set the Vercel Root Directory to `meditrack` when the repository contains this project in a nested folder.
-6. Redeploy after saving the environment variables and confirm the Cron entry is active.
+5. Keep the Vercel Root Directory set to `./` when the project files are at the repository root.
+6. Redeploy after saving the environment variables. Configure a trusted scheduler separately if background push delivery is required on Vercel Hobby.
 
 ## Structure
 - `src/app` – pages (landing, login, register, dashboard, medicines, schedule, family, history, settings)
