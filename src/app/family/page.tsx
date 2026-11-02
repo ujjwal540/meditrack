@@ -124,6 +124,13 @@ export default function FamilyPage() {
 
   useEffect(() => {
     void reload();
+    if (!supabase) return;
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
+        void reload();
+      }
+    });
+    return () => data.subscription.unsubscribe();
   }, []);
 
   const localUpdates = useMemo<RemoteActivity[]>(
