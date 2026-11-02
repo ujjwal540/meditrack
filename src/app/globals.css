@@ -15,8 +15,8 @@
   --color-muted: var(--text-secondary);
   --color-accent: var(--warning);
   --color-danger: var(--danger);
-  --font-sans: var(--font-dm-sans), Arial, sans-serif;
-  --font-display: var(--font-lora), Georgia, serif;
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
   --shadow-soft: var(--shadow-card);
 }
 
