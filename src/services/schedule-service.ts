@@ -4,7 +4,14 @@ import { readJSON, writeJSON } from "@/lib/utils";
 const LOGS_KEY = "meditrack.dose_logs";
 const SETTINGS_KEY = "meditrack.settings";
 
-export const DEFAULT_SETTINGS: AppSettings = { snoozeMinutes: 10, graceMinutes: 30 };
+export const DEFAULT_SETTINGS: AppSettings = {
+  snoozeMinutes: 10,
+  graceMinutes: 30,
+  notificationsEnabled: true,
+  soundEnabled: true,
+  soundVolume: 0.35,
+  vibrationEnabled: true,
+};
 
 export function getLogs(): Record<string, DoseLog> {
   return readJSON<Record<string, DoseLog>>(LOGS_KEY, {});
@@ -16,7 +23,27 @@ export function saveLog(log: DoseLog): void {
 }
 
 export function getSettings(): AppSettings {
-  return { ...DEFAULT_SETTINGS, ...readJSON<Partial<AppSettings>>(SETTINGS_KEY, {}) };
+  const stored = readJSON<Partial<AppSettings>>(SETTINGS_KEY, {});
+  return {
+    snoozeMinutes: [5, 10, 15, 30].includes(stored.snoozeMinutes ?? -1)
+      ? stored.snoozeMinutes!
+      : DEFAULT_SETTINGS.snoozeMinutes,
+    graceMinutes: [15, 30, 45, 60].includes(stored.graceMinutes ?? -1)
+      ? stored.graceMinutes!
+      : DEFAULT_SETTINGS.graceMinutes,
+    notificationsEnabled: typeof stored.notificationsEnabled === "boolean"
+      ? stored.notificationsEnabled
+      : DEFAULT_SETTINGS.notificationsEnabled,
+    soundEnabled: typeof stored.soundEnabled === "boolean"
+      ? stored.soundEnabled
+      : DEFAULT_SETTINGS.soundEnabled,
+    soundVolume: typeof stored.soundVolume === "number" && Number.isFinite(stored.soundVolume)
+      ? Math.min(1, Math.max(0.05, stored.soundVolume))
+      : DEFAULT_SETTINGS.soundVolume,
+    vibrationEnabled: typeof stored.vibrationEnabled === "boolean"
+      ? stored.vibrationEnabled
+      : DEFAULT_SETTINGS.vibrationEnabled,
+  };
 }
 
 export function saveSettings(settings: AppSettings): void {

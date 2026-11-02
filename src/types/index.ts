@@ -49,4 +49,8 @@ export interface CaregiverConnection {
 export interface AppSettings {
   snoozeMinutes: number;
   graceMinutes: number; // how long a dose may stay unconfirmed before a caregiver alert
+  notificationsEnabled: boolean;
+  soundEnabled: boolean;
+  soundVolume: number;
+  vibrationEnabled: boolean;
 }

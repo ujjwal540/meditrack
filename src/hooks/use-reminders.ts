@@ -25,9 +25,19 @@ export function useReminders() {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [logs, setLogs] = useState<Record<string, DoseLog>>({});
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
-  const [now, setNow] = useState<Date>(() => new Date());
+  const [now, setNow] = useState<Date>(() => new Date(0));
   const notified = useRef<Set<string>>(new Set());
-  const { permission, request, notify } = useNotifications();
+  const {
+    permission,
+    request,
+    notify,
+    testNotification,
+    testSound,
+    testVibration,
+    soundSupported,
+    vibrationSupported,
+    pushStatus,
+  } = useNotifications(settings);
 
   const refresh = useCallback(() => {
     setMedicines(getMedicines());
@@ -44,7 +54,14 @@ export function useReminders() {
   // Check the schedule every 15 seconds.
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 15000);
-    return () => clearInterval(id);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") setNow(new Date());
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, []);
 
   const today = toISODate(now);
@@ -128,5 +145,11 @@ export function useReminders() {
     removeMedicine: remove,
     notificationPermission: permission,
     requestNotifications: request,
+    testNotification,
+    testSound,
+    testVibration,
+    soundSupported,
+    vibrationSupported,
+    pushStatus,
   };
 }
