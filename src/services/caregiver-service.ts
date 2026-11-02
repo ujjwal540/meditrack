@@ -1,5 +1,5 @@
 import type { CaregiverConnection, ConsentStatus } from "@/types";
-import { supabase } from "@/lib/supabase";
+import { supabase, waitForSupabaseAuth } from "@/lib/supabase";
 import { readJSON, uid, writeJSON } from "@/lib/utils";
 
 const KEY = "meditrack.caregivers";
@@ -28,9 +28,12 @@ function fromRow(row: ConnectionRow): CaregiverConnection {
 
 export async function getConnections(): Promise<CaregiverConnection[]> {
   if (!supabase) return readJSON<CaregiverConnection[]>(KEY, []);
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError) throw new Error(`Could not load your account: ${sessionError.message}`);
-  if (!sessionData.session) return [];
+  const session = await waitForSupabaseAuth();
+  if (!session) return [];
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError?.name === "AuthSessionMissingError") return [];
+  if (userError) throw new Error(`Could not load your account: ${userError.message}`);
+  if (!userData.user) return [];
   const { data, error } = await supabase
     .from("caregiver_connections")
     .select("id, patient_id, caregiver_id, caregiver_email, consent_status, created_at")
@@ -41,7 +44,10 @@ export async function getConnections(): Promise<CaregiverConnection[]> {
 
 export async function getCurrentUserId(): Promise<string | null> {
   if (!supabase) return null;
+  const session = await waitForSupabaseAuth();
+  if (!session) return null;
   const { data, error } = await supabase.auth.getUser();
+  if (error?.name === "AuthSessionMissingError") return null;
   if (error) throw new Error(`Could not load your account: ${error.message}`);
   return data.user?.id ?? null;
 }

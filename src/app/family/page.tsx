@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   AlertTriangle,
   Bell,
@@ -28,6 +29,7 @@ import {
 } from "@/services/caregiver-service";
 import { formatTime } from "@/utils/date-utils";
 import Image from "next/image";
+import { waitForSupabaseAuth } from "@/lib/supabase";
 
 type RemoteActivity = {
   medicineName: string;
@@ -89,11 +91,27 @@ export default function FamilyPage() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(true);
 
   async function reload() {
     setError(null);
+    setLoading(true);
     try {
-      const [connections, userId] = await Promise.all([getConnections(), getCurrentUserId()]);
+      const session = await waitForSupabaseAuth();
+      if (supabase && !session) {
+        setAuthenticated(false);
+        setList([]);
+        setCurrentUserId(null);
+        setRemoteActivity([]);
+        return;
+      }
+      setAuthenticated(true);
+      const userId = await getCurrentUserId();
+      if (supabase && !userId) {
+        setAuthenticated(false);
+        return;
+      }
+      const connections = await getConnections();
       setList(connections);
       setCurrentUserId(userId);
       setRemoteActivity(await loadRemoteActivity(connections));
@@ -140,6 +158,13 @@ export default function FamilyPage() {
     <PageShell title="Family Care" subtitle="Stay connected with the people who care about you.">
       <div className="section-gap">
         {error && <p role="alert" className="rounded-2xl border-2 border-red-200 bg-red-50 p-4 font-semibold text-red-800">{error}</p>}
+        {!loading && supabase && !authenticated && (
+          <Card className="border-2 border-amber-200 bg-amber-50">
+            <h2 className="text-xl font-bold text-amber-950">Please sign in to view Family Care</h2>
+            <p className="mt-2 text-amber-900">Your session has expired or is not available on this device.</p>
+            <Link href="/login" className="mt-4 inline-flex min-h-12 items-center rounded-full bg-[#075b43] px-5 font-bold text-white">Sign in again</Link>
+          </Card>
+        )}
         <section className="hero-section relative p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
           <div className="relative z-10 max-w-2xl">
             <div className="mb-5 flex items-center gap-3">
