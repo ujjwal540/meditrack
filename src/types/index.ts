@@ -9,6 +9,7 @@ export interface Medicine {
   endDate?: string; // YYYY-MM-DD
   times: string[]; // ["08:00", "20:00"]
   notes?: string;
+  type?: "tablet" | "capsule" | "injection" | "other";
   createdAt: string;
 }
 
@@ -28,6 +29,7 @@ export interface Dose {
   medicineName: string;
   dosage: string;
   instructions: string;
+  type?: "tablet" | "capsule" | "injection" | "other";
   date: string;
   time: string;
   status: DoseStatus;
@@ -40,6 +42,8 @@ export type ConsentStatus = "invited" | "accepted" | "granted" | "revoked";
 
 export interface CaregiverConnection {
   id: string;
+  patientId?: string;
+  caregiverId?: string;
   caregiverEmail: string;
   caregiverName?: string;
   consentStatus: ConsentStatus;
@@ -47,10 +51,30 @@ export interface CaregiverConnection {
 }
 
 export interface AppSettings {
+  easyMode: boolean;
+  voiceEnabled: boolean;
   snoozeMinutes: number;
   graceMinutes: number; // how long a dose may stay unconfirmed before a caregiver alert
   notificationsEnabled: boolean;
   soundEnabled: boolean;
   soundVolume: number;
   vibrationEnabled: boolean;
+}
+
+export interface HealthMeasurement {
+  id: string;
+  type: "blood_pressure" | "weight" | "blood_sugar" | "heart_rate" | "other";
+  value: string;
+  unit?: string;
+  recordedAt: string;
+  note?: string;
+}
+
+export interface Appointment {
+  id: string;
+  title: string;
+  provider?: string;
+  date: string;
+  time?: string;
+  note?: string;
 }

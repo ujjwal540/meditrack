@@ -1,20 +1,24 @@
 "use client";
 
+import { Suspense } from "react";
 import { PageShell } from "@/components/layout/PageShell";
 import { Card } from "@/components/ui/Card";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useMediTrack } from "@/components/reminders/ReminderProvider";
 import { formatTime } from "@/utils/date-utils";
+import { useSearchParams } from "next/navigation";
 
-export default function HistoryPage() {
+function HistoryContent() {
   const { logs, medicines } = useMediTrack();
+  const searchParams = useSearchParams();
+  const medicineId = searchParams.get("medicineId");
   const names = new Map(medicines.map((m) => [m.id, m.name]));
   const rows = Object.values(logs).sort((a, b) =>
     `${b.date}${b.time}`.localeCompare(`${a.date}${a.time}`),
-  );
+  ).filter((row) => !medicineId || row.medicineId === medicineId);
 
   return (
-    <PageShell title="History" subtitle="Every dose you have responded to.">
+    <PageShell title="History" subtitle={medicineId ? `Dose history for ${names.get(medicineId) ?? "this medicine"}.` : "Every dose you have responded to."}>
       {rows.length === 0 ? (
         <Card className="text-slate-600">No dose records yet.</Card>
       ) : (
@@ -41,5 +45,13 @@ export default function HistoryPage() {
         </Card>
       )}
     </PageShell>
+  );
+}
+
+export default function HistoryPage() {
+  return (
+    <Suspense fallback={<PageShell title="History" subtitle="Loading dose history…"><Card>Loading…</Card></PageShell>}>
+      <HistoryContent />
+    </Suspense>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AppSettings, DoseLog, DoseStatus, Medicine } from "@/types";
-import { addMedicine, deleteMedicine, getMedicines } from "@/services/medicine-service";
+import { addMedicine, deleteMedicine, getMedicines, updateMedicine } from "@/services/medicine-service";
 import {
   DEFAULT_SETTINGS,
   getLogs,
@@ -36,6 +36,8 @@ export function useReminders() {
     testVibration,
     soundSupported,
     vibrationSupported,
+    voiceSupported,
+    speak,
     pushStatus,
   } = useNotifications(settings);
 
@@ -84,6 +86,22 @@ export function useReminders() {
     }
   }, [dueDoses, notify]);
 
+  useEffect(() => {
+    const overdue = doses.filter((dose) => dose.status === "not_confirmed" && !logs[dose.key]);
+    if (overdue.length === 0) return;
+    for (const dose of overdue) {
+      saveLog({
+        key: dose.key,
+        medicineId: dose.medicineId,
+        date: dose.date,
+        time: dose.time,
+        status: "not_confirmed",
+        recordedAt: new Date().toISOString(),
+      });
+    }
+    setLogs(getLogs());
+  }, [doses, logs]);
+
   const respond = useCallback(
     (key: string, status: DoseStatus, snoozeMinutes?: number) => {
       const dose = doses.find((d) => d.key === key);
@@ -103,8 +121,9 @@ export function useReminders() {
       });
       setLogs(getLogs());
       setNow(new Date());
+      if (status === "taken") speak("Your medicine has been marked as taken.");
     },
-    [doses],
+    [doses, speak],
   );
 
   const add = useCallback(
@@ -118,6 +137,14 @@ export function useReminders() {
   const remove = useCallback(
     (id: string) => {
       deleteMedicine(id);
+      refresh();
+    },
+    [refresh],
+  );
+
+  const update = useCallback(
+    (id: string, input: Omit<Medicine, "id" | "createdAt">) => {
+      updateMedicine(id, input);
       refresh();
     },
     [refresh],
@@ -142,6 +169,7 @@ export function useReminders() {
     updateSettings,
     respond,
     addMedicine: add,
+    updateMedicine: update,
     removeMedicine: remove,
     notificationPermission: permission,
     requestNotifications: request,
@@ -150,6 +178,8 @@ export function useReminders() {
     testVibration,
     soundSupported,
     vibrationSupported,
+    voiceSupported,
+    speak,
     pushStatus,
   };
 }

@@ -10,6 +10,7 @@ export type NotificationCapabilities = {
   permission: Permission;
   soundSupported: boolean;
   vibrationSupported: boolean;
+  voiceSupported: boolean;
   pushStatus: "unavailable" | "ready" | "error";
 };
 
@@ -37,11 +38,13 @@ function encodeVapidKey(value: string): ArrayBuffer {
 
 export function useNotifications({
   notificationsEnabled,
+  voiceEnabled,
   soundEnabled,
   soundVolume,
   vibrationEnabled,
 }: {
   notificationsEnabled: boolean;
+  voiceEnabled: boolean;
   soundEnabled: boolean;
   soundVolume: number;
   vibrationEnabled: boolean;
@@ -49,6 +52,7 @@ export function useNotifications({
   const [permission, setPermission] = useState<Permission>("default");
   const [audioSupported, setAudioSupported] = useState(false);
   const [vibrationSupported, setVibrationSupported] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(false);
   const [pushStatus, setPushStatus] = useState<NotificationCapabilities["pushStatus"]>("unavailable");
   const audioContext = useRef<AudioContext | null>(null);
   const permissionRequestInFlight = useRef(false);
@@ -57,6 +61,7 @@ export function useNotifications({
     setPermission(typeof Notification === "undefined" ? "unsupported" : Notification.permission);
     setAudioSupported(Boolean(getAudioContextConstructor()));
     setVibrationSupported(typeof navigator !== "undefined" && "vibrate" in navigator);
+    setVoiceSupported(typeof window !== "undefined" && "speechSynthesis" in window);
   }, []);
 
   const ensureAudio = useCallback(async () => {
@@ -104,6 +109,20 @@ export function useNotifications({
       return false;
     }
   }, []);
+
+  const speak = useCallback((message: string) => {
+    if (!voiceEnabled || typeof window === "undefined" || !("speechSynthesis" in window)) return false;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(message);
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      window.speechSynthesis.speak(utterance);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [voiceEnabled]);
 
   const registerPush = useCallback(async () => {
     const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -174,12 +193,15 @@ export function useNotifications({
     }
     if (soundEnabled) void playSound();
     if (vibrationEnabled) vibrate();
-  }, [notificationsEnabled, playSound, soundEnabled, vibrationEnabled, vibrate]);
+    speak(`${title}. ${body}`);
+  }, [notificationsEnabled, playSound, soundEnabled, vibrationEnabled, vibrate, speak]);
 
   return {
     permission,
     soundSupported: audioSupported,
     vibrationSupported,
+    voiceSupported,
+    speak,
     pushStatus,
     request,
     notify,

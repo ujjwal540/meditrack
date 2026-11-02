@@ -1,34 +1,42 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText, Plus, Trash2, Upload } from "lucide-react";
+import { FileText, Plus, Trash2, Upload, X } from "lucide-react";
 import type { Medicine } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { MedicineTypePicker } from "@/components/medicine/MedicineTypePicker";
+import type { MedType } from "@/components/ui/PillIcon";
 import { toISODate } from "@/utils/date-utils";
 import { validateMedicine, validateUpload } from "@/utils/validation";
 
-const input =
-  "mt-1 w-full min-h-12 rounded-xl border-2 border-slate-300 bg-white px-3 text-base focus-visible:outline-3 focus-visible:outline-secondary";
+const input = "form-input";
 
 export function MedicineForm({
   onSave,
+  initialMedicine,
+  onCancel,
 }: {
   onSave: (m: Omit<Medicine, "id" | "createdAt">) => void;
+  initialMedicine?: Medicine;
+  onCancel?: () => void;
 }) {
-  const [name, setName] = useState("");
-  const [dosage, setDosage] = useState("");
-  const [instructions, setInstructions] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [times, setTimes] = useState<string[]>(["08:00"]);
-  const [notes, setNotes] = useState("");
+  const [name, setName] = useState(initialMedicine?.name ?? "");
+  const [dosage, setDosage] = useState(initialMedicine?.dosage ?? "");
+  const [instructions, setInstructions] = useState(initialMedicine?.instructions ?? "");
+  const [startDate, setStartDate] = useState(initialMedicine?.startDate ?? "");
+  const [endDate, setEndDate] = useState(initialMedicine?.endDate ?? "");
+  const [times, setTimes] = useState<string[]>(initialMedicine?.times ?? ["08:00"]);
+  const [notes, setNotes] = useState(initialMedicine?.notes ?? "");
+  const [type, setType] = useState<MedType>(initialMedicine?.type ?? "tablet");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [fileError, setFileError] = useState<string | null>(null);
   const [preview, setPreview] = useState<{ url: string; name: string; isPdf: boolean } | null>(null);
   const [verified, setVerified] = useState(false);
 
-  useEffect(() => setStartDate(toISODate(new Date())), []);
+  useEffect(() => {
+    if (!initialMedicine) setStartDate(toISODate(new Date()));
+  }, [initialMedicine]);
   useEffect(() => () => { if (preview) URL.revokeObjectURL(preview.url); }, [preview]);
 
   function onFile(file?: File) {
@@ -41,49 +49,64 @@ export function MedicineForm({
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const data = { name, dosage, instructions, startDate, endDate: endDate || undefined, times };
+    const data = { name, dosage, instructions, startDate, endDate: endDate || undefined, times, type };
     const errs = validateMedicine(data);
     if (preview && !verified) errs.verified = "Please confirm the details match your prescription.";
     setErrors(errs);
     if (Object.keys(errs).length) return;
     onSave({ ...data, times: times.filter(Boolean), notes: notes || undefined });
-    setName(""); setDosage(""); setInstructions(""); setEndDate(""); setNotes("");
-    setTimes(["08:00"]); setPreview(null); setVerified(false);
+    if (!initialMedicine) {
+      setName(""); setDosage(""); setInstructions(""); setEndDate(""); setNotes("");
+      setTimes(["08:00"]); setType("tablet"); setPreview(null); setVerified(false);
+    }
   }
 
   const err = (k: string) =>
     errors[k] ? <p role="alert" className="mt-1 text-sm font-medium text-red-700">{errors[k]}</p> : null;
 
   return (
-    <Card>
+    <Card className="relative">
+      {onCancel && (
+        <button type="button" onClick={onCancel} className="icon-button absolute right-4 top-4" aria-label="Close medicine editor">
+          <X className="h-5 w-5" aria-hidden="true" />
+        </button>
+      )}
+      <div className="mb-5 flex items-center gap-3">
+        <span className="icon-badge text-2xl" aria-hidden="true">💊</span>
+        <div>
+          <h2 className="text-xl font-bold text-[#355b48]">{initialMedicine ? "Edit medicine" : "Add a medicine"}</h2>
+          <p className="text-sm text-[#707a73]">Step 1 of 1 · Enter the details exactly as prescribed.</p>
+        </div>
+      </div>
       <form onSubmit={submit} className="grid gap-4 md:grid-cols-2" noValidate>
-        <label className="block font-medium">
+        <MedicineTypePicker value={type} onChange={setType} />
+        <label className="form-label block">
           Medicine name
           <input className={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Vitamin D" />
           {err("name")}
         </label>
-        <label className="block font-medium">
+        <label className="form-label block">
           Prescribed dosage
           <input className={input} value={dosage} onChange={(e) => setDosage(e.target.value)} placeholder="e.g. 1 tablet" />
           {err("dosage")}
         </label>
-        <label className="block font-medium md:col-span-2">
+        <label className="form-label block md:col-span-2">
           Instructions from your doctor
           <input className={input} value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder="e.g. After breakfast" />
         </label>
-        <label className="block font-medium">
+        <label className="form-label block">
           Start date
           <input type="date" className={input} value={startDate} onChange={(e) => setStartDate(e.target.value)} />
           {err("startDate")}
         </label>
-        <label className="block font-medium">
+        <label className="form-label block">
           End date (optional)
           <input type="date" className={input} value={endDate} onChange={(e) => setEndDate(e.target.value)} />
           {err("endDate")}
         </label>
 
         <fieldset className="md:col-span-2">
-          <legend className="font-medium">Reminder times</legend>
+        <legend className="form-label">Reminder times</legend>
           <div className="mt-1 flex flex-wrap gap-3">
             {times.map((t, i) => (
               <div key={i} className="flex items-center gap-2">
@@ -113,7 +136,7 @@ export function MedicineForm({
           {err("times")}
         </fieldset>
 
-        <label className="block font-medium md:col-span-2">
+        <label className="form-label block md:col-span-2">
           Notes (optional)
           <textarea className={input + " py-2"} rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
         </label>
@@ -134,7 +157,6 @@ export function MedicineForm({
               {preview.isPdf ? (
                 <p className="flex items-center gap-2"><FileText className="h-5 w-5" aria-hidden="true" /> {preview.name} (PDF selected)</p>
               ) : (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img src={preview.url} alt="Prescription preview" className="max-h-64 rounded-lg border" />
               )}
               <label className="mt-3 flex items-start gap-2">
@@ -148,7 +170,10 @@ export function MedicineForm({
         </div>
 
         <div className="md:col-span-2">
-          <Button type="submit" className="w-full md:w-auto">Save medicine and schedule</Button>
+          <div className="flex flex-wrap gap-3">
+            <Button type="submit" className="w-full md:w-auto">{initialMedicine ? "Save changes" : "Save medicine and schedule"}</Button>
+            {onCancel && <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>}
+          </div>
         </div>
       </form>
     </Card>

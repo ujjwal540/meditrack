@@ -20,11 +20,12 @@ export function formatTime(time: string): string {
   return `${h % 12 || 12}:${pad(m)} ${h >= 12 ? "PM" : "AM"}`;
 }
 
-export function periodOf(time: string): "Morning" | "Afternoon" | "Evening" {
+export function periodOf(time: string): "Morning" | "Afternoon" | "Evening" | "Night" {
   const h = Number(time.split(":")[0]);
   if (h < 12) return "Morning";
   if (h < 17) return "Afternoon";
-  return "Evening";
+  if (h < 21) return "Evening";
+  return "Night";
 }
 
 export function isActiveOn(med: Medicine, date: string): boolean {
@@ -55,6 +56,7 @@ export function buildDosesForDate(
         medicineName: med.name,
         dosage: med.dosage,
         instructions: med.instructions,
+        type: med.type ?? "tablet",
         date,
         time,
         status,

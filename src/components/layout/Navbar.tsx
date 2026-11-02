@@ -3,64 +3,70 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, History, LayoutDashboard, Pill, Settings, Users } from "lucide-react";
+import { HeartPulse, Home, Pill, UserRound, Users, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const links = [
-  { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
-  { href: "/medicines", label: "Medicines", Icon: Pill },
-  { href: "/schedule", label: "Schedule", Icon: CalendarDays },
-  { href: "/family", label: "Family", Icon: Users },
-  { href: "/history", label: "History", Icon: History },
-  { href: "/settings", label: "Settings", Icon: Settings },
+const items: { href: string; label: string; Icon: LucideIcon; also: string[] }[] = [
+  { href: "/dashboard", label: "Home", Icon: Home, also: [] },
+  { href: "/medicines", label: "Medicines", Icon: Pill, also: ["/schedule"] },
+  { href: "/health", label: "Health", Icon: HeartPulse, also: ["/history"] },
+  { href: "/family", label: "Family", Icon: Users, also: [] },
+  { href: "/settings", label: "Profile", Icon: UserRound, also: [] },
 ];
 
 export function Navbar() {
-  const pathname = usePathname();
+  const path = usePathname();
+  const isActive = (item: (typeof items)[number]) =>
+    path === item.href || item.also.includes(path);
+
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-slate-900">
-          <Image src="/logo.svg" alt="" width={32} height={32} />
+    <>
+      <aside
+        aria-label="Main"
+        className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-black/5 bg-[#faf6ee] p-5 md:flex"
+      >
+        <Link href="/dashboard" className="mb-8 flex items-center gap-3 font-display text-2xl font-bold text-forest">
+          <Image src="/logo.svg" alt="" width={40} height={40} />
           MediTrack
         </Link>
-        <nav aria-label="Main" className="ml-auto hidden gap-1 md:flex">
-          {links.map(({ href, label, Icon }) => (
+        <nav className="space-y-2">
+          {items.map((item) => (
             <Link
-              key={href}
-              href={href}
-              aria-current={pathname === href ? "page" : undefined}
+              key={item.href}
+              href={item.href}
+              aria-current={isActive(item) ? "page" : undefined}
               className={cn(
-                "flex items-center gap-2 rounded-lg px-3 py-2 text-base font-medium",
-                pathname === href ? "bg-teal-50 text-primary" : "text-slate-700 hover:bg-slate-100",
+                "flex min-h-14 items-center gap-4 rounded-2xl px-4 text-lg font-extrabold transition-colors",
+                isActive(item) ? "bg-forest text-white shadow-soft" : "text-ink hover:bg-mint",
               )}
             >
-              <Icon className="h-5 w-5" aria-hidden="true" />
-              {label}
+              <item.Icon className="h-6 w-6" aria-hidden="true" />
+              {item.label}
             </Link>
           ))}
         </nav>
-      </div>
-      {/* Mobile bottom navigation */}
+      </aside>
       <nav
         aria-label="Main mobile"
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-slate-200 bg-white md:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-black/5 bg-[#3a3d37]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
-        {links.map(({ href, label, Icon }) => (
+        {items.map((item) => (
           <Link
-            key={href}
-            href={href}
-            aria-current={pathname === href ? "page" : undefined}
+            key={item.href}
+            href={item.href}
+            aria-current={isActive(item) ? "page" : undefined}
             className={cn(
-              "flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium",
-              pathname === href ? "text-primary" : "text-slate-600",
+              "flex min-h-[4.25rem] flex-col items-center justify-center gap-1 text-[0.8rem] font-extrabold",
+              isActive(item) ? "text-ink" : "text-cream",
             )}
           >
-            <Icon className="h-5 w-5" aria-hidden="true" />
-            {label}
+            <span className={cn("grid h-9 w-14 place-items-center rounded-full", isActive(item) && "bg-accent")}>
+              <item.Icon className="h-6 w-6" aria-hidden="true" />
+            </span>
+            {item.label}
           </Link>
         ))}
       </nav>
-    </header>
+    </>
   );
 }

@@ -20,6 +20,22 @@ export function addMedicine(input: Omit<Medicine, "id" | "createdAt">): Medicine
   return medicine;
 }
 
+export function updateMedicine(
+  id: string,
+  input: Omit<Medicine, "id" | "createdAt">,
+): Medicine | undefined {
+  const medicines = getMedicines();
+  const existing = medicines.find((medicine) => medicine.id === id);
+  if (!existing) return undefined;
+  const updated: Medicine = {
+    ...existing,
+    ...input,
+    times: [...new Set(input.times)].sort(),
+  };
+  writeJSON(KEY, medicines.map((medicine) => (medicine.id === id ? updated : medicine)));
+  return updated;
+}
+
 export function deleteMedicine(id: string): void {
   writeJSON(KEY, getMedicines().filter((m) => m.id !== id));
 }

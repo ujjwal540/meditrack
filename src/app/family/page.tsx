@@ -1,63 +1,190 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Mail, ShieldCheck, UsersRound } from "lucide-react";
-import type { CaregiverConnection, ConsentStatus } from "@/types";
+import { useEffect, useMemo, useState } from "react";
+import {
+  AlertTriangle,
+  Bell,
+  CheckCircle2,
+  Heart,
+  Mail,
+  ShieldCheck,
+  Sparkles,
+  UsersRound,
+} from "lucide-react";
+import type { CaregiverConnection, ConsentStatus, Dose, DoseLog } from "@/types";
 import { PageShell } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { CaregiverCard } from "@/components/family/CaregiverCard";
-import { getConnections, inviteCaregiver, removeConnection, setConsent } from "@/services/caregiver-service";
+import { useMediTrack } from "@/components/reminders/ReminderProvider";
+import { supabase } from "@/lib/supabase";
+import {
+  acceptInvitation,
+  getConnections,
+  getCurrentUserId,
+  inviteCaregiver,
+  removeConnection,
+  setConsent,
+} from "@/services/caregiver-service";
+import { formatTime } from "@/utils/date-utils";
+import Image from "next/image";
+
+type RemoteActivity = {
+  medicineName: string;
+  dosage: string;
+  status: DoseLog["status"];
+  time: string;
+  date: string;
+};
+
+async function loadRemoteActivity(connections: CaregiverConnection[]): Promise<RemoteActivity[]> {
+  if (!supabase) return [];
+  const patientIds = connections
+    .filter((connection) => connection.consentStatus === "granted" && connection.patientId)
+    .map((connection) => connection.patientId!);
+  if (patientIds.length === 0) return [];
+
+  const { data: medicines, error: medicineError } = await supabase
+    .from("medicines")
+    .select("id, medicine_name, dosage, medicine_schedules(id, reminder_time), patient_id")
+    .in("patient_id", patientIds);
+  if (medicineError) throw new Error(`Could not load shared medicines: ${medicineError.message}`);
+
+  const schedules = (medicines ?? []).flatMap((medicine) =>
+    (medicine.medicine_schedules ?? []).map((schedule: { id: string; reminder_time: string }) => ({
+      ...schedule,
+      medicineName: medicine.medicine_name as string,
+      dosage: medicine.dosage as string,
+    })),
+  );
+  if (schedules.length === 0) return [];
+
+  const { data: logs, error: logError } = await supabase
+    .from("dose_logs")
+    .select("schedule_id, scheduled_at, status")
+    .in("schedule_id", schedules.map((schedule) => schedule.id))
+    .order("scheduled_at", { ascending: false })
+    .limit(20);
+  if (logError) throw new Error(`Could not load shared dose updates: ${logError.message}`);
+
+  return (logs ?? []).map((log) => {
+    const schedule = schedules.find((item) => item.id === log.schedule_id);
+    const scheduled = new Date(log.scheduled_at);
+    return {
+      medicineName: schedule?.medicineName ?? "Medicine",
+      dosage: schedule?.dosage ?? "",
+      status: log.status as DoseLog["status"],
+      time: schedule?.reminder_time ?? scheduled.toISOString().slice(11, 16),
+      date: scheduled.toLocaleDateString(),
+    };
+  });
+}
 
 export default function FamilyPage() {
+  const { doses } = useMediTrack();
   const [list, setList] = useState<CaregiverConnection[]>([]);
+  const [remoteActivity, setRemoteActivity] = useState<RemoteActivity[]>([]);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => setList(getConnections()), []);
-  const reload = () => setList(getConnections());
+  async function reload() {
+    setError(null);
+    try {
+      const [connections, userId] = await Promise.all([getConnections(), getCurrentUserId()]);
+      setList(connections);
+      setCurrentUserId(userId);
+      setRemoteActivity(await loadRemoteActivity(connections));
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Could not load family care.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void reload();
+  }, []);
+
+  const localUpdates = useMemo<RemoteActivity[]>(
+    () =>
+      doses
+        .filter((dose) => dose.status === "taken" || dose.status === "not_confirmed")
+        .slice(0, 8)
+        .map((dose: Dose) => ({
+          medicineName: dose.medicineName,
+          dosage: dose.dosage,
+          status: dose.status,
+          time: dose.time,
+          date: dose.date,
+        })),
+    [doses],
+  );
+  const activity = supabase ? remoteActivity : localUpdates;
+  const missed = activity.filter((item) => item.status === "not_confirmed");
+  const upcoming = doses.filter((dose) => dose.status === "pending").slice(0, 2);
+
+  async function run(action: () => Promise<void>) {
+    setError(null);
+    try {
+      await action();
+      await reload();
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : "Family action could not be completed.");
+    }
+  }
 
   return (
-    <PageShell title="Family Care" subtitle="You decide who can see your dose status.">
-      <div className="space-y-6">
-        <Card className="border-teal-100 bg-gradient-to-br from-white to-teal-50/60">
+    <PageShell title="Family Care" subtitle="Stay connected with the people who care about you.">
+      <div className="section-gap">
+        {error && <p role="alert" className="rounded-2xl border-2 border-red-200 bg-red-50 p-4 font-semibold text-red-800">{error}</p>}
+        <section className="hero-section relative p-6 md:p-8">
+          <div className="relative z-10 max-w-2xl">
+            <div className="mb-5 flex items-center gap-3">
+              <span className="icon-badge bg-white"><Heart className="h-6 w-6 fill-current text-[#78947b]" aria-hidden="true" /></span>
+              <p className="font-bold uppercase tracking-[0.16em] text-[#78947b]">Care circle</p>
+            </div>
+            <h2 className="text-3xl font-bold text-[#355b48]">Care is closer than you think.</h2>
+            <p className="mt-3 text-lg text-[#4f6857]">Invite someone you trust and decide exactly what they can see.</p>
+          </div>
+          <Sparkles className="absolute right-8 top-8 h-16 w-16 text-[#78947b]/50" aria-hidden="true" />
+          <Image src="/images/illustrations/family-care.png" alt="Family members caring for one another" width={1212} height={792} className="illustration absolute bottom-0 right-0 hidden h-40 w-56 md:block" />
+        </section>
+
+        <Card>
           <div className="mb-5 flex items-start gap-3">
-            <span className="rounded-xl bg-teal-100 p-3 text-teal-700"><UsersRound className="h-6 w-6" aria-hidden="true" /></span>
+            <span className="icon-badge"><UsersRound className="h-6 w-6" aria-hidden="true" /></span>
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">Invite a trusted caregiver</h2>
-              <p className="mt-1 text-slate-600">Share updates only with someone you choose.</p>
+              <h2 className="text-xl font-semibold text-[#355b48]">Invite a trusted family member</h2>
+              <p className="mt-1 text-[#707a73]">They only see updates after you grant permission.</p>
             </div>
           </div>
-          <form
-            className="grid gap-3 md:grid-cols-[1fr_1fr_auto]"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (!email.trim()) return;
-              inviteCaregiver(email, name);
-              setEmail(""); setName(""); reload();
-            }}
-          >
-            <input aria-label="Family member name" placeholder="Name (optional)" value={name} onChange={(e) => setName(e.target.value)} className="min-h-12 rounded-xl border-2 border-slate-300 px-3" />
-            <input aria-label="Family member email" type="email" required placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} className="min-h-12 rounded-xl border-2 border-slate-300 px-3" />
-            <Button type="submit">Invite</Button>
+          <form className="grid gap-3 md:grid-cols-[1fr_1fr_auto]" onSubmit={(event) => {
+            event.preventDefault();
+            if (!email.trim()) return;
+            void run(async () => { await inviteCaregiver(email, name); setEmail(""); setName(""); });
+          }}>
+            <input aria-label="Family member name" placeholder="Name (optional)" value={name} onChange={(event) => setName(event.target.value)} className="form-input !mt-0" />
+            <input aria-label="Family member email" type="email" required placeholder="Email address" value={email} onChange={(event) => setEmail(event.target.value)} className="form-input !mt-0" />
+            <Button type="submit"><Mail className="h-5 w-5" aria-hidden="true" /> Send invite</Button>
           </form>
-          <p className="mt-3 flex items-start gap-2 text-sm text-slate-600">
-            <Mail className="mt-0.5 h-4 w-4 shrink-0 text-teal-700" aria-hidden="true" />
-            <span>Demo mode saves invitations on this device. It does not send email yet. Real email delivery needs a secure server email provider connected to Supabase.</span>
-          </p>
+          <p className="mt-3 flex items-start gap-2 text-sm text-[#707a73]"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#355b48]" aria-hidden="true" /> Supabase Row Level Security controls who can view shared medicines and dose updates.</p>
         </Card>
 
-        <section aria-label="Connected family">
-          {list.length === 0 ? (
-            <Card className="text-slate-600">No family members connected yet.</Card>
-          ) : (
+        <section aria-labelledby="connections-heading">
+          <h2 id="connections-heading" className="mb-3 text-2xl font-bold text-[#355b48]">Your care connections</h2>
+          {loading ? <Card>Loading secure connections…</Card> : list.length === 0 ? <Card className="text-[#707a73]">No family members connected yet.</Card> : (
             <ul className="space-y-3">
-              {list.map((c) => (
-                <li key={c.id}>
+              {list.map((connection) => (
+                <li key={connection.id}>
                   <CaregiverCard
-                    c={c}
-                    onConsent={(id, s: ConsentStatus) => { setConsent(id, s); reload(); }}
-                    onRemove={(id) => { removeConnection(id); reload(); }}
+                    c={connection}
+                    isIncoming={Boolean(currentUserId && connection.patientId !== currentUserId)}
+                    onAccept={(id) => void run(() => acceptInvitation(id))}
+                    onConsent={(id, status: ConsentStatus) => void run(() => setConsent(id, status))}
+                    onRemove={(id) => void run(() => removeConnection(id))}
                   />
                 </li>
               ))}
@@ -65,13 +192,33 @@ export default function FamilyPage() {
           )}
         </section>
 
-        <Card className="border-blue-100 bg-blue-50/60">
-          <h2 className="flex items-center gap-2 text-lg font-semibold"><ShieldCheck className="h-5 w-5 text-blue-700" aria-hidden="true" /> How alerts will work</h2>
-          <p className="mt-1 text-slate-700">
-            If a dose is still <strong>not yet confirmed</strong> after your grace period, your caregiver is told so.
-            An unconfirmed dose does not mean you missed it. You may simply not have tapped Taken.
-          </p>
-        </Card>
+        <section aria-labelledby="updates-heading" className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <div className="flex items-center gap-3">
+              <span className="icon-badge bg-[#e7f1e7]"><Bell className="h-6 w-6" aria-hidden="true" /></span>
+              <h2 id="updates-heading" className="text-xl font-bold text-[#355b48]">Medicine updates</h2>
+            </div>
+            {activity.length === 0 ? <p className="mt-4 text-[#707a73]">No shared medicine updates yet.</p> : (
+              <ul className="mt-4 space-y-3">
+                {activity.slice(0, 5).map((item, index) => (
+                  <li key={`${item.medicineName}-${item.date}-${item.time}-${index}`} className="flex items-start gap-3 rounded-2xl bg-[#f8f6ef] p-3">
+                    {item.status === "taken" ? <CheckCircle2 className="mt-0.5 h-5 w-5 text-[#355b48]" aria-hidden="true" /> : <AlertTriangle className="mt-0.5 h-5 w-5 text-[#b42318]" aria-hidden="true" />}
+                    <p className="text-[#26332b]">{item.status === "taken" ? `${item.medicineName} was marked as taken.` : `${item.medicineName} is not yet confirmed.`}<span className="block text-sm text-[#707a73]">{item.date} · {formatTime(item.time)}</span></p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Card>
+          <Card className="bg-[#fff8ed]">
+            <h2 className="text-xl font-bold text-[#355b48]">Upcoming reminders</h2>
+            {upcoming.length === 0 ? <p className="mt-4 text-[#707a73]">No upcoming reminders today.</p> : (
+              <ul className="mt-4 space-y-3">
+                {upcoming.map((dose) => <li key={dose.key} className="rounded-2xl bg-white p-3"><strong>{dose.medicineName}</strong><span className="block text-[#707a73]">{dose.dosage} · {formatTime(dose.time)}</span></li>)}
+              </ul>
+            )}
+            {missed.length > 0 && <p className="mt-4 rounded-2xl bg-red-50 p-3 font-semibold text-red-800"><AlertTriangle className="mr-2 inline h-5 w-5" aria-hidden="true" /> {missed.length} update{missed.length === 1 ? "" : "s"} need attention.</p>}
+          </Card>
+        </section>
       </div>
     </PageShell>
   );

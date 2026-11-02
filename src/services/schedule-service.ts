@@ -5,6 +5,8 @@ const LOGS_KEY = "meditrack.dose_logs";
 const SETTINGS_KEY = "meditrack.settings";
 
 export const DEFAULT_SETTINGS: AppSettings = {
+  easyMode: false,
+  voiceEnabled: true,
   snoozeMinutes: 10,
   graceMinutes: 30,
   notificationsEnabled: true,
@@ -25,6 +27,12 @@ export function saveLog(log: DoseLog): void {
 export function getSettings(): AppSettings {
   const stored = readJSON<Partial<AppSettings>>(SETTINGS_KEY, {});
   return {
+    easyMode: typeof stored.easyMode === "boolean"
+      ? stored.easyMode
+      : DEFAULT_SETTINGS.easyMode,
+    voiceEnabled: typeof stored.voiceEnabled === "boolean"
+      ? stored.voiceEnabled
+      : DEFAULT_SETTINGS.voiceEnabled,
     snoozeMinutes: [5, 10, 15, 30].includes(stored.snoozeMinutes ?? -1)
       ? stored.snoozeMinutes!
       : DEFAULT_SETTINGS.snoozeMinutes,

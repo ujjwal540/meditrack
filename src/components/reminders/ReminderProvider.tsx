@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 import { useReminders } from "@/hooks/use-reminders";
 import { ReminderModal } from "@/components/reminders/ReminderModal";
 
@@ -9,6 +9,10 @@ const ReminderContext = createContext<Ctx | null>(null);
 
 export function ReminderProvider({ children }: { children: ReactNode }) {
   const value = useReminders();
+  useEffect(() => {
+    document.documentElement.classList.toggle("easy-mode", value.settings.easyMode);
+  }, [value.settings.easyMode]);
+
   return (
     <ReminderContext.Provider value={value}>
       {children}

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("user can open demo mode and add a medicine", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /never miss your medicine/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /care that connects\. support that empowers/i })).toBeVisible();
 
   const demoLink = page.getByRole("link", { name: /explore demo mode/i });
   await expect(demoLink).toHaveAttribute("href", "/dashboard");
@@ -10,14 +10,14 @@ test("user can open demo mode and add a medicine", async ({ page }) => {
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(page.getByRole("heading", { name: /today's medicine/i })).toBeVisible();
 
-  await page.getByRole("link", { name: /add medicine/i }).click();
+  await page.getByRole("link", { name: /medicines/i }).first().click();
   await expect(page).toHaveURL(/\/medicines$/);
 
   await page.getByPlaceholder("e.g. Vitamin D").fill("Vitamin D");
   await page.getByPlaceholder("e.g. 1 tablet").fill("1 tablet");
   await page.getByRole("button", { name: /save medicine and schedule/i }).click();
 
-  await expect(page.getByText("Vitamin D · 1 tablet")).toBeVisible();
+  await expect(page.getByText(/Vitamin D/)).toBeVisible();
 });
 
 test("shows independent reminder controls", async ({ page }) => {

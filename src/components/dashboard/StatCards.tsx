@@ -8,12 +8,12 @@ export function StatCards({ total, taken, pending }: { total: number; taken: num
     { label: "Pending", value: pending, Icon: Clock },
   ];
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid gap-3 sm:grid-cols-3">
       {items.map(({ label, value, Icon }) => (
         <Card key={label} className="text-center">
-          <Icon className="mx-auto h-6 w-6 text-primary" aria-hidden="true" />
-          <p className="mt-1 text-3xl font-bold text-slate-900">{value}</p>
-          <p className="text-sm text-slate-600">{label}</p>
+          <Icon className="mx-auto h-7 w-7 text-[#78947b]" aria-hidden="true" />
+          <p className="mt-1 text-3xl font-bold text-[#26332b]">{value}</p>
+          <p className="text-sm text-[#707a73]">{label}</p>
         </Card>
       ))}
     </div>
