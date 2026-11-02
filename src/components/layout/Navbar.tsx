@@ -48,7 +48,7 @@ export function Navbar() {
       </aside>
       <nav
         aria-label="Main mobile"
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t border-black/5 bg-[#3a3d37]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+        className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 md:hidden"
       >
         {items.map((item) => (
           <Link
@@ -56,11 +56,11 @@ export function Navbar() {
             href={item.href}
             aria-current={isActive(item) ? "page" : undefined}
             className={cn(
-              "flex min-h-[4.25rem] flex-col items-center justify-center gap-1 text-[0.8rem] font-extrabold",
-              isActive(item) ? "text-ink" : "text-cream",
+              "mobile-bottom-nav-item flex min-h-[4.25rem] flex-col items-center justify-center gap-1 text-[0.8rem] font-extrabold",
+              isActive(item) ? "is-active" : "",
             )}
           >
-            <span className={cn("grid h-9 w-14 place-items-center rounded-full", isActive(item) && "bg-accent")}>
+            <span className="mobile-bottom-nav-icon grid h-9 w-14 place-items-center rounded-full">
               <item.Icon className="h-6 w-6" aria-hidden="true" />
             </span>
             {item.label}
