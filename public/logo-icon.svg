@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="meditrackIconGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#20C982" />
+      <stop offset="60%" stop-color="#16A36A" />
+      <stop offset="100%" stop-color="#11794E" />
+    </linearGradient>
+
+    <filter id="iconGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#16A36A" flood-opacity="0.35" />
+    </filter>
+
+    <filter id="iconLineShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2" flood-color="#07130E" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Medical Cross (+) Symbol -->
+  <g filter="url(#iconGlow)">
+    <rect x="36" y="96" width="184" height="64" rx="20" fill="url(#meditrackIconGrad)" />
+    <rect x="96" y="36" width="64" height="184" rx="20" fill="url(#meditrackIconGrad)" />
+  </g>
+
+  <!-- Integrated White ECG Waveform -->
+  <path
+    d="M 44 128 L 92 128 L 105 137 L 125 72 L 145 178 L 161 118 Q 172 113 182 128 L 212 128"
+    fill="none"
+    stroke="#FFFFFF"
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#iconLineShadow)"
+  />
+  <circle cx="44" cy="128" r="3" fill="#FFFFFF" opacity="0.9" />
+  <circle cx="212" cy="128" r="3" fill="#FFFFFF" opacity="0.9" />
+</svg>

@@ -8,7 +8,8 @@ import { AuthShell } from "@/components/auth/AuthShell";
 import { Button } from "@/components/ui/Button";
 import { type AccountType, signUp } from "@/lib/auth";
 
-const field = "mt-2 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-base text-slate-900 shadow-sm transition placeholder:text-slate-400 focus:border-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-100";
+const field =
+  "mt-1.5 min-h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-4 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] shadow-sm transition focus:border-[#16A36A] focus:outline-none focus:ring-2 focus:ring-[#16A36A]/20";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -39,40 +40,170 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthShell eyebrow="Get started" title="Create your care space" subtitle="A calmer way to manage medicines and stay connected with family.">
+    <AuthShell
+      eyebrow="Get Started"
+      title="Create your care space"
+      subtitle="A calmer way to manage medicines and stay connected with family."
+    >
       <form onSubmit={submit} className="space-y-4">
-        <label className="block font-semibold text-slate-800">Full name
-          <span className="relative block"><UserRound className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" /><input required autoComplete="name" placeholder="Your full name" className={`${field} pl-12`} value={name} onChange={(e) => setName(e.target.value)} /></span>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+          Full Name
+          <span className="relative block">
+            <UserRound
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]"
+              aria-hidden="true"
+            />
+            <input
+              required
+              autoComplete="name"
+              placeholder="Your full legal name"
+              className={`${field} pl-10`}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </span>
         </label>
-        <label className="block font-semibold text-slate-800">Email address
-          <span className="relative block"><Mail className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" /><input type="email" required autoComplete="email" placeholder="you@example.com" className={`${field} pl-12`} value={email} onChange={(e) => setEmail(e.target.value)} /></span>
+
+        <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+          Email Address
+          <span className="relative block">
+            <Mail
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]"
+              aria-hidden="true"
+            />
+            <input
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="you@example.com"
+              className={`${field} pl-10`}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </span>
         </label>
+
         <fieldset>
-          <legend className="font-semibold text-slate-800">I am joining as</legend>
-          <div className="mt-2 grid grid-cols-2 gap-3">
-            {([["patient", "Patient"], ["caregiver", "Family caregiver"]] as const).map(([value, label]) => (
-              <label key={value} className={`cursor-pointer rounded-xl border p-3 text-center text-sm font-semibold transition ${accountType === value ? "border-teal-600 bg-teal-50 text-teal-800 ring-2 ring-teal-100" : "border-slate-300 text-slate-600 hover:bg-slate-50"}`}>
-                <input type="radio" name="accountType" value={value} checked={accountType === value} onChange={() => setAccountType(value)} className="sr-only" />
-                {label}
-              </label>
-            ))}
+          <legend className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
+            I am registering as
+          </legend>
+          <div className="grid grid-cols-2 gap-2.5">
+            {([["patient", "Patient"], ["caregiver", "Family Caregiver"]] as const).map(
+              ([value, label]) => (
+                <label
+                  key={value}
+                  className={`cursor-pointer rounded-xl border p-2.5 text-center text-xs font-bold transition-all ${
+                    accountType === value
+                      ? "border-[#16A36A] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-[0_0_15px_rgba(22,163,106,0.2)]"
+                      : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#16A36A]/30"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="accountType"
+                    value={value}
+                    checked={accountType === value}
+                    onChange={() => setAccountType(value)}
+                    className="sr-only"
+                  />
+                  {label}
+                </label>
+              ),
+            )}
           </div>
         </fieldset>
-        <label className="block font-semibold text-slate-800">Password
-          <span className="relative block"><LockKeyhole className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" aria-hidden="true" /><input type={showPassword ? "text" : "password"} required minLength={8} autoComplete="new-password" placeholder="At least 8 characters" className={`${field} pl-12 pr-12`} value={password} onChange={(e) => setPassword(e.target.value)} /><button type="button" aria-label={showPassword ? "Hide password" : "Show password"} onClick={() => setShowPassword((value) => !value)} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-500 hover:bg-slate-100">{showPassword ? <EyeOff className="h-5 w-5" aria-hidden="true" /> : <Eye className="h-5 w-5" aria-hidden="true" />}</button></span>
+
+        <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+          Password
+          <span className="relative block">
+            <LockKeyhole
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]"
+              aria-hidden="true"
+            />
+            <input
+              type={showPassword ? "text" : "password"}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              placeholder="At least 8 characters"
+              className={`${field} pl-10 pr-10`}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              onClick={() => setShowPassword((value) => !value)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[var(--text-muted)] hover:text-[var(--text)]"
+            >
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </span>
         </label>
-        <label className="block font-semibold text-slate-800">Confirm password
-          <input type={showPassword ? "text" : "password"} required minLength={8} autoComplete="new-password" placeholder="Repeat your password" className={field} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+
+        <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+          Confirm Password
+          <input
+            type={showPassword ? "text" : "password"}
+            required
+            minLength={8}
+            autoComplete="new-password"
+            placeholder="Repeat your password"
+            className={field}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
         </label>
-        <label className="flex items-start gap-3 text-sm leading-6 text-slate-600">
-          <input type="checkbox" required checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 text-teal-600 focus:ring-teal-500" />
-          <span>I agree to the MediTrack terms and privacy notice.</span>
+
+        <label className="flex items-start gap-2.5 text-xs text-[var(--text-secondary)] leading-relaxed cursor-pointer">
+          <input
+            type="checkbox"
+            required
+            checked={terms}
+            onChange={(e) => setTerms(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-[var(--border)] text-[#16A36A] focus:ring-[#16A36A]"
+          />
+          <span>I agree to the MediTrack terms of service and healthcare privacy notice.</span>
         </label>
-        {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-medium leading-6 text-red-700">{error}</p>}
-        <Button type="submit" disabled={loading} className="min-h-13 w-full rounded-xl text-base shadow-lg shadow-teal-700/20">{loading ? "Creating your account…" : "Create account"}</Button>
+
+        {error && (
+          <p
+            role="alert"
+            className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-semibold text-rose-500 dark:text-[#FB7185] leading-relaxed"
+          >
+            {error}
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          disabled={loading}
+          size="md"
+          variant="primary"
+          className="w-full text-sm font-bold mt-2"
+        >
+          {loading ? "Creating Account..." : "Create Free Account"}
+        </Button>
       </form>
-      {demo && <Link href="/dashboard" className="mt-4 block rounded-xl bg-amber-50 p-3 text-center text-sm font-semibold text-amber-900 underline">Continue in demo mode</Link>}
-      <p className="mt-7 text-center text-sm text-slate-600">Already have an account? <Link href="/login" className="font-semibold text-teal-700 underline underline-offset-4">Log in</Link></p>
+
+      {demo && (
+        <Link
+          href="/dashboard"
+          className="mt-4 block rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-center text-xs font-bold text-amber-500 dark:text-[#FBBF24] hover:bg-amber-500/20 transition-colors"
+        >
+          Continue in Demo Mode (Local Storage)
+        </Link>
+      )}
+
+      <p className="mt-6 text-center text-xs text-[var(--text-secondary)]">
+        Already have an account?{" "}
+        <Link
+          href="/login"
+          className="font-bold text-[#16A36A] dark:text-[#20C982] hover:underline underline-offset-4"
+        >
+          Log in
+        </Link>
+      </p>
     </AuthShell>
   );
 }

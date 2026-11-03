@@ -4,7 +4,14 @@ import { PageShell } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useMediTrack } from "@/components/reminders/ReminderProvider";
-import { Accessibility, CheckCircle2 } from "lucide-react";
+import { useAccessibility } from "@/components/layout/AccessibilityProvider";
+import {
+  Accessibility,
+  CheckCircle2,
+  Moon,
+  Paintbrush,
+  Sun,
+} from "lucide-react";
 
 export default function SettingsPage() {
   const {
@@ -21,97 +28,293 @@ export default function SettingsPage() {
     speak,
     pushStatus,
   } = useMediTrack();
-  const sel = "mt-1 min-h-12 w-full rounded-xl border-2 border-slate-300 bg-white px-3";
+
+  const { theme, setTheme } = useAccessibility();
+
+  const selectStyle =
+    "mt-1.5 min-h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 text-xs text-[var(--text)] focus:border-[#16A36A] focus:outline-none";
+
   return (
-    <PageShell title="Settings">
+    <PageShell
+      title="Application Preferences"
+      subtitle="Configure notifications, audio guidance, appearance, and accessibility."
+    >
       <div className="max-w-2xl space-y-6">
-        <Card className={`easy-focus ${settings.easyMode ? "border-[#355b48] bg-[#e7f1e7]" : ""}`}>
-          <div className="flex items-start gap-4">
-            <span className="icon-badge"><Accessibility className="h-7 w-7" aria-hidden="true" /></span>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-[#355b48]">Easy Mode</h2>
-              <p className="mt-1 text-[#707a73]">Larger text, bigger buttons, simpler navigation, and clearer medicine reminders.</p>
+        {/* Appearance & Theme Preference */}
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="icon-badge">
+              <Paintbrush className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <h2 className="font-display text-lg font-bold text-[var(--text)]">
+                Theme &amp; Appearance
+              </h2>
+              <p className="text-xs text-[var(--text-secondary)]">
+                Choose your preferred visual styling. Medical Emerald (Dark Forest) is the official default.
+              </p>
             </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setTheme("dark")}
+              className={`flex items-center justify-center gap-2.5 rounded-xl border p-3.5 text-xs font-bold transition-all ${
+                theme === "dark"
+                  ? "border-[#16A36A] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-[0_0_15px_rgba(22,163,106,0.25)]"
+                  : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#16A36A]/30"
+              }`}
+            >
+              <Moon className="h-4 w-4" />
+              <span>Medical Emerald (Dark)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setTheme("light")}
+              className={`flex items-center justify-center gap-2.5 rounded-xl border p-3.5 text-xs font-bold transition-all ${
+                theme === "light"
+                  ? "border-[#16A36A] bg-[#16A36A]/15 text-[#16A36A] shadow-sm"
+                  : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#16A36A]/30"
+              }`}
+            >
+              <Sun className="h-4 w-4" />
+              <span>Clinical Light (Emerald)</span>
+            </button>
+          </div>
+        </Card>
+
+        {/* Easy Mode Switch */}
+        <Card className={`p-6 transition-all ${settings.easyMode ? "border-[#16A36A]/40 bg-[#16A36A]/10" : ""}`}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <span className="icon-badge">
+                <Accessibility className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div>
+                <h2 className="font-display text-lg font-bold text-[var(--text)]">
+                  Easy Mode
+                </h2>
+                <p className="mt-1 text-xs text-[var(--text-secondary)] max-w-sm">
+                  Larger fonts, high-contrast buttons, simplified controls, and bold reminders designed for elderly adults.
+                </p>
+              </div>
+            </div>
+
             <button
               type="button"
               role="switch"
               aria-checked={settings.easyMode}
               aria-label="Turn Easy Mode on or off"
               onClick={() => updateSettings({ ...settings, easyMode: !settings.easyMode })}
-              className="relative inline-flex min-h-12 min-w-24 cursor-pointer items-center justify-center rounded-full focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#f4a261]"
+              className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#16A36A] ${
+                settings.easyMode ? "bg-[#16A36A]" : "bg-slate-700"
+              }`}
             >
-              <span className={`h-10 w-20 rounded-full transition-colors ${settings.easyMode ? "bg-[#355b48]" : "bg-slate-300"}`} />
-              <span className={`pointer-events-none absolute left-2 h-7 w-7 rounded-full bg-white shadow transition-transform ${settings.easyMode ? "translate-x-10" : ""}`} />
+              <span
+                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                  settings.easyMode ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
             </button>
           </div>
-          {settings.easyMode && <p role="status" className="mt-4 flex items-center gap-2 rounded-2xl bg-white p-3 font-semibold text-[#355b48]"><CheckCircle2 className="h-5 w-5" aria-hidden="true" /> Easy Mode is on. MediTrack is ready to be simpler.</p>}
+
+          {settings.easyMode && (
+            <p
+              role="status"
+              className="mt-4 flex items-center gap-2 rounded-xl bg-[#16A36A]/15 border border-[#16A36A]/30 p-3 text-xs font-semibold text-[#16A36A] dark:text-[#A3EAC1]"
+            >
+              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+              <span>Easy Mode is active across all MediTrack views.</span>
+            </p>
+          )}
         </Card>
-        <Card className="space-y-4">
-          <label className="block font-medium">Snooze length
-            <select className={sel} value={settings.snoozeMinutes} onChange={(e) => updateSettings({ ...settings, snoozeMinutes: Number(e.target.value) })}>
-              {[5, 10, 15, 30].map((m) => <option key={m} value={m}>{m} minutes</option>)}
+
+        {/* Snooze & Grace Period Intervals */}
+        <Card className="space-y-4 p-6">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+            Snooze Reminder Interval
+            <select
+              className={selectStyle}
+              value={settings.snoozeMinutes}
+              onChange={(e) => updateSettings({ ...settings, snoozeMinutes: Number(e.target.value) })}
+            >
+              {[5, 10, 15, 30].map((m) => (
+                <option key={m} value={m} className="bg-[var(--surface-elevated)] text-[var(--text)]">
+                  {m} minutes
+                </option>
+              ))}
             </select>
           </label>
-          <label className="block font-medium">Caregiver grace period
-            <select className={sel} value={settings.graceMinutes} onChange={(e) => updateSettings({ ...settings, graceMinutes: Number(e.target.value) })}>
-              {[15, 30, 45, 60].map((m) => <option key={m} value={m}>{m} minutes</option>)}
+
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+            Caregiver Notification Grace Period
+            <select
+              className={selectStyle}
+              value={settings.graceMinutes}
+              onChange={(e) => updateSettings({ ...settings, graceMinutes: Number(e.target.value) })}
+            >
+              {[15, 30, 45, 60].map((m) => (
+                <option key={m} value={m} className="bg-[var(--surface-elevated)] text-[var(--text)]">
+                  {m} minutes
+                </option>
+              ))}
             </select>
           </label>
         </Card>
-        <Card>
-          <h2 className="text-lg font-semibold">Reminder settings</h2>
-          <p className="mt-1 text-slate-700">
-            Notification permission: <strong className="capitalize">{notificationPermission}</strong>
+
+        {/* Reminder Modalities & Hardware Tests */}
+        <Card className="p-6">
+          <h2 className="font-display text-lg font-bold text-[var(--text)]">
+            Audio &amp; Notification Hardware
+          </h2>
+          <p className="mt-1 text-xs text-[var(--text-secondary)]">
+            Current Browser Permission: <strong className="capitalize text-[#16A36A] dark:text-[#20C982]">{notificationPermission}</strong>
           </p>
+
           {notificationPermission !== "unsupported" && notificationPermission !== "denied" && (
             <Button
-              className="mt-3"
+              size="sm"
+              variant="primary"
+              className="mt-3 text-xs"
               onClick={requestNotifications}
-              disabled={notificationPermission !== "default"}
+              disabled={notificationPermission !== "granted"}
             >
-              {notificationPermission === "granted" ? "Notifications enabled" : "Enable notifications"}
+              {notificationPermission === "granted" ? "Notifications Enabled" : "Request Notifications"}
             </Button>
           )}
+
           {notificationPermission === "denied" && (
-            <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-              Notifications are blocked. Allow them for this site in your browser settings, then reload the page. Sound and vibration can still be tested separately.
+            <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-500 dark:text-amber-300">
+              Browser alerts are blocked. Allow notifications for this origin in browser settings, then reload. Sound and vibration remain testable below.
             </p>
           )}
+
           {notificationPermission === "unsupported" && (
-            <p className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
-              This browser does not support notification popups. Use a current browser on HTTPS for the best support.
+            <p className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 text-xs text-[var(--text-secondary)]">
+              Browser notification popups are unavailable on this device or context.
             </p>
           )}
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <label className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 p-4">
-              <span><strong className="block">Browser notifications</strong><span className="text-sm text-slate-600">Popup at medicine time</span></span>
-              <input type="checkbox" checked={settings.notificationsEnabled} onChange={(e) => updateSettings({ ...settings, notificationsEnabled: e.target.checked })} className="h-5 w-5" />
+
+          {/* Toggle Switches Grid */}
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 text-xs">
+            <label className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
+              <span>
+                <strong className="block text-[var(--text)]">Browser Notifications</strong>
+                <span className="text-[11px] text-[var(--text-muted)]">Popups at scheduled dose time</span>
+              </span>
+              <input
+                type="checkbox"
+                checked={settings.notificationsEnabled}
+                onChange={(e) => updateSettings({ ...settings, notificationsEnabled: e.target.checked })}
+                className="h-4 w-4 rounded text-[#16A36A] focus:ring-[#16A36A]"
+              />
             </label>
-            <label className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 p-4">
-              <span><strong className="block">Voice assistance</strong><span className="text-sm text-slate-600">{voiceSupported ? "Speak reminders and confirmations" : "Not supported in this browser"}</span></span>
-              <input type="checkbox" checked={settings.voiceEnabled} onChange={(e) => updateSettings({ ...settings, voiceEnabled: e.target.checked })} className="h-5 w-5" />
+
+            <label className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
+              <span>
+                <strong className="block text-[var(--text)]">Voice Assistance</strong>
+                <span className="text-[11px] text-[var(--text-muted)]">
+                  {voiceSupported ? "Spoken dose announcements" : "Not supported in browser"}
+                </span>
+              </span>
+              <input
+                type="checkbox"
+                checked={settings.voiceEnabled}
+                onChange={(e) => updateSettings({ ...settings, voiceEnabled: e.target.checked })}
+                className="h-4 w-4 rounded text-[#16A36A] focus:ring-[#16A36A]"
+              />
             </label>
-            <label className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 p-4">
-              <span><strong className="block">Sound / ringing</strong><span className="text-sm text-slate-600">{soundSupported ? "Supported after interaction" : "Not supported"}</span></span>
-              <input type="checkbox" checked={settings.soundEnabled} onChange={(e) => updateSettings({ ...settings, soundEnabled: e.target.checked })} className="h-5 w-5" />
+
+            <label className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
+              <span>
+                <strong className="block text-[var(--text)]">Audio Chimes</strong>
+                <span className="text-[11px] text-[var(--text-muted)]">
+                  {soundSupported ? "Gentle chime sound" : "Not supported"}
+                </span>
+              </span>
+              <input
+                type="checkbox"
+                checked={settings.soundEnabled}
+                onChange={(e) => updateSettings({ ...settings, soundEnabled: e.target.checked })}
+                className="h-4 w-4 rounded text-[#16A36A] focus:ring-[#16A36A]"
+              />
             </label>
-            <label className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 p-4">
-              <span><strong className="block">Vibration</strong><span className="text-sm text-slate-600">{vibrationSupported ? "Supported on this device" : "Not supported"}</span></span>
-              <input type="checkbox" checked={settings.vibrationEnabled} onChange={(e) => updateSettings({ ...settings, vibrationEnabled: e.target.checked })} className="h-5 w-5" />
+
+            <label className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
+              <span>
+                <strong className="block text-[var(--text)]">Haptic Vibration</strong>
+                <span className="text-[11px] text-[var(--text-muted)]">
+                  {vibrationSupported ? "Mobile vibration pulse" : "Not supported on this device"}
+                </span>
+              </span>
+              <input
+                type="checkbox"
+                checked={settings.vibrationEnabled}
+                onChange={(e) => updateSettings({ ...settings, vibrationEnabled: e.target.checked })}
+                className="h-4 w-4 rounded text-[#16A36A] focus:ring-[#16A36A]"
+              />
             </label>
-            <label className="rounded-xl border border-slate-200 p-4">
-              <span className="font-semibold">Sound volume: {Math.round(settings.soundVolume * 100)}%</span>
-              <input type="range" min="0.05" max="1" step="0.05" value={settings.soundVolume} onChange={(e) => updateSettings({ ...settings, soundVolume: Number(e.target.value) })} className="mt-3 w-full" />
+
+            <label className="sm:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
+              <span className="font-semibold text-[var(--text)] block text-xs">
+                Chime Volume: {Math.round(settings.soundVolume * 100)}%
+              </span>
+              <input
+                type="range"
+                min="0.05"
+                max="1"
+                step="0.05"
+                value={settings.soundVolume}
+                onChange={(e) => updateSettings({ ...settings, soundVolume: Number(e.target.value) })}
+                className="mt-2.5 w-full accent-[#16A36A]"
+              />
             </label>
           </div>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Button variant="outline" onClick={() => testNotification()} disabled={notificationPermission !== "granted"}>Test notification</Button>
-            <Button variant="outline" onClick={() => void testSound()} disabled={!soundSupported || !settings.soundEnabled}>Test sound</Button>
-            <Button variant="outline" onClick={() => speak("This is a MediTrack voice assistance test.")} disabled={!voiceSupported || !settings.voiceEnabled}>Test voice</Button>
-            <Button variant="outline" onClick={() => testVibration()} disabled={!vibrationSupported || !settings.vibrationEnabled}>Test vibration</Button>
+
+          {/* Test Buttons */}
+          <div className="mt-5 flex flex-wrap gap-2.5">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => testNotification()}
+              disabled={notificationPermission !== "granted"}
+              className="text-xs"
+            >
+              Test Notification
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void testSound()}
+              disabled={!soundSupported || !settings.soundEnabled}
+              className="text-xs"
+            >
+              Test Sound
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => speak("This is a MediTrack voice assistance test.")}
+              disabled={!voiceSupported || !settings.voiceEnabled}
+              className="text-xs"
+            >
+              Test Voice
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => testVibration()}
+              disabled={!vibrationSupported || !settings.vibrationEnabled}
+              className="text-xs"
+            >
+              Test Vibration
+            </Button>
           </div>
-          <p className="mt-4 text-sm text-slate-600">
-            Push status: <strong className="capitalize">{pushStatus}</strong>. Foreground reminders work while the app is open. Background push requires the secure server configuration described in the deployment notes.
+
+          <p className="mt-4 font-mono text-[11px] text-[var(--text-muted)]">
+            Push Background Status: <strong className="capitalize text-[var(--text-secondary)]">{pushStatus}</strong>.
           </p>
         </Card>
       </div>

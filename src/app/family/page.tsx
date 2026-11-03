@@ -9,10 +9,9 @@ import {
   Heart,
   Mail,
   ShieldCheck,
-  Sparkles,
   UsersRound,
 } from "lucide-react";
-import type { CaregiverConnection, ConsentStatus, Dose, DoseLog } from "@/types";
+import type { CaregiverConnection, ConsentStatus, DoseLog } from "@/types";
 import { PageShell } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -101,22 +100,21 @@ export default function FamilyPage() {
       if (supabase && !session) {
         setAuthenticated(false);
         setList([]);
-        setCurrentUserId(null);
         setRemoteActivity([]);
+        setCurrentUserId(null);
         return;
       }
       setAuthenticated(true);
-      const userId = await getCurrentUserId();
-      if (supabase && !userId) {
-        setAuthenticated(false);
-        return;
-      }
-      const connections = await getConnections();
+      const [connections, currentId] = await Promise.all([
+        getConnections(),
+        getCurrentUserId(),
+      ]);
       setList(connections);
-      setCurrentUserId(userId);
-      setRemoteActivity(await loadRemoteActivity(connections));
+      setCurrentUserId(currentId);
+      const activity = await loadRemoteActivity(connections);
+      setRemoteActivity(activity);
     } catch (loadError) {
-      setError(loadError instanceof Error ? loadError.message : "Could not load family care.");
+      setError(loadError instanceof Error ? loadError.message : "Could not load Care Circle information.");
     } finally {
       setLoading(false);
     }
@@ -124,30 +122,19 @@ export default function FamilyPage() {
 
   useEffect(() => {
     void reload();
-    if (!supabase) return;
-    const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "TOKEN_REFRESHED") {
-        void reload();
-      }
-    });
-    return () => data.subscription.unsubscribe();
   }, []);
 
-  const localUpdates = useMemo<RemoteActivity[]>(
-    () =>
-      doses
-        .filter((dose) => dose.status === "taken" || dose.status === "not_confirmed")
-        .slice(0, 8)
-        .map((dose: Dose) => ({
-          medicineName: dose.medicineName,
-          dosage: dose.dosage,
-          status: dose.status,
-          time: dose.time,
-          date: dose.date,
-        })),
-    [doses],
-  );
-  const activity = supabase ? remoteActivity : localUpdates;
+  const activity = useMemo(() => {
+    if (remoteActivity.length > 0) return remoteActivity;
+    return doses.map((dose) => ({
+      medicineName: dose.medicineName,
+      dosage: dose.dosage,
+      status: (dose.status === "pending" ? "not_confirmed" : dose.status) as DoseLog["status"],
+      time: dose.time,
+      date: "Today",
+    }));
+  }, [remoteActivity, doses]);
+
   const missed = activity.filter((item) => item.status === "not_confirmed");
   const upcoming = doses.filter((dose) => dose.status === "pending").slice(0, 2);
 
@@ -162,54 +149,138 @@ export default function FamilyPage() {
   }
 
   return (
-    <PageShell title="Family Care" subtitle="Stay connected with the people who care about you.">
-      <div className="section-gap">
-        {error && <p role="alert" className="rounded-2xl border-2 border-red-200 bg-red-50 p-4 font-semibold text-red-800">{error}</p>}
+    <PageShell
+      title="Family Care Circle"
+      subtitle="Connect with trusted loved ones and manage consent-based sharing."
+    >
+      <div className="space-y-7">
+        {error && (
+          <p
+            role="alert"
+            className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-xs font-semibold text-rose-500 dark:text-[#FB7185]"
+          >
+            {error}
+          </p>
+        )}
+
         {!loading && supabase && !authenticated && (
-          <Card className="border-2 border-amber-200 bg-amber-50">
-            <h2 className="text-xl font-bold text-amber-950">Please sign in to view Family Care</h2>
-            <p className="mt-2 text-amber-900">Your session has expired or is not available on this device.</p>
-            <Link href="/login" className="mt-4 inline-flex min-h-12 items-center rounded-full bg-[#075b43] px-5 font-bold text-white">Sign in again</Link>
+          <Card className="border border-amber-500/30 bg-amber-500/10 p-6">
+            <h2 className="font-display text-lg font-bold text-amber-500 dark:text-amber-200">
+              Sign in to view active Care Circle
+            </h2>
+            <p className="mt-1 text-xs text-amber-600 dark:text-amber-200/80">
+              Your remote session is not active on this device.
+            </p>
+            <Link
+              href="/login"
+              className="mt-4 inline-flex min-h-10 items-center rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-4 text-xs font-bold text-white shadow-sm hover:brightness-105"
+            >
+              Sign In
+            </Link>
           </Card>
         )}
-        <section className="hero-section relative p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
-          <div className="relative z-10 max-w-2xl">
-            <div className="mb-5 flex items-center gap-3">
-              <span className="icon-badge bg-white"><Heart className="h-6 w-6 fill-current text-[#78947b]" aria-hidden="true" /></span>
-              <p className="font-bold uppercase tracking-[0.16em] text-[#78947b]">Care circle</p>
+
+        {/* Hero Care Circle Card */}
+        <section className="relative overflow-hidden rounded-3xl border border-[#16A36A]/25 bg-gradient-to-br from-[var(--surface)] via-[var(--bg-secondary)] to-[var(--surface-elevated)] p-6 sm:p-8 shadow-[var(--shadow-card)]">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#16A36A]/15 blur-3xl" />
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-6">
+            <div className="max-w-xl">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#16A36A]/30 bg-[#16A36A]/10 px-3 py-1 text-xs font-semibold text-[#16A36A] dark:text-[#A3EAC1]">
+                <Heart className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
+                <span>Consent-Based Care</span>
+              </div>
+              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[var(--text)]">
+                Care is closer than you think.
+              </h2>
+              <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                Invite someone you trust to receive gentle reassurance. You decide exactly when they can see your doses and can revoke access anytime.
+              </p>
             </div>
-            <h2 className="text-3xl font-bold text-[#355b48]">Care is closer than you think.</h2>
-            <p className="mt-3 text-lg text-[#4f6857]">Invite someone you trust and decide exactly what they can see.</p>
-          </div>
-          <Sparkles className="absolute right-8 top-8 h-16 w-16 text-[#78947b]/50" aria-hidden="true" />
-          <div className="mt-6 flex justify-center md:mt-0 md:shrink-0">
-            <Image src="/images/illustrations/family-care.png" alt="Family members caring for one another" width={1212} height={792} className="illustration h-auto w-56 max-w-full" />
+            <div className="shrink-0 hidden md:block">
+              <div className="relative h-28 w-28 rounded-2xl bg-[#16A36A]/10 border border-[#16A36A]/20 p-2 flex items-center justify-center">
+                <Image
+                  src="/images/illustrations/family-care.png"
+                  alt="Family Care"
+                  width={100}
+                  height={100}
+                  className="object-contain"
+                />
+              </div>
+            </div>
           </div>
         </section>
 
-        <Card>
+        {/* Invite Form Card */}
+        <Card className="p-6">
           <div className="mb-5 flex items-start gap-3">
-            <span className="icon-badge"><UsersRound className="h-6 w-6" aria-hidden="true" /></span>
+            <span className="icon-badge">
+              <UsersRound className="h-5 w-5" aria-hidden="true" />
+            </span>
             <div>
-              <h2 className="text-xl font-semibold text-[#355b48]">Invite a trusted family member</h2>
-              <p className="mt-1 text-[#707a73]">They only see updates after you grant permission.</p>
+              <h2 className="font-display text-lg font-bold text-[var(--text)]">
+                Invite a Trusted Family Member
+              </h2>
+              <p className="text-xs text-[var(--text-secondary)]">
+                They will only be able to view updates after you explicitly grant permission.
+              </p>
             </div>
           </div>
-          <form className="grid gap-3 md:grid-cols-[1fr_1fr_auto]" onSubmit={(event) => {
-            event.preventDefault();
-            if (!email.trim()) return;
-            void run(async () => { await inviteCaregiver(email, name); setEmail(""); setName(""); });
-          }}>
-            <input aria-label="Family member name" placeholder="Name (optional)" value={name} onChange={(event) => setName(event.target.value)} className="form-input !mt-0" />
-            <input aria-label="Family member email" type="email" required placeholder="Email address" value={email} onChange={(event) => setEmail(event.target.value)} className="form-input !mt-0" />
-            <Button type="submit"><Mail className="h-5 w-5" aria-hidden="true" /> Send invite</Button>
+
+          <form
+            className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!email.trim()) return;
+              void run(async () => {
+                await inviteCaregiver(email, name);
+                setEmail("");
+                setName("");
+              });
+            }}
+          >
+            <input
+              aria-label="Family member name"
+              placeholder="Name (optional)"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2.5 text-xs text-[var(--text)] placeholder:text-[var(--text-muted)] focus:border-[#16A36A] focus:outline-none"
+            />
+            <input
+              aria-label="Family member email"
+              type="email"
+              required
+              placeholder="Email address (e.g. daughter@example.com)"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2.5 text-xs text-[var(--text)] placeholder:text-[var(--text-muted)] focus:border-[#16A36A] focus:outline-none"
+            />
+            <Button type="submit" size="sm" variant="primary" className="text-xs px-5">
+              <Mail className="h-4 w-4" aria-hidden="true" /> Send Invite
+            </Button>
           </form>
-          <p className="mt-3 flex items-start gap-2 text-sm text-[#707a73]"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#355b48]" aria-hidden="true" /> Supabase Row Level Security controls who can view shared medicines and dose updates.</p>
+
+          <p className="mt-3.5 flex items-center gap-2 text-[11px] text-[var(--text-muted)]">
+            <ShieldCheck className="h-3.5 w-3.5 text-[#16A36A] dark:text-[#20C982]" aria-hidden="true" />
+            <span>Encrypted access: Patient permissions govern who views dose logs.</span>
+          </p>
         </Card>
 
+        {/* Active Care Connections */}
         <section aria-labelledby="connections-heading">
-          <h2 id="connections-heading" className="mb-3 text-2xl font-bold text-[#355b48]">Your care connections</h2>
-          {loading ? <Card>Loading secure connections…</Card> : list.length === 0 ? <Card className="text-[#707a73]">No family members connected yet.</Card> : (
+          <div className="mb-3.5 flex items-center justify-between">
+            <h2 id="connections-heading" className="font-display text-xl font-bold tracking-tight text-[var(--text)]">
+              Connected Caregivers ({list.length})
+            </h2>
+          </div>
+
+          {loading ? (
+            <div className="skeleton h-28" />
+          ) : list.length === 0 ? (
+            <Card className="text-center p-8 border border-dashed border-[var(--border)]">
+              <UsersRound className="mx-auto h-10 w-10 text-[var(--text-muted)] opacity-60" />
+              <p className="mt-2 text-xs text-[var(--text-secondary)]">No family members connected yet. Send an invite above.</p>
+            </Card>
+          ) : (
             <ul className="space-y-3">
               {list.map((connection) => (
                 <li key={connection.id}>
@@ -226,31 +297,79 @@ export default function FamilyPage() {
           )}
         </section>
 
+        {/* Live Shared Activity & Upcoming Preview */}
         <section aria-labelledby="updates-heading" className="grid gap-6 lg:grid-cols-2">
-          <Card>
-            <div className="flex items-center gap-3">
-              <span className="icon-badge bg-[#e7f1e7]"><Bell className="h-6 w-6" aria-hidden="true" /></span>
-              <h2 id="updates-heading" className="text-xl font-bold text-[#355b48]">Medicine updates</h2>
+          {/* Medicine Updates Feed */}
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="icon-badge">
+                <Bell className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <h2 id="updates-heading" className="font-display text-base font-bold text-[var(--text)]">
+                Recent Care Feed
+              </h2>
             </div>
-            {activity.length === 0 ? <p className="mt-4 text-[#707a73]">No shared medicine updates yet.</p> : (
-              <ul className="mt-4 space-y-3">
+
+            {activity.length === 0 ? (
+              <p className="text-xs text-[var(--text-secondary)]">No recent medicine activity logged.</p>
+            ) : (
+              <ul className="space-y-2.5">
                 {activity.slice(0, 5).map((item, index) => (
-                  <li key={`${item.medicineName}-${item.date}-${item.time}-${index}`} className="flex items-start gap-3 rounded-2xl bg-[#f8f6ef] p-3">
-                    {item.status === "taken" ? <CheckCircle2 className="mt-0.5 h-5 w-5 text-[#355b48]" aria-hidden="true" /> : <AlertTriangle className="mt-0.5 h-5 w-5 text-[#b42318]" aria-hidden="true" />}
-                    <p className="text-[#26332b]">{item.status === "taken" ? `${item.medicineName} was marked as taken.` : `${item.medicineName} is not yet confirmed.`}<span className="block text-sm text-[#707a73]">{item.date} · {formatTime(item.time)}</span></p>
+                  <li
+                    key={`${item.medicineName}-${item.date}-${item.time}-${index}`}
+                    className="flex items-start gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 text-xs"
+                  >
+                    {item.status === "taken" ? (
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-500 dark:text-[#36D399] shrink-0" aria-hidden="true" />
+                    ) : (
+                      <AlertTriangle className="mt-0.5 h-4 w-4 text-rose-500 dark:text-[#FB7185] shrink-0" aria-hidden="true" />
+                    )}
+                    <div>
+                      <p className="font-semibold text-[var(--text)]">
+                        {item.status === "taken"
+                          ? `${item.medicineName} confirmed as taken.`
+                          : `${item.medicineName} is not yet confirmed.`}
+                      </p>
+                      <span className="font-mono text-[11px] text-[var(--text-muted)]">
+                        {item.date} &bull; {formatTime(item.time)}
+                      </span>
+                    </div>
                   </li>
                 ))}
               </ul>
             )}
           </Card>
-          <Card className="bg-[#fff8ed]">
-            <h2 className="text-xl font-bold text-[#355b48]">Upcoming reminders</h2>
-            {upcoming.length === 0 ? <p className="mt-4 text-[#707a73]">No upcoming reminders today.</p> : (
-              <ul className="mt-4 space-y-3">
-                {upcoming.map((dose) => <li key={dose.key} className="rounded-2xl bg-white p-3"><strong>{dose.medicineName}</strong><span className="block text-[#707a73]">{dose.dosage} · {formatTime(dose.time)}</span></li>)}
+
+          {/* Upcoming Reminders Card */}
+          <Card className="p-6 border-[#16A36A]/20">
+            <h2 className="font-display text-base font-bold text-[var(--text)] mb-4">
+              Upcoming Today
+            </h2>
+            {upcoming.length === 0 ? (
+              <p className="text-xs text-[var(--text-secondary)]">No additional reminders pending today.</p>
+            ) : (
+              <ul className="space-y-2.5">
+                {upcoming.map((dose) => (
+                  <li
+                    key={dose.key}
+                    className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 text-xs"
+                  >
+                    <div>
+                      <strong className="block text-[var(--text)]">{dose.medicineName}</strong>
+                      <span className="text-[11px] text-[var(--text-muted)]">{dose.dosage}</span>
+                    </div>
+                    <span className="font-mono font-bold text-[#16A36A] dark:text-[#20C982]">{formatTime(dose.time)}</span>
+                  </li>
+                ))}
               </ul>
             )}
-            {missed.length > 0 && <p className="mt-4 rounded-2xl bg-red-50 p-3 font-semibold text-red-800"><AlertTriangle className="mr-2 inline h-5 w-5" aria-hidden="true" /> {missed.length} update{missed.length === 1 ? "" : "s"} need attention.</p>}
+
+            {missed.length > 0 && (
+              <div className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-semibold text-rose-500 dark:text-[#FB7185] flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{missed.length} dose record(s) pending attention.</span>
+              </div>
+            )}
           </Card>
         </section>
       </div>

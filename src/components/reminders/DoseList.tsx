@@ -1,1 +1,117 @@
-"use client"; import { Check, Moon, Sun, Sunrise, Sunset, type LucideIcon } from "lucide-react";import type { Dose, DoseStatus } from "@/types";import { Button } from "@/components/ui/Button";import { Card } from "@/components/ui/Card";import { PillIcon } from "@/components/ui/PillIcon";import { StatusBadge } from "@/components/ui/StatusBadge";import { cn } from "@/lib/utils";import { formatTime } from "@/utils/date-utils"; type Period = { id: string; label: string; Icon: LucideIcon; card: string; dark: boolean };const PERIODS: Period[] = [  { id: "morning", label: "Morning", Icon: Sunrise, card: "bg-sand", dark: false },  { id: "afternoon", label: "Afternoon", Icon: Sun, card: "bg-leaf", dark: false },  { id: "evening", label: "Evening", Icon: Sunset, card: "bg-dusk", dark: false },  { id: "night", label: "Bedtime", Icon: Moon, card: "bg-forest", dark: true },]; function periodOf(time: string): string {  const h = Number(time.split(":")[0]);  return h < 12 ? "morning" : h < 17 ? "afternoon" : h < 21 ? "evening" : "night";} export function DoseList({ doses, onRespond }: { doses: Dose[]; onRespond?: (key: string, status: DoseStatus) => void }) {  if (doses.length === 0) {    return (      <Card className="bg-mint text-center">        <PillIcon type="capsule" size={72} className="mx-auto" />        <p className="mt-2 font-display text-2xl font-bold text-forest">No medicines today</p>        <p className="text-xl text-muted">Tap “Medicines” to add your first one.</p>      </Card>    );  }  return (    <div className="space-y-7">      {PERIODS.map((p) => {        const items = doses.filter((d) => periodOf(d.time) === p.id);        if (items.length === 0) return null;        return (          <section key={p.id} aria-label={p.label}>            <h3 className="mb-3 flex items-center gap-2 font-display text-2xl font-bold text-forest">              <p.Icon className="h-6 w-6" aria-hidden="true" /> {p.label}            </h3>            <ul className="space-y-3">              {items.map((d) => (                <li key={d.key} className={cn("animate-rise rounded-[1.5rem] p-4 shadow-soft", p.card, p.dark ? "text-white" : "text-ink")}>                  <div className="flex flex-wrap items-center gap-4">                    <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-white/85">                      <PillIcon type={d.type} size={44} />                    </div>                    <div className="min-w-0 flex-1 basis-40">                      <p className="font-display text-2xl font-bold leading-tight">{d.medicineName}</p>                      <p className={cn("text-lg", p.dark ? "text-white/85" : "text-ink/75")}>                        {d.dosage}                        {d.instructions ? ` · ${d.instructions}` : ""}                      </p>                    </div>                    <span className={cn("rounded-full px-5 py-2 text-xl font-extrabold", p.dark ? "bg-cream text-forest" : "bg-white text-ink")}>                      {formatTime(d.time)}                    </span>                  </div>                  <div className="mt-3 flex flex-wrap items-center gap-3">                    <StatusBadge dose={d} />                    {onRespond && d.status !== "taken" && (                      <Button variant={p.dark ? "soft" : "primary"} onClick={() => onRespond(d.key, "taken")}>                        <Check className="h-6 w-6" aria-hidden="true" /> I Took It                      </Button>                    )}                  </div>                </li>              ))}            </ul>          </section>        );      })}      <p className="text-base text-muted">Illustrative schedule, not a medical prescription.</p>    </div>  );}
+"use client";
+
+import { Check, Moon, Sun, Sunrise, Sunset, type LucideIcon } from "lucide-react";
+import type { Dose, DoseStatus } from "@/types";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { PillIcon } from "@/components/ui/PillIcon";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { cn } from "@/lib/utils";
+import { formatTime } from "@/utils/date-utils";
+
+type Period = {
+  id: string;
+  label: string;
+  Icon: LucideIcon;
+  colorClass: string;
+};
+
+const PERIODS: Period[] = [
+  { id: "morning", label: "Morning", Icon: Sunrise, colorClass: "text-[#FBBF24]" },
+  { id: "afternoon", label: "Afternoon", Icon: Sun, colorClass: "text-[#16A36A] dark:text-[#20C982]" },
+  { id: "evening", label: "Evening", Icon: Sunset, colorClass: "text-[#60A5FA]" },
+  { id: "night", label: "Bedtime", Icon: Moon, colorClass: "text-[#A78BFA]" },
+];
+
+function periodOf(time: string): string {
+  const h = Number(time.split(":")[0]);
+  return h < 12 ? "morning" : h < 17 ? "afternoon" : h < 21 ? "evening" : "night";
+}
+
+export function DoseList({
+  doses,
+  onRespond,
+}: {
+  doses: Dose[];
+  onRespond?: (key: string, status: DoseStatus) => void;
+}) {
+  if (doses.length === 0) {
+    return (
+      <Card className="text-center p-8 border border-dashed border-[var(--border)]">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#16A36A]/10 text-[#16A36A] dark:text-[#20C982]">
+          <PillIcon type="capsule" size={44} />
+        </div>
+        <h4 className="mt-4 font-display text-xl font-bold text-[var(--text)]">
+          No medicines scheduled for today
+        </h4>
+        <p className="mt-1 text-sm text-[var(--text-secondary)]">
+          Add your prescriptions under Medicines to generate your personalized timetable.
+        </p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {PERIODS.map((p) => {
+        const items = doses.filter((d) => periodOf(d.time) === p.id);
+        if (items.length === 0) return null;
+
+        return (
+          <section key={p.id} aria-label={p.label}>
+            <div className="mb-3 flex items-center gap-2">
+              <span className={cn("grid h-6 w-6 place-items-center rounded-md bg-[var(--surface-elevated)]", p.colorClass)}>
+                <p.Icon className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <h3 className="font-display text-base font-bold tracking-tight text-[var(--text)]">
+                {p.label}
+              </h3>
+              <span className="text-xs text-[var(--text-muted)] font-mono">({items.length})</span>
+            </div>
+
+            <ul className="space-y-2.5">
+              {items.map((d) => (
+                <li
+                  key={d.key}
+                  className="group relative flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 backdrop-blur-xl transition-all duration-200 hover:border-[#16A36A]/40 hover:bg-[var(--surface-elevated)] shadow-sm"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)]">
+                      <PillIcon type={d.type} size={32} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-display text-base font-bold text-[var(--text)] truncate">
+                        {d.medicineName}
+                      </p>
+                      <p className="text-xs text-[var(--text-secondary)] truncate">
+                        {d.dosage}
+                        {d.instructions ? ` · ${d.instructions}` : ""}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="font-mono text-sm font-bold tabular-nums text-[var(--text)] bg-[var(--surface-elevated)] px-3 py-1.5 rounded-lg border border-[var(--border)]">
+                      {formatTime(d.time)}
+                    </span>
+                    <StatusBadge dose={d} />
+                    {onRespond && d.status !== "taken" && (
+                      <Button
+                        size="sm"
+                        variant="soft"
+                        onClick={() => onRespond(d.key, "taken")}
+                        className="py-1 px-3 text-xs"
+                      >
+                        <Check className="h-4 w-4" aria-hidden="true" /> Mark Taken
+                      </Button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })}
+    </div>
+  );
+}

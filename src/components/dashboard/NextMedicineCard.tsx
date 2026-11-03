@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BellRing, Check } from "lucide-react";
+import { BellRing, Check, Clock3 } from "lucide-react";
 import type { Dose } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -23,56 +23,106 @@ export function NextMedicineCard({
 
   if (!dose) {
     return (
-      <Card className="bg-mint text-center">
-        <p className="font-display text-3xl font-bold text-forest">All done for now 🎉</p>
-        <p className="mt-1 text-xl text-muted">No more medicines are waiting. Well done!</p>
+      <Card className="border border-[#16A36A]/25 bg-gradient-to-br from-[#16A36A]/10 via-[#20C982]/5 to-transparent text-center p-8">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#16A36A]/20 text-[#16A36A] dark:text-[#A3EAC1]">
+          <Check className="h-7 w-7" aria-hidden="true" />
+        </div>
+        <h3 className="mt-4 font-display text-2xl font-bold text-[var(--text)]">
+          All caught up for now
+        </h3>
+        <p className="mt-1.5 text-sm text-[var(--text-secondary)]">
+          No pending medicines right now. Great job keeping your health on track!
+        </p>
       </Card>
     );
   }
 
   return (
-    <Card className="relative overflow-hidden border-0 bg-[#3a3d37] p-6 text-[#f4eee3]">
+    <Card className="relative overflow-hidden border border-[#16A36A]/30 bg-gradient-to-br from-[var(--surface)] via-[var(--bg-secondary)] to-[var(--surface-elevated)] p-6 sm:p-7 shadow-[var(--shadow-card)]">
+      {/* Subtle Ambient Radial Highlight */}
+      <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-[#16A36A]/15 blur-3xl" />
+
       {done && (
-        <div className="absolute inset-0 z-10 grid place-items-center bg-[#faf6ee]/95 text-ink" role="status">
+        <div
+          className="absolute inset-0 z-20 grid place-items-center bg-[var(--bg-app)]/95 backdrop-blur-md text-[var(--text)]"
+          role="status"
+        >
           <div className="animate-pop text-center">
-            <span className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-forest text-white">
-              <Check className="h-14 w-14" aria-hidden="true" />
+            <span className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-gradient-to-r from-[#16A36A] to-[#20C982] text-white shadow-[0_0_30px_rgba(32,201,130,0.5)]">
+              <Check className="h-10 w-10 stroke-[2.5]" aria-hidden="true" />
             </span>
-            <p className="mt-3 font-display text-3xl font-bold text-forest">Well done!</p>
-            <p className="text-xl text-muted">Your medicine has been marked as taken.</p>
+            <p className="mt-4 font-display text-2xl font-bold text-[var(--text)]">Dose Confirmed</p>
+            <p className="text-sm text-[var(--text-secondary)]">Your medication record has been logged.</p>
           </div>
         </div>
       )}
-      <div className="flex items-center gap-2 text-lg font-extrabold uppercase tracking-wide text-[#f4eee3]/80">
-        <BellRing className="h-5 w-5" aria-hidden="true" /> Next medicine
-        {dose.isDue && <span className="ml-2 rounded-full bg-accent px-3 py-0.5 text-base text-ink">Due now</span>}
-      </div>
-      <div className="mt-4 flex flex-wrap items-center gap-5">
-        <div className="grid h-28 w-28 shrink-0 place-items-center rounded-[2rem] bg-[#6aaa92]">
-          <PillIcon type={dose.type} size={80} />
+
+      {/* Header bar */}
+      <div className="flex items-center justify-between gap-3 text-xs font-semibold tracking-wider uppercase text-[var(--text-secondary)]">
+        <div className="flex items-center gap-2">
+          <span className="grid h-6 w-6 place-items-center rounded-md bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1]">
+            <BellRing className="h-3.5 w-3.5" aria-hidden="true" />
+          </span>
+          <span>Next Priority Dose</span>
         </div>
-        <div className="min-w-0 flex-1 basis-48">
-          <h2 className="font-display text-4xl font-extrabold leading-tight text-[#f4eee3]">{dose.medicineName}</h2>
-          <p className="mt-1 text-xl text-[#f4eee3]/80">
-            {dose.dosage}{dose.instructions ? ` · ${dose.instructions}` : ""}
-          </p>
-        </div>
-        <p className="rounded-full bg-accent px-6 py-2 text-3xl font-extrabold text-ink">{formatTime(dose.time)}</p>
+        {dose.isDue && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-500 dark:text-[#FBBF24] border border-amber-500/30 animate-pulse">
+            Due Now
+          </span>
+        )}
       </div>
-      <div className="mt-6 grid gap-3">
+
+      {/* Dose Main Info */}
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-5">
+        <div className="flex items-center gap-4">
+          <div className="grid h-20 w-20 shrink-0 place-items-center rounded-2xl bg-gradient-to-tr from-[#16A36A]/20 to-[#20C982]/10 border border-[#16A36A]/30 shadow-inner">
+            <PillIcon type={dose.type} size={52} />
+          </div>
+          <div>
+            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[var(--text)]">
+              {dose.medicineName}
+            </h2>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              {dose.dosage}
+              {dose.instructions ? ` · ${dose.instructions}` : ""}
+            </p>
+          </div>
+        </div>
+
+        {/* Scheduled Time Badge */}
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/60 px-5 py-3 text-right">
+          <span className="block text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">
+            Scheduled Time
+          </span>
+          <span className="font-mono text-2xl sm:text-3xl font-bold tracking-tight text-[#16A36A] dark:text-[#A3EAC1] tabular-nums">
+            {formatTime(dose.time)}
+          </span>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <Button
-          size="xl"
-          variant="soft"
+          size="md"
+          variant="primary"
           onClick={() => {
             setDone(true);
             onTaken(dose.key);
-            setTimeout(() => setDone(false), 1800);
+            setTimeout(() => setDone(false), 1600);
           }}
+          className="w-full"
         >
-          <Check className="h-7 w-7" aria-hidden="true" /> I Took My Medicine
+          <Check className="h-5 w-5" aria-hidden="true" />
+          Mark as Taken
         </Button>
-        <Button size="xl" variant="outline" className="border-[#f4eee3]/60 bg-transparent text-[#f4eee3] hover:bg-[#f4eee3]/10" onClick={() => onLater(dose.key)}>
-          Remind Me Later ({snoozeMinutes} min)
+        <Button
+          size="md"
+          variant="outline"
+          onClick={() => onLater(dose.key)}
+          className="w-full"
+        >
+          <Clock3 className="h-5 w-5" aria-hidden="true" />
+          Remind Later ({snoozeMinutes}m)
         </Button>
       </div>
     </Card>

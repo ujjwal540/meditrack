@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   title: "MediTrack – Never Miss Your Medicine",
   description: "A caring medicine companion for seniors and their families.",
   icons: { icon: "/logo.svg" },
+  openGraph: {
+    title: "MediTrack – Never Miss Your Medicine",
+    description: "A caring medicine companion for seniors and their families.",
+  },
 };
 
 export const viewport: Viewport = {

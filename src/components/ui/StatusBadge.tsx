@@ -1,1 +1,49 @@
-import { AlarmClock, BellRing, CheckCircle2, Clock, HelpCircle } from "lucide-react";import type { Dose } from "@/types";import { cn } from "@/lib/utils"; /** Icon + words, never colour alone. */export function StatusBadge({ dose }: { dose: Pick<Dose, "status" | "isDue"> }) {  const map = {    taken: { label: "Taken", Icon: CheckCircle2, cls: "bg-mint text-forest" },    pending: dose.isDue      ? { label: "Due now", Icon: BellRing, cls: "bg-[#FFF1D6] text-amber" }      : { label: "Upcoming", Icon: Clock, cls: "bg-white/80 text-ink" },    snoozed: { label: "Remind later", Icon: AlarmClock, cls: "bg-[#E8E3F5] text-[#4B3F7A]" },    not_confirmed: { label: "Not yet confirmed", Icon: HelpCircle, cls: "bg-[#F6E2DE] text-danger" },  } as const;  const { label, Icon, cls } = map[dose.status];  return (    <span className={cn("inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-base font-extrabold", cls)}>      <Icon className="h-5 w-5" aria-hidden="true" />      {label}    </span>  );}
+import { AlarmClock, BellRing, CheckCircle2, Clock, HelpCircle } from "lucide-react";
+import type { Dose } from "@/types";
+import { cn } from "@/lib/utils";
+
+/** Icon + words + subtle status dot, never colour alone. */
+export function StatusBadge({ dose }: { dose: Pick<Dose, "status" | "isDue"> }) {
+  const map = {
+    taken: {
+      label: "Taken",
+      Icon: CheckCircle2,
+      cls: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/25",
+    },
+    pending: dose.isDue
+      ? {
+          label: "Due now",
+          Icon: BellRing,
+          cls: "bg-amber-500/15 text-amber-300 border border-amber-500/30 animate-pulse",
+        }
+      : {
+          label: "Upcoming",
+          Icon: Clock,
+          cls: "bg-slate-500/10 text-slate-300 dark:text-slate-300 border border-slate-500/20",
+        },
+    snoozed: {
+      label: "Snoozed",
+      Icon: AlarmClock,
+      cls: "bg-purple-500/15 text-purple-300 border border-purple-500/30",
+    },
+    not_confirmed: {
+      label: "Not confirmed",
+      Icon: HelpCircle,
+      cls: "bg-rose-500/15 text-rose-400 border border-rose-500/30",
+    },
+  } as const;
+
+  const { label, Icon, cls } = map[dose.status];
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-wide",
+        cls,
+      )}
+    >
+      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+      <span>{label}</span>
+    </span>
+  );
+}

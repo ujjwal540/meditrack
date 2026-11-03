@@ -1,39 +1,142 @@
 :root {
-  --primary: #075b43;
-  --primary-dark: #064532;
-  --primary-light: #087653;
-  --sage: #80b99a;
-  --sage-light: #dcebdd;
-  --mint: #eaf3e7;
-  --background: #f7f5ec;
-  --surface: #fffefa;
-  --surface-green: #edf4e9;
-  --surface-peach: #fcf1e9;
-  --text: #25352d;
-  --text-secondary: #64736a;
-  --text-muted: #89958d;
-  --success: #25865b;
-  --warning: #e6a23c;
-  --danger: #d9534f;
-  --info: #4389b8;
-  --border: #e6e8dc;
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
-  --radius-xl: 30px;
-  --radius-pill: 999px;
-  --shadow-card: 0 5px 20px rgb(26 74 53 / 0.08);
-  --shadow-hover: 0 12px 28px rgb(26 74 53 / 0.13);
-  --font-heading: "Lora", Georgia, serif;
-  --font-body: "DM Sans", Arial, sans-serif;
+  /* OFFICIAL MEDICAL EMERALD PALETTE (Default Dark Forest Theme) */
+  --bg-app: #07130E;               /* Deep Forest Black */
+  --bg-secondary: #0B1C13;
+  --surface: #10251A;              /* Card background */
+  --surface-elevated: #183326;     /* Elevated surface */
+  --surface-glass: rgba(16, 37, 26, 0.78);
+  --border: rgba(163, 234, 193, 0.10);
+  --border-subtle: rgba(163, 234, 193, 0.05);
+  --border-glow: rgba(32, 201, 130, 0.35);
+
+  --primary: #16A36A;              /* Medical Emerald */
+  --primary-dark: #128254;
+  --primary-light: #20C982;        /* Secondary green */
+  --primary-glow: rgba(22, 163, 106, 0.25);
+
+  --secondary: #20C982;            /* Secondary green */
+  --mint: #A3EAC1;                 /* Soft mint */
+  --ai-accent: #A78BFA;            /* AI accent */
+  --ai-accent-glow: rgba(167, 139, 250, 0.25);
+
+  --text: #F4F8F5;                 /* Primary text */
+  --text-secondary: #A7B7AC;       /* Secondary text */
+  --text-muted: #708477;           /* Muted text */
+
+  --success: #36D399;
+  --warning: #FBBF24;
+  --danger: #FB7185;
+  --info: #60A5FA;
+
+  /* Backward compatible semantic mappings */
+  --forest: #16A36A;
+  --sage: #20C982;
+  --background: #07130E;
+  --cream: #07130E;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 9999px;
+
+  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
+  --shadow-hover: 0 20px 40px -15px rgba(22, 163, 106, 0.2), 0 0 0 1px var(--border-glow);
+  --shadow-glow: 0 0 35px -5px rgba(32, 201, 130, 0.3);
+
+  --font-heading: "Plus Jakarta Sans", "Sora", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
   --section-gap: 64px;
   --card-padding: 24px;
   --container-width: 1280px;
 }
 
+html[data-theme="light"],
+html:not(.dark):not([data-theme="dark"]) {
+  /* Pristine Medical Emerald Light Theme */
+  --bg-app: #F4F8F5;
+  --bg-secondary: #EAF3ED;
+  --surface: #FFFFFF;
+  --surface-elevated: #F0F7F2;
+  --surface-glass: rgba(255, 255, 255, 0.88);
+  --border: rgba(22, 163, 106, 0.15);
+  --border-subtle: rgba(22, 163, 106, 0.08);
+  --border-glow: rgba(22, 163, 106, 0.40);
+
+  --primary: #16A36A;              /* Medical Emerald */
+  --primary-dark: #128254;
+  --primary-light: #20C982;
+  --primary-glow: rgba(22, 163, 106, 0.15);
+
+  --secondary: #20C982;
+  --mint: #E8F8F0;
+  --ai-accent: #7C3AED;
+  --ai-accent-glow: rgba(124, 58, 237, 0.15);
+
+  --text: #07130E;
+  --text-secondary: #41574A;
+  --text-muted: #708477;
+
+  --success: #16A36A;
+  --warning: #D97706;
+  --danger: #E11D48;
+  --info: #2563EB;
+
+  --forest: #16A36A;
+  --sage: #20C982;
+  --background: #F4F8F5;
+  --cream: #F4F8F5;
+
+  --shadow-card: 0 4px 20px -2px rgba(7, 19, 14, 0.06), 0 0 0 1px var(--border);
+  --shadow-hover: 0 12px 28px -4px rgba(22, 163, 106, 0.15), 0 0 0 1px var(--border-glow);
+  --shadow-glow: 0 0 25px -5px rgba(22, 163, 106, 0.25);
+}
+
+html.dark,
+html[data-theme="dark"] {
+  --bg-app: #07130E;
+  --bg-secondary: #0B1C13;
+  --surface: #10251A;
+  --surface-elevated: #183326;
+  --surface-glass: rgba(16, 37, 26, 0.78);
+  --border: rgba(163, 234, 193, 0.10);
+  --border-subtle: rgba(163, 234, 193, 0.05);
+  --border-glow: rgba(32, 201, 130, 0.35);
+
+  --primary: #16A36A;
+  --primary-dark: #128254;
+  --primary-light: #20C982;
+  --primary-glow: rgba(22, 163, 106, 0.25);
+
+  --secondary: #20C982;
+  --mint: #A3EAC1;
+  --ai-accent: #A78BFA;
+  --ai-accent-glow: rgba(167, 139, 250, 0.25);
+
+  --text: #F4F8F5;
+  --text-secondary: #A7B7AC;
+  --text-muted: #708477;
+
+  --success: #36D399;
+  --warning: #FBBF24;
+  --danger: #FB7185;
+  --info: #60A5FA;
+
+  --forest: #16A36A;
+  --sage: #20C982;
+  --background: #07130E;
+  --cream: #07130E;
+
+  --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--border);
+  --shadow-hover: 0 20px 40px -15px rgba(22, 163, 106, 0.2), 0 0 0 1px var(--border-glow);
+  --shadow-glow: 0 0 35px -5px rgba(32, 201, 130, 0.3);
+}
+
 @media (max-width: 767px) {
   :root {
-    --section-gap: 40px;
+    --section-gap: 36px;
     --card-padding: 18px;
   }
 }
