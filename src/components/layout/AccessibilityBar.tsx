@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Contrast,
   Type,
@@ -53,6 +54,7 @@ export function AccessibilityBar({
   user?: { id: string; name?: string; email?: string; role: UserRole } | null;
   onUserUpdated?: (u: { id: string; name?: string; email?: string; role: UserRole }) => void;
 }) {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { easy, contrast, voice, toggle } = useAccessibility();
   const { speak } = useVoice();
   const { t, isNepali } = useTranslation();
@@ -61,7 +63,10 @@ export function AccessibilityBar({
     <div
       role="group"
       aria-label="Display, theme, language, voice and account preferences"
-      className="mb-6 flex flex-wrap items-center justify-between gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/70 p-2 backdrop-blur-md shadow-sm transition-colors duration-200"
+      className={cn(
+        "relative mb-6 flex flex-wrap items-center justify-between gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/85 p-2 sm:p-2.5 backdrop-blur-md shadow-sm transition-all duration-200",
+        isProfileOpen ? "z-50" : "z-30",
+      )}
     >
       <div className="flex flex-wrap items-center gap-2">
         <Toggle
@@ -94,7 +99,7 @@ export function AccessibilityBar({
         />
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
         {/* Global Instant Bilingual Language Switcher */}
         <LanguageSwitcher variant="toggle" showIcon={true} />
 
@@ -105,6 +110,7 @@ export function AccessibilityBar({
           compact={true}
           direction="down"
           onUserUpdated={onUserUpdated}
+          onOpenChange={setIsProfileOpen}
         />
       </div>
     </div>

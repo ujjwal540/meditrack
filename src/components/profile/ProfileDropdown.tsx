@@ -32,6 +32,7 @@ export interface ProfileDropdownProps {
   compact?: boolean;
   className?: string;
   onUserUpdated?: (user: { id: string; name?: string; email?: string; role: UserRole }) => void;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 export function ProfileDropdown({
@@ -40,6 +41,7 @@ export function ProfileDropdown({
   compact = false,
   className,
   onUserUpdated,
+  onOpenChange,
 }: ProfileDropdownProps) {
   const router = useRouter();
   const { t, isNepali } = useTranslation();
@@ -48,25 +50,34 @@ export function ProfileDropdown({
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [accountModalTab, setAccountModalTab] = useState<AccountTab | null>(null);
+  const [horizontalShift, setHorizontalShift] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close on click outside
+  const setMenuOpen = (next: boolean) => {
+    setIsOpen(next);
+    onOpenChange?.(next);
+  };
+
+  // Close on click outside (mouse or touch)
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
       if (
         containerRef.current &&
         !containerRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false);
+        setMenuOpen(false);
       }
     }
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("touchstart", handleClickOutside);
     }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
     };
   }, [isOpen]);
 
@@ -74,12 +85,61 @@ export function ProfileDropdown({
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape" && isOpen) {
-        setIsOpen(false);
+        setMenuOpen(false);
         triggerRef.current?.focus();
       }
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen]);
+
+  // Close when another floating panel opens, and coordinate dismissals
+  useEffect(() => {
+    function handleCloseFloating(e: Event) {
+      const customEvent = e as CustomEvent<{ origin?: string }>;
+      if (customEvent.detail?.origin !== "profile") {
+        setMenuOpen(false);
+      }
+    }
+    window.addEventListener("meditrack:close-floating", handleCloseFloating);
+    return () => window.removeEventListener("meditrack:close-floating", handleCloseFloating);
+  }, []);
+
+  // When opened, broadcast to close conflicting floating panels and ensure viewport containment
+  useEffect(() => {
+    if (!isOpen) {
+      setHorizontalShift(0);
+      return;
+    }
+
+    // Dismiss any conflicting popovers or drawers
+    window.dispatchEvent(
+      new CustomEvent("meditrack:close-floating", {
+        detail: { origin: "profile" },
+      }),
+    );
+
+    // Viewport containment check
+    const checkViewportBounds = () => {
+      if (!menuRef.current) return;
+      const rect = menuRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const margin = 12;
+
+      let shift = 0;
+      if (rect.left < margin) {
+        shift = margin - rect.left;
+      } else if (rect.right > viewportWidth - margin) {
+        shift = -(rect.right - (viewportWidth - margin));
+      }
+      setHorizontalShift(shift);
+    };
+
+    // Check immediately and on window resize
+    checkViewportBounds();
+    const handleResize = () => checkViewportBounds();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [isOpen]);
 
   const initials = (user?.name || user?.email || "U")
@@ -99,7 +159,7 @@ export function ProfileDropdown({
           : isNepali ? "बिरामी" : "Patient";
 
   function handleAction(action: () => void) {
-    setIsOpen(false);
+    setMenuOpen(false);
     action();
   }
 
@@ -165,14 +225,14 @@ export function ProfileDropdown({
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label="User profile and account menu"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setMenuOpen(!isOpen)}
         className={cn(
           "group relative flex items-center gap-2.5 rounded-2xl border transition-all duration-200 ease-out",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#20D6C2]",
           compact
             ? "p-1.5 border-[var(--border)] bg-[var(--surface-elevated)]/80 hover:border-[#20D6C2] hover:shadow-[0_0_16px_rgba(32,214,194,0.25)]"
             : "w-full p-2.5 border-[var(--border)] bg-[var(--surface-elevated)]/60 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(32,214,194,0.2)]",
-          isOpen && "border-[#20D6C2] bg-[#16A36A]/15 shadow-[0_0_18px_rgba(32,214,194,0.3)]",
+          isOpen && "border-[#20D6C2] bg-[#16A36A]/15 shadow-[0_0_18px_rgba(32,214,194,0.3)] ring-1 ring-[#20D6C2]/40",
         )}
       >
         {/* Avatar Circle with Online Status Indicator */}
@@ -216,18 +276,25 @@ export function ProfileDropdown({
       {/* Profile Dropdown Menu */}
       {isOpen && (
         <div
+          ref={menuRef}
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="profile-menu-button"
+          style={{
+            transform: horizontalShift ? `translateX(${horizontalShift}px)` : undefined,
+          }}
           className={cn(
-            "absolute z-50 w-72 sm:w-80 max-w-[calc(100vw-1.5rem)] rounded-2xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] p-2 shadow-2xl shadow-black/80 backdrop-blur-2xl transition-all animate-scale-in",
+            "absolute z-50 w-72 sm:w-80 max-w-[calc(100vw-2rem)] rounded-2xl border p-2.5 text-[var(--text)]",
+            "bg-white dark:bg-[#0A1A12]",
+            "border-emerald-500/30 dark:border-emerald-500/30",
+            "shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_0_1px_rgba(32,214,194,0.2)]",
             direction === "up"
-              ? "bottom-full left-0 mb-2"
-              : "top-full right-0 mt-2",
+              ? "bottom-full left-0 mb-2.5 animate-dropdown-up origin-bottom-left"
+              : "top-full right-0 mt-2.5 animate-dropdown-down origin-top-right",
           )}
         >
           {/* Top Section: User Name, Email, Profile Picture */}
-          <div className="flex items-center gap-3 rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-3 mb-1.5">
+          <div className="flex items-center gap-3 rounded-xl border border-emerald-500/20 dark:border-emerald-500/20 bg-emerald-50/70 dark:bg-[#10251A] p-3 mb-2">
             <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-tr from-[#16A36A] to-[#20D6C2] text-white text-sm font-black shadow-md shadow-[#16A36A]/30">
               {initials}
             </div>
@@ -253,7 +320,7 @@ export function ProfileDropdown({
           </div>
 
           {/* Quick Language Switcher Inside Profile Menu */}
-          <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[var(--surface-elevated)]/50 border border-[var(--border-subtle)] mb-1">
+          <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#10251A]/80 border border-emerald-500/15 dark:border-emerald-500/15 mb-1.5">
             <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
               <Languages className="h-3.5 w-3.5 text-[#16A36A] dark:text-[#20C982]" />
               <span>{t.common.language}</span>
@@ -273,15 +340,15 @@ export function ProfileDropdown({
                   onClick={() => handleAction(item.onClick)}
                   className={cn(
                     "group flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-xs transition-all duration-150",
-                    "hover:bg-[var(--surface-hover)] hover:text-[var(--text)] hover:shadow-sm focus-visible:outline-none focus-visible:bg-[var(--surface-hover)]",
+                    "hover:bg-[#16A36A]/10 hover:text-[var(--text)] focus-visible:outline-none focus-visible:bg-[#16A36A]/15",
                   )}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--text-secondary)] group-hover:text-[#20D6C2] group-hover:border-[#20D6C2]/40 transition-colors">
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-emerald-50 dark:bg-[#10251A] border border-emerald-500/20 text-[#16A36A] dark:text-[#20C982] group-hover:border-[#20D6C2]/50 group-hover:bg-[#20D6C2]/15 transition-colors">
                       <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                     </span>
                     <div className="min-w-0">
-                      <span className="block font-semibold text-[var(--text)] group-hover:text-[#20D6C2] transition-colors truncate">
+                      <span className="block font-semibold text-[var(--text)] group-hover:text-[#16A36A] dark:group-hover:text-[#20D6C2] transition-colors truncate">
                         {item.label}
                       </span>
                       <span className="block text-[10px] text-[var(--text-muted)] truncate">
@@ -308,7 +375,7 @@ export function ProfileDropdown({
             onClick={() => handleAction(() => setShowLogoutDialog(true))}
             className={cn(
               "group flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-xs transition-all duration-150",
-              "text-rose-500 dark:text-[#FB7185] hover:bg-rose-500/10 hover:border hover:border-rose-500/20 focus-visible:outline-none focus-visible:bg-rose-500/15",
+              "text-rose-600 dark:text-[#FB7185] hover:bg-rose-500/10 hover:border hover:border-rose-500/20 focus-visible:outline-none focus-visible:bg-rose-500/15",
             )}
           >
             <div className="flex items-center gap-2.5">
