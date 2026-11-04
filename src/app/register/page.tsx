@@ -139,7 +139,7 @@ export default function RegisterPage() {
           <legend className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
             {t.auth.registeringAs}
           </legend>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-1.5 xs:gap-2">
             {[
               { id: "patient", label: t.auth.patientRole, Icon: User, desc: isNepali ? "व्यक्तिगत" : "Personal" },
               { id: "family_caregiver", label: t.auth.familyRole, Icon: HeartHandshake, desc: isNepali ? "परिवार" : "Family" },
@@ -147,7 +147,7 @@ export default function RegisterPage() {
             ].map(({ id, label, Icon, desc }) => (
               <label
                 key={id}
-                className={`cursor-pointer rounded-xl border p-2.5 text-center transition-all ${
+                className={`cursor-pointer rounded-xl border p-1.5 xs:p-2.5 text-center transition-all ${
                   accountType === id
                     ? "border-[#20D6C2] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-[0_0_15px_rgba(32,214,194,0.22)]"
                     : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:border-[#20D6C2]/40"
@@ -162,8 +162,8 @@ export default function RegisterPage() {
                   className="sr-only"
                 />
                 <Icon className="h-4 w-4 mx-auto mb-1" />
-                <span className="block text-xs font-bold truncate">{label}</span>
-                <span className="block text-[10px] opacity-75 truncate">{desc}</span>
+                <span className="block text-[10px] xs:text-xs font-bold truncate">{label}</span>
+                <span className="block text-[9px] xs:text-[10px] opacity-75 truncate">{desc}</span>
               </label>
             ))}
           </div>

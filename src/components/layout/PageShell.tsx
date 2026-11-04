@@ -69,22 +69,22 @@ export function PageShell({
       <Navbar user={currentUser} onUserUpdated={setCurrentUser} />
 
       <div className="md:pl-64">
-        <main className="animate-rise mx-auto max-w-5xl px-4 pb-32 pt-5 md:px-8 md:pb-16 md:pt-8">
+        <main className="animate-rise mx-auto max-w-5xl px-3 xs:px-4 sm:px-6 md:px-8 pb-28 pt-4 sm:pt-5 md:pb-16 md:pt-8">
           <AccessibilityBar user={currentUser} onUserUpdated={setCurrentUser} />
 
           {!bare && title && (
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--border)] pb-5">
-              <div>
-                <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--text)]">
+            <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 border-b border-[var(--border)] pb-4 sm:pb-5">
+              <div className="min-w-0">
+                <h1 className="font-display text-xl xs:text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--text)]">
                   {title}
                 </h1>
                 {subtitle && (
-                  <p className="mt-1.5 text-xs sm:text-sm md:text-base text-[var(--text-secondary)]">
+                  <p className="mt-1 text-xs sm:text-sm md:text-base text-[var(--text-secondary)]">
                     {subtitle}
                   </p>
                 )}
               </div>
-              {action && <div className="shrink-0">{action}</div>}
+              {action && <div className="shrink-0 w-full sm:w-auto">{action}</div>}
             </div>
           )}
 

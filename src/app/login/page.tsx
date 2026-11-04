@@ -157,12 +157,12 @@ export default function LoginPage() {
         <p className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] text-center mb-2.5">
           {isNepali ? "वा १-क्लिकमा परीक्षण खाता छान्नुहोस्:" : "Or try a 1-click test role:"}
         </p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 xs:grid-cols-3 gap-1.5 xs:gap-2">
           <button
             type="button"
             disabled={loading}
             onClick={() => handleQuickDemo("eleanor.vance@example.com", "/dashboard")}
-            className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2 text-center text-[11px] font-semibold text-[var(--text-secondary)] hover:border-[#20D6C2] hover:text-[var(--text)] hover:bg-[var(--surface-hover)] transition-all"
+            className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2 xs:p-2 text-center text-[11px] font-semibold text-[var(--text-secondary)] hover:border-[#20D6C2] hover:text-[var(--text)] hover:bg-[var(--surface-hover)] transition-all"
           >
             <span className="block font-bold text-[var(--text)]">{t.auth.patientRole}</span>
             <span className="block text-[10px] text-[var(--text-muted)] truncate">Eleanor</span>
@@ -171,7 +171,7 @@ export default function LoginPage() {
             type="button"
             disabled={loading}
             onClick={() => handleQuickDemo("sarah.caregiver@example.com", "/family")}
-            className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2 text-center text-[11px] font-semibold text-[var(--text-secondary)] hover:border-[#20D6C2] hover:text-[var(--text)] hover:bg-[var(--surface-hover)] transition-all"
+            className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2 xs:p-2 text-center text-[11px] font-semibold text-[var(--text-secondary)] hover:border-[#20D6C2] hover:text-[var(--text)] hover:bg-[var(--surface-hover)] transition-all"
           >
             <span className="block font-bold text-[var(--text)]">{t.auth.familyRole}</span>
             <span className="block text-[10px] text-[var(--text-muted)] truncate">Sarah</span>
@@ -180,7 +180,7 @@ export default function LoginPage() {
             type="button"
             disabled={loading}
             onClick={() => handleQuickDemo("elena.pro@meditrack.care", "/marketplace?role=professional")}
-            className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2 text-center text-[11px] font-semibold text-[var(--text-secondary)] hover:border-[#20D6C2] hover:text-[var(--text)] hover:bg-[var(--surface-hover)] transition-all"
+            className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2 xs:p-2 text-center text-[11px] font-semibold text-[var(--text-secondary)] hover:border-[#20D6C2] hover:text-[var(--text)] hover:bg-[var(--surface-hover)] transition-all"
           >
             <span className="block font-bold text-[var(--text)]">{t.auth.careProRole}</span>
             <span className="block text-[10px] text-[var(--text-muted)] truncate">Elena, RN</span>

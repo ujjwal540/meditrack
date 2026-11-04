@@ -111,7 +111,8 @@ export function Navbar({
       {/* Mobile Bottom Navigation Dock */}
       <nav
         aria-label="Mobile navigation"
-        className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 md:hidden border-t border-[var(--border)] bg-[var(--surface)]/95 backdrop-blur-xl"
+        className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 md:hidden border-t border-[var(--border)] bg-[var(--surface)]/95 backdrop-blur-xl shadow-[0_-8px_20px_rgba(0,0,0,0.25)]"
+        style={{ paddingBottom: "max(env(safe-area-inset-bottom, 0px), 0.25rem)" }}
       >
         {items.map((item) => {
           const active = isActive(item);
@@ -121,13 +122,13 @@ export function Navbar({
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "mobile-bottom-nav-item flex min-h-[3.75rem] flex-col items-center justify-center gap-0.5 px-0.5 text-[0.65rem] sm:text-[0.72rem] font-medium tracking-tight transition-colors duration-200",
+                "mobile-bottom-nav-item flex min-h-[3.6rem] xs:min-h-[3.75rem] flex-col items-center justify-center gap-0.5 px-0.5 text-[0.58rem] xs:text-[0.65rem] sm:text-[0.72rem] font-semibold tracking-tight transition-all duration-200 active:scale-95",
                 active ? "is-active text-[#16A36A] dark:text-[#20C982]" : "text-[var(--text-muted)] hover:text-[#20D6C2]",
               )}
             >
               <span
                 className={cn(
-                  "mobile-bottom-nav-icon grid h-7 w-9 sm:h-8 sm:w-11 place-items-center rounded-full transition-all duration-200",
+                  "mobile-bottom-nav-icon grid h-6 w-8 xs:h-7 xs:w-9 sm:h-8 sm:w-11 place-items-center rounded-full transition-all duration-200",
                   active
                     ? "bg-[#16A36A]/20 text-[#16A36A] dark:text-[#A3EAC1] shadow-[0_0_12px_rgba(32,214,194,0.35)]"
                     : "text-[var(--text-muted)] group-hover:text-[#20D6C2]",
@@ -135,7 +136,7 @@ export function Navbar({
               >
                 <item.Icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
               </span>
-              <span className="truncate w-full text-center px-0.5">{item.label}</span>
+              <span className="truncate w-full text-center px-0.5 leading-none">{item.label}</span>
             </Link>
           );
         })}

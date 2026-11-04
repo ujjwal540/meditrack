@@ -1,17 +1,21 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Activity,
   ArrowRight,
   Bell,
   CheckCircle2,
+  ChevronRight,
   Clock,
   HeartHandshake,
   Lock,
+  Menu,
   ShieldCheck,
   Sparkles,
   Users,
+  X,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
@@ -35,6 +39,16 @@ function ensureDemoSession() {
 
 export default function Home() {
   const { t, isNepali } = useTranslation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Close mobile menu on Escape key
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   return (
     <div className="relative min-h-screen bg-[var(--bg-app)] text-[var(--text)] selection:bg-[#16A36A] selection:text-white overflow-x-hidden font-sans transition-colors duration-300">
@@ -43,15 +57,25 @@ export default function Home() {
       <div className="pointer-events-none fixed -top-40 left-1/2 -translate-x-1/2 h-[34rem] w-[52rem] rounded-full bg-gradient-to-b from-[#16A36A]/20 via-[#A78BFA]/10 to-transparent blur-[140px]" />
       <div className="pointer-events-none fixed -bottom-40 -right-40 h-[30rem] w-[30rem] rounded-full bg-[#20C982]/12 blur-[150px]" />
 
-      {/* Top Navigation Bar */}
+      {/* Top Navigation Bar with Intelligent Responsive Layout */}
       <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-glass)] backdrop-blur-xl transition-colors duration-300">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          {/* Zone 1: Brand wordmark with Medical Emerald Icon */}
-          <Link href="/" className="shrink-0 transition-transform hover:scale-[1.02]">
-            <Logo variant="full" size="md" glow={true} />
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 xs:gap-3 sm:gap-4 px-3 sm:px-6">
+          {/* Zone 1: Adaptive Brand wordmark */}
+          <Link href="/" className="shrink-0 transition-transform hover:scale-[1.02] flex items-center">
+            {/* Ultra-compact logo for small screens under 640px */}
+            <div className="flex items-center gap-2 sm:hidden">
+              <Logo variant="icon" size="sm" glow={true} />
+              <span className="font-display font-extrabold text-base tracking-tight text-[var(--text)] leading-none">
+                Medi<span className="text-[#16A36A] dark:text-[#20C982]">Track</span>
+              </span>
+            </div>
+            {/* Full logo for screens 640px and above */}
+            <div className="hidden sm:block">
+              <Logo variant="full" size="md" glow={true} />
+            </div>
           </Link>
 
-          {/* Zone 2: Navigation Links */}
+          {/* Zone 2: Desktop Navigation Links (>= 1024px) */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
             <a href="#features" className="hover:text-[#16A36A] dark:hover:text-[#20C982] transition-colors whitespace-nowrap shrink-0">
               {isNepali ? "विशेषताहरू" : "Features"}
@@ -70,14 +94,14 @@ export default function Home() {
             </a>
           </nav>
 
-          {/* Zone 3: Language Switcher, Theme Toggle & Primary Action */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Zone 3: Desktop Controls & CTA (>= 1024px) */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
             <LanguageSwitcher variant="minimal" />
             <ThemeToggle showLabel={false} />
 
             <Link
               href="/login"
-              className="hidden sm:inline-flex min-h-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-xs font-semibold text-[var(--text)] hover:border-[#16A36A]/50 hover:text-[#16A36A] dark:hover:text-[#20C982] transition-all whitespace-nowrap shadow-sm"
+              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-xs font-semibold text-[var(--text)] hover:border-[#16A36A]/50 hover:text-[#16A36A] dark:hover:text-[#20C982] transition-all whitespace-nowrap shadow-sm"
             >
               {t.nav.signIn}
             </Link>
@@ -85,21 +109,132 @@ export default function Home() {
             <Link
               href="/dashboard"
               onClick={ensureDemoSession}
-              className="inline-flex min-h-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-4 sm:px-5 text-xs font-bold text-white shadow-[0_0_20px_rgba(22,163,106,0.35)] hover:shadow-[0_0_28px_rgba(32,201,130,0.5)] hover:brightness-105 active:scale-95 transition-all whitespace-nowrap"
+              className="inline-flex min-h-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-5 text-xs font-bold text-white shadow-[0_0_20px_rgba(22,163,106,0.35)] hover:shadow-[0_0_28px_rgba(32,201,130,0.5)] hover:brightness-105 active:scale-95 transition-all whitespace-nowrap"
             >
               {isNepali ? "ड्यासबोर्ड खोल्नुहोस्" : "Launch Demo"}
             </Link>
           </div>
+
+          {/* Zone 4: Mobile & Tablet Action Cluster (< 1024px) */}
+          <div className="flex lg:hidden items-center gap-1.5 xs:gap-2 shrink-0">
+            {/* Tablet-only quick controls (640px to 1023px) */}
+            <div className="hidden sm:flex items-center gap-2">
+              <LanguageSwitcher variant="minimal" />
+              <ThemeToggle showLabel={false} />
+            </div>
+
+            {/* Guaranteed-Visible Launch Demo Button */}
+            <Link
+              href="/dashboard"
+              onClick={ensureDemoSession}
+              className="inline-flex h-9 xs:h-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-2.5 xs:px-3.5 sm:px-4 text-[11px] xs:text-xs font-bold text-white shadow-[0_0_15px_rgba(22,163,106,0.35)] hover:brightness-105 active:scale-95 transition-all whitespace-nowrap shrink-0"
+            >
+              <span>{isNepali ? "ड्यासबोर्ड" : "Launch Demo"}</span>
+            </Link>
+
+            {/* Mobile Hamburger Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              aria-label={mobileMenuOpen ? (isNepali ? "मेनु बन्द गर्नुहोस्" : "Close menu") : (isNepali ? "मेनु खोल्नुहोस्" : "Open menu")}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-nav-drawer"
+              className="grid h-9 w-9 xs:h-10 xs:w-10 place-items-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] hover:border-[#16A36A] hover:text-[#16A36A] dark:hover:text-[#20C982] active:scale-95 transition-all shrink-0 shadow-sm"
+            >
+              {mobileMenuOpen ? <X className="h-4 w-4 xs:h-5 xs:w-5" /> : <Menu className="h-4 w-4 xs:h-5 xs:w-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Navigation Drawer / Dropdown */}
+        {mobileMenuOpen && (
+          <div
+            id="mobile-nav-drawer"
+            className="lg:hidden border-t border-[var(--border)] bg-[var(--surface)]/98 backdrop-blur-2xl px-4 py-4 sm:px-6 shadow-[0_20px_40px_rgba(0,0,0,0.5)] animate-in fade-in slide-in-from-top-3 duration-200"
+          >
+            {/* Preferences bar on mobile phones (< 640px) */}
+            <div className="flex items-center justify-between gap-3 pb-3 mb-3 border-b border-[var(--border-subtle)] sm:hidden">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                {isNepali ? "भाषा र दृश्य" : "Preferences"}
+              </span>
+              <div className="flex items-center gap-2">
+                <LanguageSwitcher variant="minimal" />
+                <ThemeToggle showLabel={false} />
+              </div>
+            </div>
+
+            {/* Mobile Navigation Links */}
+            <nav className="flex flex-col space-y-1 text-sm font-semibold text-[var(--text)]">
+              <a
+                href="#features"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between rounded-xl p-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-[#16A36A] dark:hover:text-[#20C982] transition-colors"
+              >
+                <span>{isNepali ? "विशेषताहरू" : "Features"}</span>
+                <ChevronRight className="h-4 w-4 text-[var(--text-muted)]" />
+              </a>
+              <a
+                href="#how-it-works"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between rounded-xl p-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-[#16A36A] dark:hover:text-[#20C982] transition-colors"
+              >
+                <span>{isNepali ? "कसरी काम गर्छ" : "How It Works"}</span>
+                <ChevronRight className="h-4 w-4 text-[var(--text-muted)]" />
+              </a>
+              <a
+                href="#family-care"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between rounded-xl p-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-[#16A36A] dark:hover:text-[#20C982] transition-colors"
+              >
+                <span>{isNepali ? "परिवार समूह" : "Family Circle"}</span>
+                <ChevronRight className="h-4 w-4 text-[var(--text-muted)]" />
+              </a>
+              <Link
+                href="/marketplace"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between rounded-xl p-2.5 text-[#20D6C2] hover:bg-[var(--surface-elevated)] transition-colors font-bold"
+              >
+                <span>{isNepali ? "हेरचाहकर्मी (Care Pros)" : "Care Professionals"}</span>
+                <ChevronRight className="h-4 w-4 text-[#20D6C2]/60" />
+              </Link>
+              <a
+                href="#ai-assistant"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between rounded-xl p-2.5 text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-[#A78BFA] transition-colors"
+              >
+                <span>{isNepali ? "स्वास्थ्य साथी (AI Companion)" : "AI Healthcare Companion"}</span>
+                <ChevronRight className="h-4 w-4 text-[var(--text-muted)]" />
+              </a>
+            </nav>
+
+            {/* Mobile Auth Actions */}
+            <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] grid grid-cols-2 gap-2.5">
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex min-h-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-xs font-bold text-[var(--text)] hover:border-[#16A36A] active:scale-95 transition-all shadow-sm"
+              >
+                {t.nav.signIn}
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] text-xs font-bold text-white shadow-sm hover:brightness-105 active:scale-95 transition-all"
+              >
+                {isNepali ? "दर्ता गर्नुहोस्" : "Get Started"}
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-16 pb-20 sm:pt-24 sm:pb-28">
-        <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
+      <section className="relative pt-12 pb-16 xs:pt-16 xs:pb-20 sm:pt-24 sm:pb-28">
+        <div className="mx-auto max-w-5xl px-3 xs:px-4 text-center sm:px-6">
           {/* Eyebrow Kicker */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#16A36A]/30 bg-[#16A36A]/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-[#16A36A] dark:text-[#A3EAC1] mb-8 backdrop-blur-md shadow-sm">
-            <Sparkles className="h-3.5 w-3.5 text-[#20C982]" />
-            <span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#16A36A]/30 bg-[#16A36A]/10 px-3 xs:px-4 py-1.5 text-[11px] xs:text-xs font-semibold tracking-wide text-[#16A36A] dark:text-[#A3EAC1] mb-6 xs:mb-8 backdrop-blur-md shadow-sm max-w-full text-balance">
+            <Sparkles className="h-3.5 w-3.5 text-[#20C982] shrink-0" />
+            <span className="truncate">
               {isNepali
                 ? "स्मार्ट औषधि स्मरण तथा पारिवारिक हेरचाह प्रणाली"
                 : "Intelligent Medication & Family Care Platform"}
@@ -107,7 +242,7 @@ export default function Home() {
           </div>
 
           {/* Main Headline */}
-          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[var(--text)] leading-[1.08] text-balance">
+          <h1 className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-[var(--text)] leading-[1.1] text-balance">
             {isNepali ? (
               <>
                 औषधि कहिल्यै नछुटोस्।{" "}
@@ -126,17 +261,17 @@ export default function Home() {
           </h1>
 
           {/* Subtitle */}
-          <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-[var(--text-secondary)] text-balance">
+          <p className="mx-auto mt-4 xs:mt-6 max-w-2xl text-sm xs:text-base sm:text-lg leading-relaxed text-[var(--text-secondary)] text-balance">
             {isNepali
               ? "सटीक औषधि अनुस्मारक, दैनिक तालिका, सहमतिमा आधारित पारिवारिक हेरचाह समन्वय र आवाज प्रणालीका साथ सहज स्वास्थ्य व्यवस्थापन।"
               : "Precision reminders, timetable scheduling, consent-based family caregiver updates, and an AI healthcare assistant crafted around medical trust and clarity."}
           </p>
 
           {/* Call to Actions */}
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+          <div className="mt-8 xs:mt-9 flex flex-col xs:flex-row items-stretch xs:items-center justify-center gap-3 sm:gap-4 max-w-md xs:max-w-none mx-auto">
             <Link
               href="/register"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-7 text-sm font-bold text-white shadow-[0_4px_22px_rgba(22,163,106,0.35)] hover:shadow-[0_6px_30px_rgba(32,201,130,0.5)] hover:brightness-105 active:scale-95 transition-all"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-6 sm:px-7 text-sm font-bold text-white shadow-[0_4px_22px_rgba(22,163,106,0.35)] hover:shadow-[0_6px_30px_rgba(32,201,130,0.5)] hover:brightness-105 active:scale-95 transition-all"
             >
               <span>{isNepali ? "निःशुल्क सुरु गर्नुहोस्" : "Get Started Free"}</span>
               <ArrowRight className="h-4 w-4" />
@@ -145,20 +280,20 @@ export default function Home() {
             <Link
               href="/dashboard"
               onClick={ensureDemoSession}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-6 text-sm font-semibold text-[var(--text)] hover:border-[#16A36A]/40 hover:text-[#16A36A] dark:hover:text-[#20C982] active:scale-95 transition-all backdrop-blur-sm shadow-sm"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-5 sm:px-6 text-sm font-semibold text-[var(--text)] hover:border-[#16A36A]/40 hover:text-[#16A36A] dark:hover:text-[#20C982] active:scale-95 transition-all backdrop-blur-sm shadow-sm"
             >
               <span>{isNepali ? "अन्तर्क्रियात्मक डेमो हेर्नुहोस्" : "Explore Interactive Demo"}</span>
             </Link>
           </div>
 
           {/* Trust Highlights */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-[var(--text-secondary)]">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-[var(--text-secondary)]">
             <span className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-[#16A36A] dark:text-[#20C982]" />
-              {isNepali ? "कुनै क्रेडिट कार्ड आवश्यक छैन" : "No Credit Card Required"}
+              <ShieldCheck className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] shrink-0" />
+              {isNepali ? "कुनै क्रेडिट कार्ड चाहिँदैन" : "No Credit Card Required"}
             </span>
             <span className="flex items-center gap-1.5">
-              <Lock className="h-4 w-4 text-[#16A36A] dark:text-[#20C982]" />
+              <Lock className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] shrink-0" />
               {isNepali ? "पूर्ण सहमतिमा आधारित गोपनीयता" : "Strict Consent-Based Privacy"}
             </span>
 
