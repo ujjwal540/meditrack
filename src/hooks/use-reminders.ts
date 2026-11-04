@@ -43,14 +43,15 @@ export function useReminders() {
     pushStatus,
   } = useNotifications(settings);
 
-  const refresh = useCallback(() => {
-    setMedicines(getMedicines());
+  const refresh = useCallback(async () => {
+    const [loadedMedicines] = await Promise.all([getMedicines()]);
+    setMedicines(loadedMedicines);
     setLogs(getLogs());
     setSettings(getSettings());
   }, []);
 
   useEffect(() => {
-    refresh();
+    void refresh();
     void getActiveUser().then(setUser);
     setNow(new Date());
     setReady(true);
@@ -137,25 +138,25 @@ export function useReminders() {
   );
 
   const add = useCallback(
-    (input: Omit<Medicine, "id" | "createdAt">) => {
-      addMedicine(input);
-      refresh();
+    async (input: Omit<Medicine, "id" | "createdAt">) => {
+      await addMedicine(input);
+      await refresh();
     },
     [refresh],
   );
 
   const remove = useCallback(
-    (id: string) => {
-      deleteMedicine(id);
-      refresh();
+    async (id: string) => {
+      await deleteMedicine(id);
+      await refresh();
     },
     [refresh],
   );
 
   const update = useCallback(
-    (id: string, input: Omit<Medicine, "id" | "createdAt">) => {
-      updateMedicine(id, input);
-      refresh();
+    async (id: string, input: Omit<Medicine, "id" | "createdAt">) => {
+      await updateMedicine(id, input);
+      await refresh();
     },
     [refresh],
   );
