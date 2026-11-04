@@ -6,21 +6,20 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PillIcon } from "@/components/ui/PillIcon";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { useTranslation } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
-import { formatTime } from "@/utils/date-utils";
 
 type Period = {
   id: string;
-  label: string;
   Icon: LucideIcon;
   colorClass: string;
 };
 
-const PERIODS: Period[] = [
-  { id: "morning", label: "Morning", Icon: Sunrise, colorClass: "text-[#FBBF24]" },
-  { id: "afternoon", label: "Afternoon", Icon: Sun, colorClass: "text-[#16A36A] dark:text-[#20C982]" },
-  { id: "evening", label: "Evening", Icon: Sunset, colorClass: "text-[#60A5FA]" },
-  { id: "night", label: "Bedtime", Icon: Moon, colorClass: "text-[#A78BFA]" },
+const PERIOD_DEFS: Period[] = [
+  { id: "morning", Icon: Sunrise, colorClass: "text-[#FBBF24]" },
+  { id: "afternoon", Icon: Sun, colorClass: "text-[#16A36A] dark:text-[#20C982]" },
+  { id: "evening", Icon: Sunset, colorClass: "text-[#60A5FA]" },
+  { id: "night", Icon: Moon, colorClass: "text-[#A78BFA]" },
 ];
 
 function periodOf(time: string): string {
@@ -35,6 +34,15 @@ export function DoseList({
   doses: Dose[];
   onRespond?: (key: string, status: DoseStatus) => void;
 }) {
+  const { t, formatTimeDisplay, formatNumber } = useTranslation();
+
+  const periodLabels: Record<string, string> = {
+    morning: t.schedule.morningSection,
+    afternoon: t.schedule.afternoonSection,
+    evening: t.schedule.eveningSection,
+    night: t.schedule.bedtimeSection,
+  };
+
   if (doses.length === 0) {
     return (
       <Card className="text-center p-8 border border-dashed border-[var(--border)]">
@@ -42,10 +50,10 @@ export function DoseList({
           <PillIcon type="capsule" size={44} />
         </div>
         <h4 className="mt-4 font-display text-xl font-bold text-[var(--text)]">
-          No medicines scheduled for today
+          {t.schedule.noMedicinesScheduled}
         </h4>
         <p className="mt-1 text-sm text-[var(--text-secondary)]">
-          Add your prescriptions under Medicines to generate your personalized timetable.
+          {t.schedule.noMedicinesHint}
         </p>
       </Card>
     );
@@ -53,20 +61,21 @@ export function DoseList({
 
   return (
     <div className="space-y-6">
-      {PERIODS.map((p) => {
+      {PERIOD_DEFS.map((p) => {
         const items = doses.filter((d) => periodOf(d.time) === p.id);
         if (items.length === 0) return null;
+        const label = periodLabels[p.id] || p.id;
 
         return (
-          <section key={p.id} aria-label={p.label}>
+          <section key={p.id} aria-label={label}>
             <div className="mb-3 flex items-center gap-2">
               <span className={cn("grid h-6 w-6 place-items-center rounded-md bg-[var(--surface-elevated)]", p.colorClass)}>
                 <p.Icon className="h-4 w-4" aria-hidden="true" />
               </span>
               <h3 className="font-display text-base font-bold tracking-tight text-[var(--text)]">
-                {p.label}
+                {label}
               </h3>
-              <span className="text-xs text-[var(--text-muted)] font-mono">({items.length})</span>
+              <span className="text-xs text-[var(--text-muted)] font-mono">({formatNumber(items.length)})</span>
             </div>
 
             <ul className="space-y-2.5">
@@ -92,7 +101,7 @@ export function DoseList({
 
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-[var(--border-subtle)] pt-2.5 sm:pt-0">
                     <span className="font-mono text-xs sm:text-sm font-bold tabular-nums text-[var(--text)] bg-[var(--surface-elevated)] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[var(--border)]">
-                      {formatTime(d.time)}
+                      {formatTimeDisplay(d.time)}
                     </span>
                     <StatusBadge dose={d} />
                     {onRespond && d.status !== "taken" && (
@@ -102,7 +111,7 @@ export function DoseList({
                         onClick={() => onRespond(d.key, "taken")}
                         className="py-1 px-2.5 text-xs font-semibold"
                       >
-                        <Check className="h-3.5 w-3.5" aria-hidden="true" /> Mark Taken
+                        <Check className="h-3.5 w-3.5" aria-hidden="true" /> {t.medicines.markTaken}
                       </Button>
                     )}
                   </div>

@@ -4,13 +4,7 @@ import { CheckCircle2, ShieldCheck, Trash2, UserCheck, XCircle } from "lucide-re
 import type { CaregiverConnection, ConsentStatus } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-
-const LABEL: Record<ConsentStatus, { text: string; color: string }> = {
-  invited: { text: "Invitation Sent", color: "bg-amber-500/10 text-amber-500 dark:text-[#FBBF24] border-amber-500/25" },
-  accepted: { text: "Accepted – Awaiting Consent", color: "bg-blue-500/10 text-blue-500 dark:text-[#60A5FA] border-blue-500/25" },
-  granted: { text: "Sharing Active", color: "bg-emerald-500/10 text-emerald-500 dark:text-[#36D399] border-emerald-500/25" },
-  revoked: { text: "Sharing Paused", color: "bg-slate-500/10 text-slate-500 dark:text-[#708477] border-slate-500/25" },
-};
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export function CaregiverCard({
   c,
@@ -25,8 +19,29 @@ export function CaregiverCard({
   onConsent: (id: string, s: ConsentStatus) => void;
   onRemove: (id: string) => void;
 }) {
+  const { t, isNepali } = useTranslation();
   const initials = (c.caregiverName || c.caregiverEmail).slice(0, 2).toUpperCase();
-  const statusInfo = LABEL[c.consentStatus];
+
+  const statusLabel: Record<ConsentStatus, { text: string; color: string }> = {
+    invited: {
+      text: t.family.consentInvited,
+      color: "bg-amber-500/10 text-amber-500 dark:text-[#FBBF24] border-amber-500/25",
+    },
+    accepted: {
+      text: t.family.consentPending,
+      color: "bg-blue-500/10 text-blue-500 dark:text-[#60A5FA] border-blue-500/25",
+    },
+    granted: {
+      text: t.family.consentGranted,
+      color: "bg-emerald-500/10 text-emerald-500 dark:text-[#36D399] border-emerald-500/25",
+    },
+    revoked: {
+      text: isNepali ? "साझेदारी रोकियो" : "Sharing Paused",
+      color: "bg-slate-500/10 text-slate-500 dark:text-[#708477] border-slate-500/25",
+    },
+  };
+
+  const statusInfo = statusLabel[c.consentStatus];
 
   return (
     <Card interactive={true} className="flex flex-wrap items-center justify-between gap-4 p-5">
@@ -56,7 +71,7 @@ export function CaregiverCard({
       <div className="flex flex-wrap items-center gap-2 shrink-0">
         {isIncoming && c.consentStatus === "invited" && onAccept && (
           <Button size="sm" variant="primary" onClick={() => onAccept(c.id)}>
-            <CheckCircle2 className="h-3.5 w-3.5" /> Accept Invitation
+            <CheckCircle2 className="h-3.5 w-3.5" /> {isNepali ? "निमन्त्रणा स्वीकार्नुहोस्" : "Accept Invitation"}
           </Button>
         )}
         {c.consentStatus === "invited" && (
@@ -66,7 +81,7 @@ export function CaregiverCard({
             onClick={() => onConsent(c.id, "accepted")}
             className="text-xs py-1 px-3"
           >
-            Simulate Acceptance
+            {isNepali ? "स्वीकृति परीक्षण" : "Simulate Acceptance"}
           </Button>
         )}
         {c.consentStatus === "accepted" && (
@@ -76,7 +91,7 @@ export function CaregiverCard({
             onClick={() => onConsent(c.id, "granted")}
             className="text-xs py-1 px-3"
           >
-            <UserCheck className="h-3.5 w-3.5" /> Grant Access
+            <UserCheck className="h-3.5 w-3.5" /> {t.family.grantAccessBtn}
           </Button>
         )}
         {c.consentStatus === "granted" && (
@@ -86,13 +101,14 @@ export function CaregiverCard({
             onClick={() => onConsent(c.id, "revoked")}
             className="text-xs py-1 px-3 text-amber-500 dark:text-[#FBBF24] border-amber-500/25"
           >
-            <XCircle className="h-3.5 w-3.5" /> Pause Sharing
+            <XCircle className="h-3.5 w-3.5" /> {t.family.revokeAccessBtn}
           </Button>
         )}
         <Button
           size="sm"
           variant="danger"
-          aria-label={`Remove ${c.caregiverEmail}`}
+          aria-label={`${t.family.removeConnectionBtn} ${c.caregiverEmail}`}
+          title={t.family.removeConnectionBtn}
           onClick={() => onRemove(c.id)}
           className="text-xs py-1 px-3"
         >

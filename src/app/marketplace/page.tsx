@@ -34,8 +34,10 @@ import {
 import { getActiveUser } from "@/lib/auth";
 import { formatTime } from "@/utils/date-utils";
 import Image from "next/image";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export default function MarketplacePage() {
+  const { t, isNepali, formatNumber, formatTimeDisplay } = useTranslation();
   const [caregivers, setCaregivers] = useState<ProfessionalCaregiver[]>([]);
   const [bookings, setBookings] = useState<ProfessionalBooking[]>([]);
   const [currentUser, setCurrentUser] = useState<{ id: string; name?: string; role: UserRole } | null>(null);
@@ -145,13 +147,13 @@ export default function MarketplacePage() {
 
   return (
     <PageShell
-      title="Professional Caregiver Marketplace"
-      subtitle="Find, schedule, and hire licensed healthcare companions and certified nursing assistants."
+      title={t.marketplace.pageTitle}
+      subtitle={t.marketplace.pageSubtitle}
       action={
         <div className="flex items-center gap-2">
           {currentUser?.role === "professional_caregiver" && (
             <span className="font-mono text-xs font-bold text-[#20D6C2] bg-[#20D6C2]/10 border border-[#20D6C2]/30 px-3 py-1.5 rounded-xl">
-              Caregiver Workspace Active
+              {isNepali ? "हेरचाहकर्ता कार्यस्थान सक्रिय" : "Caregiver Workspace Active"}
             </span>
           )}
         </div>
@@ -170,7 +172,7 @@ export default function MarketplacePage() {
               }`}
             >
               <Search className="inline-block h-3.5 w-3.5 mr-1.5" />
-              Browse Caregivers ({filteredCaregivers.length})
+              {t.marketplace.tabBrowse} ({formatNumber(filteredCaregivers.length)})
             </button>
 
             <button
@@ -182,7 +184,7 @@ export default function MarketplacePage() {
               }`}
             >
               <Calendar className="inline-block h-3.5 w-3.5 mr-1.5" />
-              My Bookings ({bookings.length})
+              {t.marketplace.tabBookings} ({formatNumber(bookings.length)})
             </button>
 
             {currentUser?.role === "professional_caregiver" && (
@@ -195,14 +197,18 @@ export default function MarketplacePage() {
                 }`}
               >
                 <Briefcase className="inline-block h-3.5 w-3.5 mr-1.5" />
-                Caregiver Workspace
+                {t.marketplace.tabWorkspace}
               </button>
             )}
           </div>
 
           <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
             <ShieldCheck className="h-4 w-4 text-[#20D6C2]" />
-            <span>100% Background-Checked Healthcare Professionals</span>
+            <span>
+              {isNepali
+                ? "१००% प्रमाणित र पृष्ठभूमि जाँच गरिएका स्वास्थ्यकर्मीहरू"
+                : "100% Background-Checked Healthcare Professionals"}
+            </span>
           </div>
         </div>
 
@@ -220,7 +226,7 @@ export default function MarketplacePage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search nurse, specialist, or name..."
+                    placeholder={t.marketplace.searchPlaceholder}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] pl-9 pr-3.5 py-2.5 text-xs text-[var(--text)] focus:border-[#20D6C2] focus:outline-none"
                   />
                 </div>
@@ -231,7 +237,7 @@ export default function MarketplacePage() {
                     onChange={(e) => setLocationFilter(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2.5 text-xs text-[var(--text)] focus:border-[#20D6C2] focus:outline-none"
                   >
-                    <option value="all">All Locations</option>
+                    <option value="all">{isNepali ? "सबै स्थानहरू" : "All Locations"}</option>
                     {locations.filter((l) => l !== "all").map((loc) => (
                       <option key={loc} value={loc}>{loc}</option>
                     ))}
@@ -244,10 +250,10 @@ export default function MarketplacePage() {
                     onChange={(e) => setExperienceFilter(Number(e.target.value))}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2.5 text-xs text-[var(--text)] focus:border-[#20D6C2] focus:outline-none"
                   >
-                    <option value={0}>Any Experience</option>
-                    <option value={3}>3+ Years Exp</option>
-                    <option value={5}>5+ Years Exp</option>
-                    <option value={8}>8+ Years Exp</option>
+                    <option value={0}>{isNepali ? "कुनै पनि अनुभव" : "Any Experience"}</option>
+                    <option value={3}>{isNepali ? "३+ वर्ष अनुभव" : "3+ Years Exp"}</option>
+                    <option value={5}>{isNepali ? "५+ वर्ष अनुभव" : "5+ Years Exp"}</option>
+                    <option value={8}>{isNepali ? "८+ वर्ष अनुभव" : "8+ Years Exp"}</option>
                   </select>
                 </div>
 
@@ -257,14 +263,15 @@ export default function MarketplacePage() {
                     onChange={(e) => setMaxRateFilter(Number(e.target.value))}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2.5 text-xs text-[var(--text)] focus:border-[#20D6C2] focus:outline-none"
                   >
-                    <option value={100}>Max: $100/hr</option>
-                    <option value={60}>Under $60/hr</option>
-                    <option value={45}>Under $45/hr</option>
-                    <option value={35}>Under $35/hr</option>
+                    <option value={100}>{isNepali ? "अधिकतम: $१००/घण्टा" : "Max: $100/hr"}</option>
+                    <option value={60}>{isNepali ? "$६०/घण्टा मुनि" : "Under $60/hr"}</option>
+                    <option value={45}>{isNepali ? "$४५/घण्टा मुनि" : "Under $45/hr"}</option>
+                    <option value={35}>{isNepali ? "$३५/घण्टा मुनि" : "Under $35/hr"}</option>
                   </select>
                 </div>
               </div>
             </Card>
+
 
             {/* Caregivers Grid */}
             <div className="grid gap-5 md:grid-cols-2">
@@ -304,9 +311,9 @@ export default function MarketplacePage() {
 
                       <div className="text-right">
                         <span className="font-mono text-xl font-bold text-[#20D6C2]">
-                          ${pro.hourlyRate}
+                          ${formatNumber(pro.hourlyRate)}
                         </span>
-                        <span className="text-[10px] text-[var(--text-muted)] block">/ hour</span>
+                        <span className="text-[10px] text-[var(--text-muted)] block">/ {t.marketplace.perHour}</span>
                       </div>
                     </div>
 
@@ -319,13 +326,13 @@ export default function MarketplacePage() {
                     <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)] font-mono">
                       <span className="flex items-center gap-1 text-[var(--text)]">
                         <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
-                        <strong className="text-[var(--text)]">{pro.rating.toFixed(2)}</strong> ({pro.reviewCount} reviews)
+                        <strong className="text-[var(--text)]">{formatNumber(pro.rating.toFixed(2))}</strong> ({formatNumber(pro.reviewCount)} {isNepali ? "समीक्षाहरू" : "reviews"})
                       </span>
                       <span className="flex items-center gap-1">
                         <MapPin className="h-3.5 w-3.5 text-[#20D6C2]" /> {pro.serviceLocation}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Award className="h-3.5 w-3.5 text-[#16A36A]" /> {pro.yearsExperience} yrs exp
+                        <Award className="h-3.5 w-3.5 text-[#16A36A]" /> {formatNumber(pro.yearsExperience)} {t.marketplace.yearsExp}
                       </span>
                     </div>
                   </div>
@@ -338,7 +345,7 @@ export default function MarketplacePage() {
                       onClick={() => openProfile(pro)}
                       className="text-xs"
                     >
-                      View Profile &amp; Reviews
+                      {t.marketplace.viewProfileBtn}
                     </Button>
                     <Button
                       size="sm"
@@ -349,7 +356,7 @@ export default function MarketplacePage() {
                       }}
                       className="text-xs font-bold"
                     >
-                      Book Care Check-In
+                      {t.marketplace.bookCaregiverBtn}
                     </Button>
                   </div>
                 </Card>
@@ -359,8 +366,10 @@ export default function MarketplacePage() {
             {filteredCaregivers.length === 0 && (
               <Card className="text-center p-12 border border-dashed border-[var(--border)]">
                 <Search className="mx-auto h-12 w-12 text-[var(--text-muted)] opacity-50" />
-                <h3 className="mt-3 font-display text-base font-bold text-[var(--text)]">No Caregivers Match Search</h3>
-                <p className="mt-1 text-xs text-[var(--text-secondary)]">Try clearing your filters or selecting a different service location.</p>
+                <h3 className="mt-3 font-display text-base font-bold text-[var(--text)]">{t.marketplace.noCaregiversMatch}</h3>
+                <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                  {isNepali ? "फिल्टर हटाएर वा अन्य सेवा स्थान छानेर हेर्नुहोस्।" : "Try clearing your filters or selecting a different service location."}
+                </p>
               </Card>
             )}
           </div>
@@ -373,17 +382,19 @@ export default function MarketplacePage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-lg font-bold text-[var(--text)]">
-                Active &amp; Past Care Bookings ({bookings.length})
+                {t.marketplace.myBookingsTitle} ({formatNumber(bookings.length)})
               </h2>
             </div>
 
             {bookings.length === 0 ? (
               <Card className="text-center p-10 border border-dashed border-[var(--border)]">
                 <Calendar className="mx-auto h-12 w-12 text-[var(--text-muted)] opacity-50" />
-                <h3 className="mt-3 font-display text-base font-bold text-[var(--text)]">No Bookings Found</h3>
-                <p className="mt-1 text-xs text-[var(--text-secondary)]">You haven't booked any caregiver check-ins yet.</p>
+                <h3 className="mt-3 font-display text-base font-bold text-[var(--text)]">{t.marketplace.noBookingsYet}</h3>
+                <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                  {isNepali ? "तपाईंले अहिलेसम्म कुनै हेरचाहकर्ता बुक गर्नुभएको छैन।" : "You haven't booked any caregiver check-ins yet."}
+                </p>
                 <Button size="sm" variant="primary" onClick={() => setViewTab("browse")} className="mt-4 text-xs">
-                  Browse Verified Caregivers
+                  {t.marketplace.tabBrowse}
                 </Button>
               </Card>
             ) : (
@@ -403,24 +414,30 @@ export default function MarketplacePage() {
                               : "bg-amber-500/10 text-amber-500 border border-amber-500/25"
                           }`}
                         >
-                          {b.status}
+                          {b.status === "confirmed"
+                            ? (isNepali ? "पुष्टि भएको" : "Confirmed")
+                            : b.status === "completed"
+                            ? (isNepali ? "सम्पन्न" : "Completed")
+                            : b.status === "cancelled"
+                            ? (isNepali ? "रद्द गरिएको" : "Cancelled")
+                            : (isNepali ? "अनुरोध गरिएको" : "Requested")}
                         </span>
                         <span className="text-xs text-[var(--text-muted)] font-mono capitalize">
-                          &bull; {b.serviceType} ({b.durationMinutes}m)
+                          &bull; {b.serviceType === "visit" ? t.marketplace.serviceTypeVisit : b.serviceType === "call" ? t.marketplace.serviceTypeCall : t.marketplace.serviceTypeCheckin} ({formatNumber(b.durationMinutes)}m)
                         </span>
                       </div>
 
                       <h3 className="font-display text-base font-bold text-[var(--text)]">
-                        {b.caregiverName || "Professional Caregiver"}
+                        {b.caregiverName || (isNepali ? "व्यावसायिक हेरचाहकर्ता" : "Professional Caregiver")}
                       </h3>
                       <p className="text-xs text-[var(--text-secondary)] mt-0.5">
                         {b.careRequirements}
                       </p>
 
                       <div className="mt-2 flex items-center gap-4 text-xs font-mono text-[var(--text-muted)]">
-                        <span>Date: <strong className="text-[var(--text)]">{b.scheduledDate}</strong></span>
-                        <span>Time: <strong className="text-[var(--text)]">{formatTime(b.scheduledTime)}</strong></span>
-                        <span>Rate: <strong className="text-[#20D6C2]">${b.totalAmount}</strong></span>
+                        <span>{t.marketplace.serviceDate}: <strong className="text-[var(--text)]">{b.scheduledDate}</strong></span>
+                        <span>{t.marketplace.serviceTime}: <strong className="text-[var(--text)]">{formatTimeDisplay(b.scheduledTime)}</strong></span>
+                        <span>{isNepali ? "रकम" : "Rate"}: <strong className="text-[#20D6C2]">${formatNumber(b.totalAmount)}</strong></span>
                       </div>
                     </div>
 
@@ -435,7 +452,7 @@ export default function MarketplacePage() {
                           }}
                           className="text-xs py-1.5 px-3"
                         >
-                          <CheckCircle2 className="h-3.5 w-3.5" /> Mark Completed
+                          <CheckCircle2 className="h-3.5 w-3.5" /> {isNepali ? "सम्पन्न चिन्ह लगाउनुहोस्" : "Mark Completed"}
                         </Button>
                       )}
                       {b.status === "requested" && (
@@ -448,7 +465,7 @@ export default function MarketplacePage() {
                           }}
                           className="text-xs py-1.5 px-3"
                         >
-                          Cancel
+                          {isNepali ? "रद्द गर्नुहोस्" : "Cancel"}
                         </Button>
                       )}
                     </div>
@@ -458,6 +475,7 @@ export default function MarketplacePage() {
             )}
           </div>
         )}
+
 
         {/* =========================================================================
             TAB 3: CAREGIVER WORKSPACE (For Registered Professional Caregivers)
@@ -584,41 +602,45 @@ export default function MarketplacePage() {
                 </div>
                 <div>
                   <h3 className="font-display text-lg font-bold text-[var(--text)]">
-                    Schedule Care with {bookingTarget.fullName}
+                    {isNepali ? `${bookingTarget.fullName} सँग हेरचाह तालिका बनाउनुहोस्` : `Schedule Care with ${bookingTarget.fullName}`}
                   </h3>
-                  <span className="text-xs text-[#20D6C2] font-mono">${bookingTarget.hourlyRate}/hr &bull; Verified</span>
+                  <span className="text-xs text-[#20D6C2] font-mono">
+                    ${formatNumber(bookingTarget.hourlyRate)}/{t.marketplace.perHour} &bull; {t.marketplace.verifiedBadge}
+                  </span>
                 </div>
               </div>
 
               {bookingSuccess ? (
                 <div className="py-8 text-center space-y-3">
                   <CheckCircle2 className="h-12 w-12 text-[#20D6C2] mx-auto animate-bounce" />
-                  <h4 className="font-display text-lg font-bold text-[var(--text)]">Booking Requested!</h4>
-                  <p className="text-xs text-[var(--text-secondary)]">The caregiver has been notified and will confirm your check-in time.</p>
+                  <h4 className="font-display text-lg font-bold text-[var(--text)]">{t.marketplace.bookingSuccessMsg}</h4>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    {isNepali ? "हेरचाहकर्तालाई सूचित गरिएको छ र उहाँले समय पुष्टि गर्नुहुनेछ।" : "The caregiver has been notified and will confirm your check-in time."}
+                  </p>
                 </div>
               ) : (
                 <form onSubmit={handleBookSubmit} className="space-y-3.5 text-xs">
                   <div>
                     <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                      Check-In Method
+                      {isNepali ? "हेरचाह विधि" : "Check-In Method"}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
-                        { id: "visit", label: "Home Visit" },
-                        { id: "call", label: "Phone Call" },
-                        { id: "checkin", label: "Quick Check-in" },
-                      ].map((t) => (
+                        { id: "visit", label: t.marketplace.serviceTypeVisit },
+                        { id: "call", label: t.marketplace.serviceTypeCall },
+                        { id: "checkin", label: t.marketplace.serviceTypeCheckin },
+                      ].map((tItem) => (
                         <button
-                          key={t.id}
+                          key={tItem.id}
                           type="button"
-                          onClick={() => setServiceType(t.id as any)}
+                          onClick={() => setServiceType(tItem.id as any)}
                           className={`p-2 rounded-xl border text-center font-bold transition-all ${
-                            serviceType === t.id
+                            serviceType === tItem.id
                               ? "border-[#20D6C2] bg-[#16A36A]/15 text-[#20D6C2]"
                               : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)]"
                           }`}
                         >
-                          {t.label}
+                          {tItem.label}
                         </button>
                       ))}
                     </div>
@@ -627,7 +649,7 @@ export default function MarketplacePage() {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                        Date
+                        {t.marketplace.serviceDate}
                       </label>
                       <input
                         type="date"
@@ -639,7 +661,7 @@ export default function MarketplacePage() {
                     </div>
                     <div>
                       <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                        Time
+                        {t.marketplace.serviceTime}
                       </label>
                       <input
                         type="time"
@@ -654,12 +676,12 @@ export default function MarketplacePage() {
                   {serviceType === "visit" ? (
                     <div>
                       <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                        Home Address
+                        {t.marketplace.serviceAddress}
                       </label>
                       <input
                         type="text"
                         required
-                        placeholder="Street Address, Apt, City"
+                        placeholder={isNepali ? "घरको ठेगाना, टोल, सहर" : "Street Address, Apt, City"}
                         value={serviceAddress}
                         onChange={(e) => setServiceAddress(e.target.value)}
                         className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-xs text-[var(--text)] focus:border-[#20D6C2] focus:outline-none"
@@ -668,12 +690,12 @@ export default function MarketplacePage() {
                   ) : (
                     <div>
                       <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                        Patient Phone Number
+                        {t.marketplace.contactPhone}
                       </label>
                       <input
                         type="tel"
                         required
-                        placeholder="(555) 000-0000"
+                        placeholder={isNepali ? "९८००००००००" : "(555) 000-0000"}
                         value={patientPhone}
                         onChange={(e) => setPatientPhone(e.target.value)}
                         className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-xs text-[var(--text)] focus:border-[#20D6C2] focus:outline-none"
@@ -683,28 +705,28 @@ export default function MarketplacePage() {
 
                   <div>
                     <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                      Medication / Check-In Instructions
+                      {t.marketplace.careRequirementsLabel}
                     </label>
                     <textarea
                       rows={2}
                       value={careRequirements}
                       onChange={(e) => setCareRequirements(e.target.value)}
-                      placeholder="e.g. Please verify morning blood pressure medication and food intake."
+                      placeholder={isNepali ? "जस्तै: बिहानको रक्तचाप औषधिको जाँच र खाना खाएको सुनिश्चितता।" : "e.g. Please verify morning blood pressure medication and food intake."}
                       className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-xs text-[var(--text)] focus:border-[#20D6C2] focus:outline-none resize-none"
                     />
                   </div>
 
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 flex items-center justify-between">
-                    <span className="text-[var(--text-secondary)]">Total Estimated Charge:</span>
-                    <strong className="font-mono text-base text-[#20D6C2]">${bookingTarget.hourlyRate}.00</strong>
+                    <span className="text-[var(--text-secondary)]">{isNepali ? "अनुमानित कुल शुल्क:" : "Total Estimated Charge:"}</span>
+                    <strong className="font-mono text-base text-[#20D6C2]">${formatNumber(bookingTarget.hourlyRate)}.00</strong>
                   </div>
 
                   <div className="pt-2 flex justify-end gap-2">
                     <Button type="button" size="sm" variant="outline" onClick={() => setBookingTarget(null)}>
-                      Cancel
+                      {t.common.cancel}
                     </Button>
                     <Button type="submit" size="sm" variant="primary">
-                      Confirm Request
+                      {t.marketplace.confirmBookingBtn}
                     </Button>
                   </div>
                 </form>
@@ -712,6 +734,7 @@ export default function MarketplacePage() {
             </Card>
           </div>
         )}
+
 
         {/* =========================================================================
             PROFILE DETAILS & REVIEWS MODAL

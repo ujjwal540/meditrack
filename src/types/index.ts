@@ -50,7 +50,10 @@ export interface CaregiverConnection {
   createdAt: string;
 }
 
+export type SupportedLanguage = "en" | "ne";
+
 export interface AppSettings {
+  language?: SupportedLanguage;
   easyMode: boolean;
   voiceEnabled: boolean;
   snoozeMinutes: number;

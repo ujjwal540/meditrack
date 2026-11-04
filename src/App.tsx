@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import { AppRouterProvider, usePathname } from "./lib/next-shim";
 import { AccessibilityProvider } from "./components/layout/AccessibilityProvider";
+import { LanguageProvider } from "./i18n/LanguageContext";
 import { ReminderProvider } from "./components/reminders/ReminderProvider";
 
 // Import Next.js route pages
@@ -61,13 +62,15 @@ function RouteRenderer() {
 export default function App() {
   return (
     <AppRouterProvider>
-      <AccessibilityProvider>
-        <ReminderProvider>
-          <Suspense fallback={<div className="p-8 text-center text-sm text-[var(--text-secondary)]">Loading...</div>}>
-            <RouteRenderer />
-          </Suspense>
-        </ReminderProvider>
-      </AccessibilityProvider>
+      <LanguageProvider>
+        <AccessibilityProvider>
+          <ReminderProvider>
+            <Suspense fallback={<div className="p-8 text-center text-sm text-[var(--text-secondary)]">Loading...</div>}>
+              <RouteRenderer />
+            </Suspense>
+          </ReminderProvider>
+        </AccessibilityProvider>
+      </LanguageProvider>
     </AppRouterProvider>
   );
 }

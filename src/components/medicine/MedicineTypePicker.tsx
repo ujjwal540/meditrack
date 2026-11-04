@@ -2,14 +2,8 @@
 
 import { Check } from "lucide-react";
 import { PillIcon, type MedType } from "@/components/ui/PillIcon";
+import { useTranslation } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
-
-const OPTIONS: { id: MedType; label: string }[] = [
-  { id: "tablet", label: "Tablet" },
-  { id: "capsule", label: "Capsule" },
-  { id: "injection", label: "Injection" },
-  { id: "other", label: "Other Form" },
-];
 
 export function MedicineTypePicker({
   value,
@@ -18,13 +12,22 @@ export function MedicineTypePicker({
   value: MedType;
   onChange: (t: MedType) => void;
 }) {
+  const { t } = useTranslation();
+
+  const options: { id: MedType; label: string }[] = [
+    { id: "tablet", label: t.medicines.typeTablet },
+    { id: "capsule", label: t.medicines.typeCapsule },
+    { id: "injection", label: t.medicines.typeInjection },
+    { id: "other", label: t.medicines.typeOther },
+  ];
+
   return (
     <fieldset className="md:col-span-2">
       <legend className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
-        Medication Delivery Form
+        {t.medicines.typeLabel}
       </legend>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {OPTIONS.map((o) => {
+        {options.map((o) => {
           const selected = value === o.id;
           return (
             <button

@@ -44,6 +44,7 @@ import {
 import { formatTime } from "@/utils/date-utils";
 import Image from "next/image";
 import { waitForSupabaseAuth } from "@/lib/supabase";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 type RemoteActivity = {
   medicineName: string;
@@ -98,6 +99,7 @@ async function loadRemoteActivity(connections: CaregiverConnection[]): Promise<R
 
 export default function FamilyPage() {
   const { doses, user, userName } = useMediTrack();
+  const { t, isNepali, formatNumber, formatTimeDisplay } = useTranslation();
   const [list, setList] = useState<CaregiverConnection[]>([]);
   const [remoteActivity, setRemoteActivity] = useState<RemoteActivity[]>([]);
   const [email, setEmail] = useState("");
@@ -167,9 +169,9 @@ export default function FamilyPage() {
       dosage: dose.dosage,
       status: (dose.status === "pending" ? "not_confirmed" : dose.status) as DoseLog["status"],
       time: dose.time,
-      date: "Today",
+      date: isNepali ? "आज" : "Today",
     }));
-  }, [remoteActivity, doses]);
+  }, [remoteActivity, doses, isNepali]);
 
   const missed = activity.filter((item) => item.status === "not_confirmed");
   const upcoming = doses.filter((dose) => dose.status === "pending").slice(0, 3);
@@ -205,7 +207,7 @@ export default function FamilyPage() {
     if (!reportNotes.trim()) return;
     addCareReport({
       patientName: reportPatient,
-      date: "Today",
+      date: isNepali ? "आज" : "Today",
       visitType: reportType,
       adherenceObserved: reportAdherence,
       notes: reportNotes,
@@ -219,11 +221,13 @@ export default function FamilyPage() {
 
   return (
     <PageShell
-      title={isCaregiver ? "Caregiver Support Workspace" : "Family Care Circle"}
+      title={isCaregiver ? (isNepali ? "हेरचाहकर्ता कार्यस्थान" : "Caregiver Support Workspace") : t.family.pageTitle}
       subtitle={
         isCaregiver
-          ? (userName ? `Care coordination dashboard for ${userName}. Review patient check-ins and schedules.` : "Care coordination dashboard. Review patient check-ins and schedules.")
-          : "Connect with trusted loved ones, monitor doses, and coordinate care visits."
+          ? (userName
+              ? (isNepali ? `${userName} को हेरचाह ड्यासबोर्ड। बिरामीको औषधि र तालिका समीक्षा गर्नुहोस्।` : `Care coordination dashboard for ${userName}. Review patient check-ins and schedules.`)
+              : (isNepali ? "हेरचाह ड्यासबोर्ड। बिरामीको औषधि र तालिका समीक्षा गर्नुहोस्।" : "Care coordination dashboard. Review patient check-ins and schedules."))
+          : t.family.pageSubtitle
       }
     >
       <div className="space-y-7">
@@ -239,16 +243,16 @@ export default function FamilyPage() {
         {!loading && supabase && !authenticated && (
           <Card className="border border-amber-500/30 bg-amber-500/10 p-6">
             <h2 className="font-display text-lg font-bold text-amber-500 dark:text-amber-200">
-              Sign in to view active Care Circle
+              {isNepali ? "सक्रिय हेरचाह समूह हेर्न लग इन गर्नुहोस्" : "Sign in to view active Care Circle"}
             </h2>
             <p className="mt-1 text-xs text-amber-600 dark:text-amber-200/80">
-              Your remote session is not active on this device.
+              {isNepali ? "तपाईंको सत्र यो यन्त्रमा सक्रिय छैन।" : "Your remote session is not active on this device."}
             </p>
             <Link
               href="/login"
               className="mt-4 inline-flex min-h-10 items-center rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-4 text-xs font-bold text-white shadow-sm hover:brightness-105"
             >
-              Sign In
+              {t.nav.signIn}
             </Link>
           </Card>
         )}
@@ -262,17 +266,19 @@ export default function FamilyPage() {
                 <Heart className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
                 <span>
                   {isCaregiver
-                    ? (userName ? `Caregiver: ${userName}` : "Caregiver Coordination Portal")
-                    : "Consent-Based Care Coordination"}
+                    ? (userName ? (isNepali ? `हेरचाहकर्ता: ${userName}` : `Caregiver: ${userName}`) : (isNepali ? "हेरचाह समन्वय पोर्टल" : "Caregiver Coordination Portal"))
+                    : (isNepali ? "सहमतिमा आधारित हेरचाह समन्वय" : "Consent-Based Care Coordination")}
                 </span>
               </div>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[var(--text)]">
                 {isCaregiver
-                  ? (userName ? `Welcome back, ${userName}!` : "Caregiver Coordination Workspace")
-                  : (userName ? `Welcome to your Care Circle, ${userName}` : "Care is closer than you think.")}
+                  ? (userName ? (isNepali ? `स्वागत छ, ${userName} ज्यू!` : `Welcome back, ${userName}!`) : (isNepali ? "हेरचाह समन्वय कार्यस्थान" : "Caregiver Coordination Workspace"))
+                  : (userName ? (isNepali ? `तपाईंको हेरचाह समूहमा स्वागत छ, ${userName} ज्यू` : `Welcome to your Care Circle, ${userName}`) : (isNepali ? "हेरचाह तपाईंको नजिकै छ।" : "Care is closer than you think."))}
               </h2>
               <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                Connect family members and caregivers for reassuring visibility. Schedule regular check-in calls, coordinate home visits, and log real-time care updates with complete consent control.
+                {isNepali
+                  ? "पारिवारिक सदस्य र हेरचाहकर्तालाई जोड्नुहोस्। नियमित सम्पर्क तालिका बनाउनुहोस्, भेटघाट समन्वय गर्नुहोस् र पूर्ण सहमतिका साथ औषधिको ताजा अवस्था हेर्नुहोस्।"
+                  : "Connect family members and caregivers for reassuring visibility. Schedule regular check-in calls, coordinate home visits, and log real-time care updates with complete consent control."}
               </p>
               <div className="mt-5 flex flex-wrap items-center gap-3">
                 <Button
@@ -281,7 +287,7 @@ export default function FamilyPage() {
                   onClick={() => setShowScheduleModal(true)}
                   className="text-xs font-bold"
                 >
-                  <CalendarDays className="h-4 w-4" /> Schedule Call / Visit
+                  <CalendarDays className="h-4 w-4" /> {t.family.scheduleCallOrVisitBtn}
                 </Button>
                 <Button
                   size="sm"
@@ -289,7 +295,7 @@ export default function FamilyPage() {
                   onClick={() => setShowReportModal(true)}
                   className="text-xs font-semibold"
                 >
-                  <Send className="h-4 w-4" /> Submit Care Report
+                  <Send className="h-4 w-4" /> {t.family.addCareReportBtn}
                 </Button>
               </div>
             </div>
@@ -315,10 +321,10 @@ export default function FamilyPage() {
             </span>
             <div>
               <h2 className="font-display text-lg font-bold text-[var(--text)]">
-                Invite a Trusted Caregiver
+                {t.family.inviteTitle}
               </h2>
               <p className="text-xs text-[var(--text-secondary)]">
-                Family members only receive medication updates after you explicitly grant consent.
+                {t.family.inviteSubtitle}
               </p>
             </div>
           </div>
@@ -335,28 +341,32 @@ export default function FamilyPage() {
             }}
           >
             <input
-              aria-label="Family member name"
-              placeholder="Name (e.g. Sarah / Daughter)"
+              aria-label={t.family.inviteNameLabel}
+              placeholder={isNepali ? "नाम (जस्तै: छोरा / छोरी)" : "Name (e.g. Sarah / Daughter)"}
               value={name}
               onChange={(event) => setName(event.target.value)}
               className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2.5 text-xs text-[var(--text)] placeholder:text-[var(--text-muted)] focus:border-[#16A36A] focus:outline-none"
             />
             <input
-              aria-label="Family member email"
+              aria-label={t.family.inviteEmailLabel}
               type="email"
               required
-              placeholder="Email address (e.g. sarah@example.com)"
+              placeholder={isNepali ? "इमेल ठेगाना (जस्तै: family@example.com)" : "Email address (e.g. sarah@example.com)"}
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2.5 text-xs text-[var(--text)] placeholder:text-[var(--text-muted)] focus:border-[#16A36A] focus:outline-none"
             />
             <Button type="submit" size="sm" variant="primary" className="text-xs px-5">
-              <Mail className="h-4 w-4" aria-hidden="true" /> Send Invite
+              <Mail className="h-4 w-4" aria-hidden="true" /> {t.family.sendInviteBtn}
             </Button>
           </form>
           <p className="mt-3.5 flex items-center gap-2 text-[11px] text-[var(--text-muted)]">
             <ShieldCheck className="h-3.5 w-3.5 text-[#16A36A] dark:text-[#20C982]" aria-hidden="true" />
-            <span>Encrypted access: Patient permissions govern who views dose logs. Access can be paused or revoked at any time.</span>
+            <span>
+              {isNepali
+                ? "सुरक्षित पहुँच: बिरामीको अनुमति अनुसार मात्र औषधि विवरण देखाइन्छ। पहुँच जुनसुकै बेला रोक्न वा हटाउन सकिन्छ।"
+                : "Encrypted access: Patient permissions govern who views dose logs. Access can be paused or revoked at any time."}
+            </span>
           </p>
         </Card>
 
@@ -365,10 +375,12 @@ export default function FamilyPage() {
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 id="schedules-heading" className="font-display text-xl font-bold tracking-tight text-[var(--text)]">
-                Scheduled Check-Ins &amp; Home Visits ({schedules.length})
+                {t.family.careSchedulesHeading} ({formatNumber(schedules.length)})
               </h2>
               <p className="text-xs text-[var(--text-secondary)]">
-                Caregivers can coordinate routine check-in calls and in-person patient visits.
+                {isNepali
+                  ? "हेरचाहकर्ताहरूले नियमित फोन कल तथा प्रत्यक्ष भेटघाटको समय मिलाउन सक्नुहुन्छ।"
+                  : "Caregivers can coordinate routine check-in calls and in-person patient visits."}
               </p>
             </div>
             <Button
@@ -378,7 +390,7 @@ export default function FamilyPage() {
               className="text-xs font-semibold gap-1.5"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>Schedule New</span>
+              <span>{isNepali ? "नयाँ तालिका" : "Schedule New"}</span>
             </Button>
           </div>
 
@@ -398,7 +410,9 @@ export default function FamilyPage() {
                       }`}
                     >
                       {item.type === "call" ? <Phone className="h-3 w-3" /> : <Calendar className="h-3 w-3" />}
-                      <span className="capitalize">{item.type} Scheduled</span>
+                      <span className="capitalize">
+                        {item.type === "call" ? t.family.callType : t.family.visitType}
+                      </span>
                     </span>
                     <span
                       className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md ${
@@ -407,7 +421,7 @@ export default function FamilyPage() {
                           : "bg-amber-500/10 text-amber-500"
                       }`}
                     >
-                      {item.status}
+                      {item.status === "completed" ? (isNepali ? "सम्पन्न" : "Completed") : (isNepali ? "निर्धारित" : "Scheduled")}
                     </span>
                   </div>
 
@@ -419,7 +433,7 @@ export default function FamilyPage() {
                       <Calendar className="h-3 w-3 text-[var(--text-muted)]" /> {item.date}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3 text-[var(--text-muted)]" /> {formatTime(item.time)}
+                      <Clock className="h-3 w-3 text-[var(--text-muted)]" /> {formatTimeDisplay(item.time)}
                     </span>
                   </div>
                   {item.notes && (
@@ -440,16 +454,16 @@ export default function FamilyPage() {
                       }}
                       className="text-xs py-1 px-3"
                     >
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Mark Completed
+                      <CheckCircle2 className="h-3.5 w-3.5" /> {isNepali ? "सम्पन्न भयो भनी चिन्ह लगाउनुहोस्" : "Mark Completed"}
                     </Button>
                   ) : (
                     <span className="text-[11px] font-semibold text-emerald-500 flex items-center gap-1">
-                      <CheckCircle2 className="h-3.5 w-3.5" /> Completed
+                      <CheckCircle2 className="h-3.5 w-3.5" /> {isNepali ? "सम्पन्न भयो" : "Completed"}
                     </span>
                   )}
                   {item.type === "call" && (
                     <span className="text-xs text-[var(--text-muted)] flex items-center gap-1 font-mono">
-                      <PhoneCall className="h-3.5 w-3.5 text-[#16A36A]" /> Voice Call
+                      <PhoneCall className="h-3.5 w-3.5 text-[#16A36A]" /> {isNepali ? "फोन कल" : "Voice Call"}
                     </span>
                   )}
                 </div>
@@ -462,7 +476,7 @@ export default function FamilyPage() {
         <section aria-labelledby="connections-heading">
           <div className="mb-3.5 flex items-center justify-between">
             <h2 id="connections-heading" className="font-display text-xl font-bold tracking-tight text-[var(--text)]">
-              Connected Caregivers ({list.length})
+              {t.family.connectedCaregiversHeading} ({formatNumber(list.length)})
             </h2>
           </div>
           {loading ? (
@@ -470,7 +484,7 @@ export default function FamilyPage() {
           ) : list.length === 0 ? (
             <Card className="text-center p-8 border border-dashed border-[var(--border)]">
               <UsersRound className="mx-auto h-10 w-10 text-[var(--text-muted)] opacity-60" />
-              <p className="mt-2 text-xs text-[var(--text-secondary)]">No family members connected yet. Send an invite above.</p>
+              <p className="mt-2 text-xs text-[var(--text-secondary)]">{t.family.noCaregiversYet}</p>
             </Card>
           ) : (
             <ul className="space-y-3">
@@ -498,11 +512,11 @@ export default function FamilyPage() {
                 <Bell className="h-4 w-4" aria-hidden="true" />
               </span>
               <h2 id="updates-heading" className="font-display text-base font-bold text-[var(--text)]">
-                Recent Medication Feed
+                {t.family.remoteActivityHeading}
               </h2>
             </div>
             {activity.length === 0 ? (
-              <p className="text-xs text-[var(--text-secondary)]">No recent medicine activity logged.</p>
+              <p className="text-xs text-[var(--text-secondary)]">{t.family.noRemoteActivity}</p>
             ) : (
               <ul className="space-y-2.5">
                 {activity.slice(0, 5).map((item, index) => (
@@ -518,11 +532,11 @@ export default function FamilyPage() {
                     <div>
                       <p className="font-semibold text-[var(--text)]">
                         {item.status === "taken"
-                          ? `${item.medicineName} confirmed as taken.`
-                          : `${item.medicineName} is not yet confirmed.`}
+                          ? (isNepali ? `${item.medicineName} खाइसकेको पुष्टि भयो।` : `${item.medicineName} confirmed as taken.`)
+                          : (isNepali ? `${item.medicineName} खान बाँकी छ।` : `${item.medicineName} is not yet confirmed.`)}
                       </p>
                       <span className="font-mono text-[11px] text-[var(--text-muted)]">
-                        {item.date} &bull; {formatTime(item.time)}
+                        {item.date} &bull; {formatTimeDisplay(item.time)}
                       </span>
                     </div>
                   </li>
@@ -530,6 +544,7 @@ export default function FamilyPage() {
               </ul>
             )}
           </Card>
+
 
           {/* Caregiver Visit & Activity Reports */}
           <Card className="p-6 border-[#16A36A]/20">
@@ -539,7 +554,7 @@ export default function FamilyPage() {
                   <UserCheck className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <h2 className="font-display text-base font-bold text-[var(--text)]">
-                  Care Reports &amp; Visit Notes
+                  {t.family.careReportsHeading}
                 </h2>
               </div>
               <Button
@@ -548,12 +563,14 @@ export default function FamilyPage() {
                 onClick={() => setShowReportModal(true)}
                 className="text-xs py-1 px-2.5"
               >
-                + Add Report
+                + {t.family.addCareReportBtn}
               </Button>
             </div>
 
             {reports.length === 0 ? (
-              <p className="text-xs text-[var(--text-secondary)]">No care reports submitted yet.</p>
+              <p className="text-xs text-[var(--text-secondary)]">
+                {isNepali ? "कुनै हेरचाह प्रतिवेदन पेस गरिएको छैन।" : "No care reports submitted yet."}
+              </p>
             ) : (
               <ul className="space-y-3">
                 {reports.slice(0, 4).map((r) => (
@@ -563,7 +580,9 @@ export default function FamilyPage() {
                   >
                     <div className="flex items-center justify-between text-[11px] mb-1">
                       <strong className="text-[var(--text)]">{r.patientName}</strong>
-                      <span className="font-mono text-[var(--text-muted)]">{r.date} &bull; {r.visitType}</span>
+                      <span className="font-mono text-[var(--text-muted)]">
+                        {r.date} &bull; {r.visitType === "call" ? t.family.callType : r.visitType === "visit" ? t.family.visitType : t.family.checkinType}
+                      </span>
                     </div>
                     <div className="inline-block rounded-md bg-[#16A36A]/10 border border-[#16A36A]/20 px-2 py-0.5 text-[10px] font-bold text-[#16A36A] dark:text-[#A3EAC1] mb-1.5">
                       {r.adherenceObserved}
@@ -579,7 +598,11 @@ export default function FamilyPage() {
             {missed.length > 0 && (
               <div className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs font-semibold text-rose-500 dark:text-[#FB7185] flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span>{missed.length} dose record(s) pending patient attention.</span>
+                <span>
+                  {isNepali
+                    ? `${formatNumber(missed.length)} खुराक औषधि बिरामीले खान बाँकी छ।`
+                    : `${missed.length} dose record(s) pending patient attention.`}
+                </span>
               </div>
             )}
           </Card>
@@ -591,7 +614,7 @@ export default function FamilyPage() {
             <Card className="w-full max-w-md p-5 sm:p-6 bg-[var(--surface)] border border-[#16A36A]/30 max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-display text-lg font-bold text-[var(--text)]">
-                  Schedule Patient Call or Visit
+                  {t.family.scheduleCallOrVisitBtn}
                 </h3>
                 <button
                   type="button"
@@ -606,7 +629,7 @@ export default function FamilyPage() {
               <form onSubmit={handleCreateSchedule} className="space-y-3.5 text-xs">
                 <div>
                   <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                    Event Type
+                    {isNepali ? "प्रकार" : "Event Type"}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -619,7 +642,7 @@ export default function FamilyPage() {
                       }`}
                     >
                       <Phone className="h-3.5 w-3.5" />
-                      <span>Phone Call</span>
+                      <span>{t.family.callType}</span>
                     </button>
                     <button
                       type="button"
@@ -631,14 +654,14 @@ export default function FamilyPage() {
                       }`}
                     >
                       <Home className="h-3.5 w-3.5" />
-                      <span>Home Visit</span>
+                      <span>{t.family.visitType}</span>
                     </button>
                   </div>
                 </div>
 
                 <div>
                   <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                    Patient Name
+                    {t.family.patientLabel}
                   </label>
                   <input
                     type="text"
@@ -646,14 +669,14 @@ export default function FamilyPage() {
                     value={schedPatient}
                     onChange={(e) => setSchedPatient(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-xs text-[var(--text)] focus:border-[#16A36A] focus:outline-none"
-                    placeholder="Patient or Family Member Name"
+                    placeholder={isNepali ? "बिरामी वा परिवारको सदस्यको नाम" : "Patient or Family Member Name"}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                      Date
+                      {t.family.scheduleDateLabel}
                     </label>
                     <input
                       type="date"
@@ -665,7 +688,7 @@ export default function FamilyPage() {
                   </div>
                   <div>
                     <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                      Time
+                      {t.family.scheduleTimeLabel}
                     </label>
                     <input
                       type="time"
@@ -679,23 +702,23 @@ export default function FamilyPage() {
 
                 <div>
                   <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                    Care Notes (Optional)
+                    {t.family.scheduleNotesLabel}
                   </label>
                   <textarea
                     rows={2}
                     value={schedNotes}
                     onChange={(e) => setSchedNotes(e.target.value)}
-                    placeholder="Check pillbox, remind about water intake, discuss doctor visit..."
+                    placeholder={isNepali ? "औषधिको बट्टा जाँच, पानी पिउन स्मरण, डाक्टर भेटबारे छलफल..." : "Check pillbox, remind about water intake, discuss doctor visit..."}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-xs text-[var(--text)] focus:border-[#16A36A] focus:outline-none resize-none"
                   />
                 </div>
 
                 <div className="pt-2 flex justify-end gap-2">
                   <Button type="button" size="sm" variant="outline" onClick={() => setShowScheduleModal(false)}>
-                    Cancel
+                    {t.common.cancel}
                   </Button>
                   <Button type="submit" size="sm" variant="primary">
-                    Save Schedule
+                    {t.family.createScheduleBtn}
                   </Button>
                 </div>
               </form>
@@ -709,7 +732,7 @@ export default function FamilyPage() {
             <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto p-5 sm:p-6 bg-[var(--surface)] border border-[#16A36A]/30">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-display text-lg font-bold text-[var(--text)]">
-                  Submit Care Report &amp; Update
+                  {t.family.addCareReportBtn}
                 </h3>
                 <button
                   type="button"
@@ -724,21 +747,21 @@ export default function FamilyPage() {
               <form onSubmit={handleCreateReport} className="space-y-3.5 text-xs">
                 <div>
                   <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                    Interaction Type
+                    {isNepali ? "सम्पर्क / भेटघाट प्रकार" : "Interaction Type"}
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    {(["call", "visit", "checkin"] as const).map((t) => (
+                    {(["call", "visit", "checkin"] as const).map((kind) => (
                       <button
-                        key={t}
+                        key={kind}
                         type="button"
-                        onClick={() => setReportType(t)}
+                        onClick={() => setReportType(kind)}
                         className={`p-2 rounded-xl border text-center font-bold capitalize transition-all ${
-                          reportType === t
+                          reportType === kind
                             ? "border-[#16A36A] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1]"
                             : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)]"
                         }`}
                       >
-                        {t}
+                        {kind === "call" ? t.family.callType : kind === "visit" ? t.family.visitType : t.family.checkinType}
                       </button>
                     ))}
                   </div>
@@ -746,7 +769,7 @@ export default function FamilyPage() {
 
                 <div>
                   <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                    Patient Name
+                    {t.family.patientLabel}
                   </label>
                   <input
                     type="text"
@@ -759,41 +782,51 @@ export default function FamilyPage() {
 
                 <div>
                   <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                    Adherence Status Observed
+                    {t.family.adherenceObserved}
                   </label>
                   <select
                     value={reportAdherence}
                     onChange={(e) => setReportAdherence(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-xs text-[var(--text)] focus:border-[#16A36A] focus:outline-none"
                   >
-                    <option value="All scheduled morning doses confirmed">All scheduled morning doses confirmed</option>
-                    <option value="Patient confirmed taking afternoon medications">Patient confirmed taking afternoon medications</option>
-                    <option value="Snoozed dose taken after reminder call">Snoozed dose taken after reminder call</option>
-                    <option value="Medication refilled and organized in pillbox">Medication refilled and organized in pillbox</option>
-                    <option value="Pending evening confirmation">Pending evening confirmation</option>
+                    <option value="All scheduled morning doses confirmed">
+                      {isNepali ? "बिहानका सबै निर्धारित औषधि खाइसकिएको पुष्टि" : "All scheduled morning doses confirmed"}
+                    </option>
+                    <option value="Patient confirmed taking afternoon medications">
+                      {isNepali ? "दिउँसोको औषधि खाइसकिएको पुष्टि भयो" : "Patient confirmed taking afternoon medications"}
+                    </option>
+                    <option value="Snoozed dose taken after reminder call">
+                      {isNepali ? "फोन सम्झौतापछि सारिएको औषधि खाइयो" : "Snoozed dose taken after reminder call"}
+                    </option>
+                    <option value="Medication refilled and organized in pillbox">
+                      {isNepali ? "औषधि थप गरियो र बट्टामा मिलाएर राखियो" : "Medication refilled and organized in pillbox"}
+                    </option>
+                    <option value="Pending evening confirmation">
+                      {isNepali ? "साँझको औषधि पुष्टि हुन बाँकी" : "Pending evening confirmation"}
+                    </option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                    Observations &amp; Caregiver Notes
+                    {t.family.notesOrObservations}
                   </label>
                   <textarea
                     rows={3}
                     required
                     value={reportNotes}
                     onChange={(e) => setReportNotes(e.target.value)}
-                    placeholder="Note patient's mood, symptoms, food directions followed, or special instructions..."
+                    placeholder={isNepali ? "बिरामीको अवस्था, लक्षण, खाना सम्बन्धी निर्देशन पालना भए/नभएको उल्लेख गर्नुहोस्..." : "Note patient's mood, symptoms, food directions followed, or special instructions..."}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-xs text-[var(--text)] focus:border-[#16A36A] focus:outline-none resize-none"
                   />
                 </div>
 
                 <div className="pt-2 flex justify-end gap-2">
                   <Button type="button" size="sm" variant="outline" onClick={() => setShowReportModal(false)}>
-                    Cancel
+                    {t.common.cancel}
                   </Button>
                   <Button type="submit" size="sm" variant="primary">
-                    Submit Care Update
+                    {t.family.createReportBtn}
                   </Button>
                 </div>
               </form>
@@ -804,3 +837,4 @@ export default function FamilyPage() {
     </PageShell>
   );
 }
+

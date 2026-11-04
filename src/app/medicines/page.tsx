@@ -18,7 +18,7 @@ import { Card } from "@/components/ui/Card";
 import { MedicineForm } from "@/components/medicine/MedicineForm";
 import { PillIcon } from "@/components/ui/PillIcon";
 import { useMediTrack } from "@/components/reminders/ReminderProvider";
-import { formatTime } from "@/utils/date-utils";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export default function MedicinesPage() {
   const {
@@ -30,24 +30,29 @@ export default function MedicinesPage() {
     respond,
     settings,
   } = useMediTrack();
+  const { t, isNepali, formatNumber, formatTimeDisplay } = useTranslation();
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const editingMedicine = medicines.find((medicine) => medicine.id === editingId);
 
   function remove(id: string, name: string) {
-    if (window.confirm(`Delete ${name}? This will remove it from your active daily schedule.`)) {
+    const prompt = isNepali
+      ? `${name} हटाउन चाहनुहुन्छ? यो औषधि दैनिक तालिकाबाट हट्नेछ।`
+      : `Delete ${name}? This will remove it from your active daily schedule.`;
+    if (window.confirm(prompt)) {
       removeMedicine(id);
     }
   }
 
   return (
     <PageShell
-      title="Medications & Prescriptions"
-      subtitle="Configure daily schedules, dosages, and medical instructions."
+      title={t.medicines.pageTitle}
+      subtitle={t.medicines.pageSubtitle}
       action={
         <div className="flex items-center gap-2">
           <span className="font-mono text-xs font-bold text-[#16A36A] dark:text-[#A3EAC1] bg-[#16A36A]/10 border border-[#16A36A]/20 px-3 py-1.5 rounded-xl">
-            {medicines.length} {medicines.length === 1 ? "Medicine" : "Medicines"} Active
+            {formatNumber(medicines.length)} {t.medicines.medicinesActiveCount}
           </span>
         </div>
       }
@@ -68,10 +73,10 @@ export default function MedicinesPage() {
         )}
 
         {/* Medicines List Section */}
-        <section aria-label="Your active medicines">
+        <section aria-label={t.medicines.prescriptionsHeading}>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-[var(--text)]">
-              Your Prescriptions ({medicines.length})
+              {t.medicines.prescriptionsHeading} ({formatNumber(medicines.length)})
             </h2>
           </div>
 
@@ -79,7 +84,7 @@ export default function MedicinesPage() {
             <Card className="text-center p-8 border border-dashed border-[var(--border)]">
               <Pill className="mx-auto h-12 w-12 text-[var(--text-muted)] opacity-60" />
               <p className="mt-3 text-sm text-[var(--text-secondary)]">
-                No medications configured yet. Use the form above to add your first routine.
+                {t.medicines.noMedicinesConfigured}
               </p>
             </Card>
           ) : (
@@ -103,11 +108,11 @@ export default function MedicinesPage() {
                         </span>
                       </div>
                       <p className="mt-0.5 text-xs text-[var(--text-secondary)] truncate">
-                        {m.instructions || "No specific instructions specified"}
+                        {m.instructions || (isNepali ? "कुनै विशेष सल्लाह लेखिएको छैन" : "No specific instructions specified")}
                       </p>
                       <p className="mt-1 font-mono text-[11px] text-[var(--text-muted)]">
-                        {m.times.map(formatTime).join(" · ")} · from {m.startDate}
-                        {m.endDate ? ` to ${m.endDate}` : ""}
+                        {m.times.map(formatTimeDisplay).join(" · ")} · {isNepali ? "सुरु:" : "from"} {m.startDate}
+                        {m.endDate ? ` ${isNepali ? "देखि" : "to"} ${m.endDate}` : ""}
                       </p>
                     </div>
 
@@ -120,7 +125,7 @@ export default function MedicinesPage() {
                         className="text-xs py-1.5 px-3"
                       >
                         <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>{detailsId === m.id ? "Hide" : "Details"}</span>
+                        <span>{detailsId === m.id ? t.common.hide : t.common.details}</span>
                       </Button>
                       <Button
                         size="sm"
@@ -129,17 +134,17 @@ export default function MedicinesPage() {
                         className="text-xs py-1.5 px-3"
                       >
                         <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>Edit</span>
+                        <span>{t.common.edit}</span>
                       </Button>
                       <Button
                         size="sm"
                         variant="danger"
-                        aria-label={`Delete ${m.name}`}
+                        aria-label={`${t.common.delete} ${m.name}`}
                         onClick={() => remove(m.id, m.name)}
                         className="text-xs py-1.5 px-3"
                       >
                         <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>Delete</span>
+                        <span>{t.common.delete}</span>
                       </Button>
                     </div>
 
@@ -150,35 +155,39 @@ export default function MedicinesPage() {
                           <div className="flex items-start gap-2.5">
                             <Clock3 className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
                             <div>
-                              <strong className="block text-[var(--text)]">Daily Frequency</strong>
-                              <span className="text-[var(--text-secondary)]">{m.times.length} dose{m.times.length === 1 ? "" : "s"} daily</span>
+                              <strong className="block text-[var(--text)]">{t.medicines.dailyFrequency}</strong>
+                              <span className="text-[var(--text-secondary)]">
+                                {formatNumber(m.times.length)} {isNepali ? "पटक" : "doses daily"}
+                              </span>
                             </div>
                           </div>
 
                           <div className="flex items-start gap-2.5">
                             <Utensils className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
                             <div>
-                              <strong className="block text-[var(--text)]">Food Instructions</strong>
-                              <span className="text-[var(--text-secondary)]">{m.instructions || "None noted"}</span>
+                              <strong className="block text-[var(--text)]">{t.medicines.foodInstructions}</strong>
+                              <span className="text-[var(--text-secondary)]">{m.instructions || (isNepali ? "कुनै छैन" : "None noted")}</span>
                             </div>
                           </div>
 
                           <div className="flex items-start gap-2.5">
                             <CalendarDays className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
                             <div>
-                              <strong className="block text-[var(--text)]">Course Duration</strong>
-                              <span className="text-[var(--text-secondary)]">{m.startDate} {m.endDate ? `– ${m.endDate}` : "– ongoing"}</span>
+                              <strong className="block text-[var(--text)]">{t.medicines.courseDuration}</strong>
+                              <span className="text-[var(--text-secondary)]">
+                                {m.startDate} {m.endDate ? `– ${m.endDate}` : `– ${t.medicines.ongoing}`}
+                              </span>
                             </div>
                           </div>
 
                           <div className="flex items-start gap-2.5">
                             <Pill className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
                             <div>
-                              <strong className="block text-[var(--text)]">Next Due Dose</strong>
+                              <strong className="block text-[var(--text)]">{t.medicines.nextDueDose}</strong>
                               <span className="text-[var(--text-secondary)]">
                                 {doses.find((dose) => dose.medicineId === m.id && dose.status !== "taken")?.time
-                                  ? formatTime(doses.find((dose) => dose.medicineId === m.id && dose.status !== "taken")!.time)
-                                  : "Completed for today"}
+                                  ? formatTimeDisplay(doses.find((dose) => dose.medicineId === m.id && dose.status !== "taken")!.time)
+                                  : t.medicines.completedForToday}
                               </span>
                             </div>
                           </div>
@@ -186,7 +195,7 @@ export default function MedicinesPage() {
 
                         {m.notes && (
                           <p className="mt-3 text-xs text-[var(--text-secondary)] border-t border-[var(--border-subtle)] pt-2">
-                            <strong className="text-[var(--text)]">Notes:</strong> {m.notes}
+                            <strong className="text-[var(--text)]">{t.common.notes}:</strong> {m.notes}
                           </p>
                         )}
 
@@ -197,7 +206,7 @@ export default function MedicinesPage() {
                               <span key={dose.key} className="inline-flex flex-wrap gap-2">
                                 <Button size="sm" variant="primary" onClick={() => respond(dose.key, "taken")} className="text-xs py-1.5 px-3">
                                   <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
-                                  Mark {formatTime(dose.time)} Taken
+                                  {isNepali ? `${formatTimeDisplay(dose.time)} खाएको जनाउनुहोस्` : `Mark ${formatTimeDisplay(dose.time)} Taken`}
                                 </Button>
                                 <Button
                                   size="sm"
@@ -206,7 +215,7 @@ export default function MedicinesPage() {
                                   className="text-xs py-1.5 px-3"
                                 >
                                   <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
-                                  Snooze ({settings.snoozeMinutes}m)
+                                  {isNepali ? `${formatNumber(settings.snoozeMinutes)} मिनेट पछि` : `Snooze (${settings.snoozeMinutes}m)`}
                                 </Button>
                               </span>
                             ))}
@@ -214,7 +223,7 @@ export default function MedicinesPage() {
                             href={`/history?medicineId=${encodeURIComponent(m.id)}`}
                             className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 text-xs font-semibold text-[#16A36A] dark:text-[#20C982] hover:border-[#16A36A]/40 transition-colors"
                           >
-                            <Eye className="h-3.5 w-3.5" aria-hidden="true" /> View Dose History
+                            <Eye className="h-3.5 w-3.5" aria-hidden="true" /> {t.medicines.doseHistory}
                           </Link>
                         </div>
                       </div>

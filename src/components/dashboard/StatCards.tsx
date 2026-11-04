@@ -1,5 +1,8 @@
+"use client";
+
 import { CheckCircle2, Clock, Pill } from "lucide-react";
 import { Card } from "@/components/ui/Card";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export function StatCards({
   total,
@@ -10,24 +13,26 @@ export function StatCards({
   taken: number;
   pending: number;
 }) {
+  const { t, formatNumber } = useTranslation();
+
   const items = [
     {
-      label: "Scheduled Today",
-      value: total,
+      label: t.dashboard.totalScheduled,
+      value: formatNumber(total),
       Icon: Pill,
       color: "text-[#16A36A] dark:text-[#20C982]",
       bg: "bg-[#16A36A]/10 border-[#16A36A]/20",
     },
     {
-      label: "Doses Taken",
-      value: taken,
+      label: t.dashboard.dosesTaken,
+      value: formatNumber(taken),
       Icon: CheckCircle2,
       color: "text-emerald-500 dark:text-[#36D399]",
       bg: "bg-emerald-500/10 border-emerald-500/20",
     },
     {
-      label: "Pending Doses",
-      value: pending,
+      label: t.dashboard.dosesPending,
+      value: formatNumber(pending),
       Icon: Clock,
       color: "text-amber-500 dark:text-[#FBBF24]",
       bg: "bg-amber-500/10 border-amber-500/20",

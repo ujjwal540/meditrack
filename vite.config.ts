@@ -8,13 +8,15 @@ export default defineConfig(() => {
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src'),
-        'next/link': path.resolve(__dirname, './src/lib/next-shim.tsx'),
-        'next/navigation': path.resolve(__dirname, './src/lib/next-shim.tsx'),
-        'next/image': path.resolve(__dirname, './src/lib/next-shim.tsx'),
+        '@': path.resolve(import.meta.dirname, './src'),
+        'next/link': path.resolve(import.meta.dirname, './src/lib/next-shim.tsx'),
+        'next/navigation': path.resolve(import.meta.dirname, './src/lib/next-shim.tsx'),
+        'next/image': path.resolve(import.meta.dirname, './src/lib/next-shim.tsx'),
       },
     },
     server: {
+      host: '0.0.0.0',
+      port: 3000,
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',

@@ -9,6 +9,7 @@ import { MedicineTypePicker } from "@/components/medicine/MedicineTypePicker";
 import type { MedType } from "@/components/ui/PillIcon";
 import { toISODate } from "@/utils/date-utils";
 import { validateMedicine, validateUpload } from "@/utils/validation";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 const inputStyle =
   "w-full min-h-12 mt-1.5 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--text-muted)] text-sm transition-all focus:border-[#16A36A] focus:outline-none focus:ring-2 focus:ring-[#16A36A]/20";
@@ -22,6 +23,7 @@ export function MedicineForm({
   initialMedicine?: Medicine;
   onCancel?: () => void;
 }) {
+  const { t, isNepali } = useTranslation();
   const [name, setName] = useState(initialMedicine?.name ?? "");
   const [dosage, setDosage] = useState(initialMedicine?.dosage ?? "");
   const [instructions, setInstructions] = useState(initialMedicine?.instructions ?? "");
@@ -59,7 +61,11 @@ export function MedicineForm({
     e.preventDefault();
     const data = { name, dosage, instructions, startDate, endDate: endDate || undefined, times, type };
     const errs = validateMedicine(data);
-    if (preview && !verified) errs.verified = "Please confirm the details match your prescription.";
+    if (preview && !verified) {
+      errs.verified = isNepali
+        ? "कृपया भरिएको विवरण प्रेस्क्रिप्शनसँग मिलेको पुष्टि गर्नुहोस्।"
+        : "Please confirm the details match your prescription.";
+    }
     setErrors(errs);
     if (Object.keys(errs).length) return;
     onSave({ ...data, times: times.filter(Boolean), notes: notes || undefined });
@@ -90,7 +96,7 @@ export function MedicineForm({
           type="button"
           onClick={onCancel}
           className="absolute right-5 top-5 grid h-8 w-8 place-items-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)] transition-colors"
-          aria-label="Close medicine editor"
+          aria-label={t.common.close}
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
@@ -103,10 +109,10 @@ export function MedicineForm({
         </div>
         <div>
           <h2 className="font-display text-xl font-bold tracking-tight text-[var(--text)]">
-            {initialMedicine ? "Edit Prescription Regimen" : "Add New Medicine"}
+            {initialMedicine ? t.medicines.editMedicineTitle : t.medicines.addMedicineTitle}
           </h2>
           <p className="text-xs text-[var(--text-secondary)]">
-            Enter medication details and daily reminder schedule.
+            {initialMedicine ? t.medicines.editMedicineSubtitle : t.medicines.addMedicineSubtitle}
           </p>
         </div>
       </div>
@@ -115,39 +121,39 @@ export function MedicineForm({
         <MedicineTypePicker value={type} onChange={setType} />
 
         <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-          Medicine Name
+          {t.medicines.nameLabel}
           <input
             className={inputStyle}
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Atorvastatin or Vitamin D"
+            placeholder={t.medicines.namePlaceholder}
           />
           {renderErr("name")}
         </label>
 
         <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-          Prescribed Dosage
+          {t.medicines.dosageLabel}
           <input
             className={inputStyle}
             value={dosage}
             onChange={(e) => setDosage(e.target.value)}
-            placeholder="e.g. 20mg or 1 capsule"
+            placeholder={t.medicines.dosagePlaceholder}
           />
           {renderErr("dosage")}
         </label>
 
         <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] md:col-span-2">
-          Instructions &amp; Food Directions
+          {t.medicines.instructionsLabel}
           <input
             className={inputStyle}
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
-            placeholder="e.g. Take with dinner and full glass of water"
+            placeholder={t.medicines.instructionsPlaceholder}
           />
         </label>
 
         <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-          Start Date
+          {t.medicines.startDateLabel}
           <input
             type="date"
             className={inputStyle}
@@ -158,7 +164,7 @@ export function MedicineForm({
         </label>
 
         <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-          End Date (optional)
+          {t.medicines.endDateLabel}
           <input
             type="date"
             className={inputStyle}
@@ -171,16 +177,16 @@ export function MedicineForm({
         {/* Times Timetable Picker */}
         <fieldset className="md:col-span-2">
           <legend className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
-            Daily Reminder Times
+            {t.medicines.timesLabel}
           </legend>
           <div className="flex flex-wrap gap-3">
-            {times.map((t, i) => (
+            {times.map((timeVal, i) => (
               <div key={i} className="flex items-center gap-1.5">
                 <input
                   type="time"
                   aria-label={`Reminder time ${i + 1}`}
                   className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-sm font-mono text-[#16A36A] dark:text-[#A3EAC1] focus:border-[#16A36A] focus:outline-none"
-                  value={t}
+                  value={timeVal}
                   onChange={(e) =>
                     setTimes(times.map((x, j) => (j === i ? e.target.value : x)))
                   }
@@ -204,33 +210,35 @@ export function MedicineForm({
               onClick={() => setTimes([...times, "20:00"])}
               className="text-xs py-2"
             >
-              <Plus className="h-3.5 w-3.5" aria-hidden="true" /> Add Time
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" /> {t.medicines.addTime}
             </Button>
           </div>
           {renderErr("times")}
         </fieldset>
 
         <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] md:col-span-2">
-          Personal Notes (optional)
+          {t.medicines.notesLabel}
           <textarea
             className={inputStyle + " py-2 h-20 resize-none"}
             rows={2}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Special storage instructions or doctor recommendations"
+            placeholder={t.medicines.notesPlaceholder}
           />
         </label>
 
         {/* Prescription Attachment Preview Box */}
         <div className="md:col-span-2 rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface-elevated)]/40 p-5">
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--text)]">
-            Prescription Documentation (optional)
+            {isNepali ? "प्रेस्क्रिप्शन कागजात (ऐच्छिक)" : "Prescription Documentation (optional)"}
           </p>
           <p className="mt-1 text-xs text-[var(--text-secondary)]">
-            Upload an image or PDF of your doctor prescription to review against your schedule.
+            {isNepali
+              ? "डाक्टरको प्रेस्क्रिप्शन फोटो वा PDF यहाँ राख्न सक्नुहुन्छ।"
+              : "Upload an image or PDF of your doctor prescription to review against your schedule."}
           </p>
           <label className="mt-3 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-xs font-semibold text-[var(--text)] hover:border-[#16A36A]/40 transition-colors">
-            <Upload className="h-4 w-4" aria-hidden="true" /> Choose File
+            <Upload className="h-4 w-4" aria-hidden="true" /> {isNepali ? "फाइल छान्नुहोस्" : "Choose File"}
             <input
               type="file"
               className="sr-only"
@@ -264,7 +272,11 @@ export function MedicineForm({
                   checked={verified}
                   onChange={(e) => setVerified(e.target.checked)}
                 />
-                <span>I confirm that these entered details match my prescription.</span>
+                <span>
+                  {isNepali
+                    ? "म पुष्टि गर्दछु कि यी विवरणहरू डाक्टरको प्रेस्क्रिप्शनसँग मिल्छन्।"
+                    : "I confirm that these entered details match my prescription."}
+                </span>
               </label>
               {renderErr("verified")}
             </div>
@@ -275,11 +287,11 @@ export function MedicineForm({
         <div className="md:col-span-2 pt-2">
           <div className="flex flex-wrap gap-3">
             <Button type="submit" size="md" variant="primary" className="px-6">
-              {initialMedicine ? "Save Changes" : "Save Medicine & Schedule"}
+              {initialMedicine ? t.common.save : t.medicines.saveMedicine}
             </Button>
             {onCancel && (
               <Button type="button" size="md" variant="outline" onClick={onCancel}>
-                Cancel
+                {t.common.cancel}
               </Button>
             )}
           </div>

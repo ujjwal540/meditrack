@@ -15,16 +15,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
+import { useTranslation } from "@/i18n/LanguageContext";
 import type { UserRole } from "@/types";
-
-const items: { href: string; label: string; Icon: LucideIcon; also: string[] }[] = [
-  { href: "/dashboard", label: "Dashboard", Icon: Home, also: [] },
-  { href: "/medicines", label: "Medicines", Icon: Pill, also: ["/schedule"] },
-  { href: "/health", label: "Health", Icon: HeartPulse, also: ["/history"] },
-  { href: "/family", label: "Family", Icon: Users, also: [] },
-  { href: "/marketplace", label: "Care Pros", Icon: Briefcase, also: [] },
-  { href: "/settings", label: "Settings", Icon: UserRound, also: [] },
-];
 
 export function Navbar({
   user,
@@ -34,6 +26,17 @@ export function Navbar({
   onUserUpdated?: (u: { id: string; name?: string; email?: string; role: UserRole }) => void;
 }) {
   const path = usePathname();
+  const { t } = useTranslation();
+
+  const items: { href: string; label: string; Icon: LucideIcon; also: string[] }[] = [
+    { href: "/dashboard", label: t.nav.dashboard, Icon: Home, also: [] },
+    { href: "/medicines", label: t.nav.medicines, Icon: Pill, also: ["/schedule"] },
+    { href: "/health", label: t.nav.healthStats, Icon: HeartPulse, also: ["/history"] },
+    { href: "/family", label: t.nav.familyCare, Icon: Users, also: [] },
+    { href: "/marketplace", label: t.nav.carePros, Icon: Briefcase, also: [] },
+    { href: "/settings", label: t.nav.settings, Icon: UserRound, also: [] },
+  ];
+
   const isActive = (item: (typeof items)[number]) =>
     path === item.href || item.also.includes(path);
 
@@ -72,7 +75,7 @@ export function Navbar({
                   className={cn(
                     "h-5 w-5 shrink-0 transition-colors duration-200",
                     active
-                      ? "text-[#16A36A] dark:text-[#20D6C2]"
+                      ? "text-[#16A36A] dark:text-[#20C982]"
                       : "text-[var(--text-muted)] group-hover:text-[#20D6C2]",
                   )}
                   aria-hidden="true"
@@ -99,8 +102,8 @@ export function Navbar({
             href="/schedule"
             className="flex items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/40 p-2.5 text-xs text-[var(--text-secondary)] transition-all duration-200 ease-out hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:-translate-y-0.5 hover:text-[var(--text)] hover:shadow-[0_4px_14px_rgba(32,214,194,0.15)]"
           >
-            <CalendarDays className="h-4 w-4 text-[#16A36A] dark:text-[#20D6C2] shrink-0" />
-            <span className="truncate font-medium text-[11px]">Daily Timetable</span>
+            <CalendarDays className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] shrink-0" />
+            <span className="truncate font-medium text-[11px]">{t.nav.timetable}</span>
           </Link>
         </div>
       </aside>
@@ -119,7 +122,7 @@ export function Navbar({
               aria-current={active ? "page" : undefined}
               className={cn(
                 "mobile-bottom-nav-item flex min-h-[3.75rem] flex-col items-center justify-center gap-0.5 px-0.5 text-[0.65rem] sm:text-[0.72rem] font-medium tracking-tight transition-colors duration-200",
-                active ? "is-active text-[#16A36A] dark:text-[#20D6C2]" : "text-[var(--text-muted)] hover:text-[#20D6C2]",
+                active ? "is-active text-[#16A36A] dark:text-[#20C982]" : "text-[var(--text-muted)] hover:text-[#20D6C2]",
               )}
             >
               <span

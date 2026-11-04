@@ -6,7 +6,7 @@ import type { Dose } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PillIcon } from "@/components/ui/PillIcon";
-import { formatTime } from "@/utils/date-utils";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export function NextMedicineCard({
   dose,
@@ -20,6 +20,7 @@ export function NextMedicineCard({
   onLater: (key: string) => void;
 }) {
   const [done, setDone] = useState(false);
+  const { t, isNepali, formatTimeDisplay, formatNumber } = useTranslation();
 
   if (!dose) {
     return (
@@ -28,10 +29,12 @@ export function NextMedicineCard({
           <Check className="h-7 w-7" aria-hidden="true" />
         </div>
         <h3 className="mt-4 font-display text-2xl font-bold text-[var(--text)]">
-          All caught up for now
+          {isNepali ? "अहिलेका लागि सबै खाइसकियो" : "All caught up for now"}
         </h3>
         <p className="mt-1.5 text-sm text-[var(--text-secondary)]">
-          No pending medicines right now. Great job keeping your health on track!
+          {isNepali
+            ? "अहिले कुनै औषधि खान बाँकी छैन। समयमै औषधि खानुभएकोमा धेरै राम्रो!"
+            : "No pending medicines right now. Great job keeping your health on track!"}
         </p>
       </Card>
     );
@@ -51,8 +54,12 @@ export function NextMedicineCard({
             <span className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-gradient-to-r from-[#16A36A] to-[#20C982] text-white shadow-[0_0_30px_rgba(32,201,130,0.5)]">
               <Check className="h-10 w-10 stroke-[2.5]" aria-hidden="true" />
             </span>
-            <p className="mt-4 font-display text-2xl font-bold text-[var(--text)]">Dose Confirmed</p>
-            <p className="text-sm text-[var(--text-secondary)]">Your medication record has been logged.</p>
+            <p className="mt-4 font-display text-2xl font-bold text-[var(--text)]">
+              {isNepali ? "औषधि खाइसकियो" : "Dose Confirmed"}
+            </p>
+            <p className="text-sm text-[var(--text-secondary)]">
+              {isNepali ? "औषधि खाएको विवरण सुरक्षित गरियो।" : "Your medication record has been logged."}
+            </p>
           </div>
         </div>
       )}
@@ -63,11 +70,11 @@ export function NextMedicineCard({
           <span className="grid h-6 w-6 place-items-center rounded-md bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1]">
             <BellRing className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
-          <span>Next Priority Dose</span>
+          <span>{t.dashboard.priorityDose}</span>
         </div>
         {dose.isDue && (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-xs font-bold text-amber-500 dark:text-[#FBBF24] border border-amber-500/30 animate-pulse">
-            Due Now
+            {t.schedule.dueNow}
           </span>
         )}
       </div>
@@ -92,37 +99,42 @@ export function NextMedicineCard({
         {/* Scheduled Time Badge */}
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/60 px-4 py-2.5 sm:px-5 sm:py-3 text-left sm:text-right shrink-0">
           <span className="block text-[10px] sm:text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">
-            Scheduled Time
+            {t.dashboard.scheduledFor}
           </span>
           <span className="font-mono text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#16A36A] dark:text-[#A3EAC1] tabular-nums">
-            {formatTime(dose.time)}
+            {formatTimeDisplay(dose.time)}
           </span>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+      {/* Actions */}
+      <div className="mt-6 flex flex-wrap items-center gap-3">
         <Button
           size="md"
           variant="primary"
           onClick={() => {
-            setDone(true);
             onTaken(dose.key);
-            setTimeout(() => setDone(false), 1600);
+            setDone(true);
+            setTimeout(() => setDone(false), 2200);
           }}
-          className="w-full"
+          className="flex-1 sm:flex-initial"
         >
-          <Check className="h-5 w-5" aria-hidden="true" />
-          Mark as Taken
+          <Check className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
+          <span>{t.dashboard.markTakenBtn}</span>
         </Button>
+
         <Button
           size="md"
           variant="outline"
           onClick={() => onLater(dose.key)}
-          className="w-full"
+          className="flex-1 sm:flex-initial"
         >
-          <Clock3 className="h-5 w-5" aria-hidden="true" />
-          Remind Later ({snoozeMinutes}m)
+          <Clock3 className="h-4 w-4" aria-hidden="true" />
+          <span>
+            {isNepali
+              ? `${formatNumber(snoozeMinutes)} मिनेट पछि`
+              : `${t.dashboard.snoozeBtn}`}
+          </span>
         </Button>
       </div>
     </Card>

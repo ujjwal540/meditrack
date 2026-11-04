@@ -5,6 +5,7 @@ import { Check, Eye, EyeOff, KeyRound, Lock, ShieldCheck, X } from "lucide-react
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { changeUserPassword } from "@/lib/auth";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export function ChangePasswordModal({
   isOpen,
@@ -13,6 +14,7 @@ export function ChangePasswordModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const { t, isNepali } = useTranslation();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -39,15 +41,15 @@ export function ChangePasswordModal({
     setError(null);
 
     if (!isMinLength) {
-      setError("New password must be at least 8 characters long.");
+      setError(t.auth.passwordTooShort);
       return;
     }
     if (!hasLetter || !hasNumber) {
-      setError("New password must contain both letters and numbers.");
+      setError(isNepali ? "पासवर्डमा कम्तीमा एउटा अक्षर र एउटा अङ्क हुनुपर्छ।" : "New password must contain both letters and numbers.");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setError("New passwords do not match.");
+      setError(t.auth.passwordsDoNotMatch);
       return;
     }
 
@@ -65,7 +67,7 @@ export function ChangePasswordModal({
         onClose();
       }, 1800);
     } else {
-      setError(res.error || "Failed to update password. Please check your current password.");
+      setError(res.error || (isNepali ? "पासवर्ड परिवर्तन गर्न असफल भयो। कृपया हालको पासवर्ड जाँच्नुहोस्।" : "Failed to update password. Please check your current password."));
     }
   }
 
@@ -94,7 +96,7 @@ export function ChangePasswordModal({
           type="button"
           onClick={handleClose}
           className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)] transition-colors"
-          aria-label="Close modal"
+          aria-label={t.common.cancel}
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
@@ -106,10 +108,10 @@ export function ChangePasswordModal({
           </div>
           <div>
             <h2 id="change-password-title" className="font-display text-lg font-bold text-[var(--text)]">
-              Change Password
+              {isNepali ? "पासवर्ड परिवर्तन गर्नुहोस्" : "Change Password"}
             </h2>
             <p className="text-xs text-[var(--text-secondary)]">
-              Update your account password securely using Supabase Auth.
+              {isNepali ? "आफ्नो खाताको पासवर्ड सुरक्षित रूपमा परिवर्तन गर्नुहोस्।" : "Update your account password securely using Supabase Auth."}
             </p>
           </div>
         </div>
@@ -121,7 +123,7 @@ export function ChangePasswordModal({
             className="mb-4 flex items-center gap-2.5 rounded-xl border border-[#16A36A]/40 bg-[#16A36A]/15 p-3.5 text-xs font-semibold text-[#16A36A] dark:text-[#A3EAC1]"
           >
             <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <span>Password updated successfully! Closing...</span>
+            <span>{isNepali ? "पासवर्ड सफलतापूर्वक परिवर्तन भयो! बन्द हुँदैछ..." : "Password updated successfully! Closing..."}</span>
           </div>
         )}
 
@@ -139,7 +141,7 @@ export function ChangePasswordModal({
           {/* Current Password */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              Current Password
+              {isNepali ? "हालको पासवर्ड" : "Current Password"}
             </label>
             <div className="relative">
               <Lock
@@ -151,7 +153,7 @@ export function ChangePasswordModal({
                 required
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Enter your current password"
+                placeholder={isNepali ? "हालको पासवर्ड लेख्नुहोस्" : "Enter your current password"}
                 className={inputStyle}
               />
               <button
@@ -168,7 +170,7 @@ export function ChangePasswordModal({
           {/* New Password */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              New Password
+              {t.auth.newPasswordLabel}
             </label>
             <div className="relative">
               <Lock
@@ -180,7 +182,7 @@ export function ChangePasswordModal({
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter your new secure password"
+                placeholder={isNepali ? "नयाँ पासवर्ड लेख्नुहोस्" : "Enter your new secure password"}
                 className={inputStyle}
               />
               <button
@@ -197,7 +199,7 @@ export function ChangePasswordModal({
           {/* Confirm New Password */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-              Confirm New Password
+              {t.auth.confirmPasswordLabel}
             </label>
             <div className="relative">
               <Lock
@@ -209,7 +211,7 @@ export function ChangePasswordModal({
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Re-enter your new password"
+                placeholder={t.auth.confirmPasswordPlaceholder}
                 className={inputStyle}
               />
               <button
@@ -226,25 +228,25 @@ export function ChangePasswordModal({
           {/* Live Validation Checklist */}
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 space-y-1.5 text-[11px]">
             <p className="font-semibold text-[var(--text-secondary)] uppercase tracking-wider text-[10px] mb-1">
-              Security Requirements:
+              {isNepali ? "सुरक्षा आवश्यकताहरू:" : "Security Requirements:"}
             </p>
             <div className={`flex items-center gap-2 ${isMinLength ? "text-[#16A36A] dark:text-[#20C982]" : "text-[var(--text-muted)]"}`}>
               <span className={`grid h-4 w-4 place-items-center rounded-full text-[10px] ${isMinLength ? "bg-[#16A36A]/20" : "bg-[var(--border)]"}`}>
                 {isMinLength ? <Check className="h-2.5 w-2.5 stroke-[3]" /> : "·"}
               </span>
-              <span>Minimum 8 characters</span>
+              <span>{isNepali ? "कम्तीमा ८ अक्षर" : "Minimum 8 characters"}</span>
             </div>
             <div className={`flex items-center gap-2 ${hasLetter && hasNumber ? "text-[#16A36A] dark:text-[#20C982]" : "text-[var(--text-muted)]"}`}>
               <span className={`grid h-4 w-4 place-items-center rounded-full text-[10px] ${hasLetter && hasNumber ? "bg-[#16A36A]/20" : "bg-[var(--border)]"}`}>
                 {hasLetter && hasNumber ? <Check className="h-2.5 w-2.5 stroke-[3]" /> : "·"}
               </span>
-              <span>Contains letters and numbers</span>
+              <span>{isNepali ? "अक्षर र अङ्क दुवै समावेश" : "Contains letters and numbers"}</span>
             </div>
             <div className={`flex items-center gap-2 ${isMatching ? "text-[#16A36A] dark:text-[#20C982]" : "text-[var(--text-muted)]"}`}>
               <span className={`grid h-4 w-4 place-items-center rounded-full text-[10px] ${isMatching ? "bg-[#16A36A]/20" : "bg-[var(--border)]"}`}>
                 {isMatching ? <Check className="h-2.5 w-2.5 stroke-[3]" /> : "·"}
               </span>
-              <span>New passwords match</span>
+              <span>{isNepali ? "नयाँ पासवर्ड मेल खान्छ" : "New passwords match"}</span>
             </div>
           </div>
 
@@ -258,7 +260,7 @@ export function ChangePasswordModal({
               disabled={loading}
               className="text-xs"
             >
-              Cancel
+              {t.common.cancel}
             </Button>
             <Button
               type="submit"
@@ -267,7 +269,7 @@ export function ChangePasswordModal({
               disabled={loading || !isValid}
               className="text-xs font-bold px-5"
             >
-              {loading ? "Updating..." : "Save Changes"}
+              {loading ? "..." : t.profile.saveChangesBtn}
             </Button>
           </div>
         </form>
@@ -275,3 +277,4 @@ export function ChangePasswordModal({
     </div>
   );
 }
+

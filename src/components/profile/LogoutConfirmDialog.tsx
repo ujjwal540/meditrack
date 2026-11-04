@@ -6,6 +6,7 @@ import { AlertTriangle, LogOut, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { signOut } from "@/lib/auth";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export function LogoutConfirmDialog({
   isOpen,
@@ -15,6 +16,7 @@ export function LogoutConfirmDialog({
   onClose: () => void;
 }) {
   const router = useRouter();
+  const { t, isNepali } = useTranslation();
   const [loggingOut, setLoggingOut] = useState(false);
 
   if (!isOpen) return null;
@@ -40,7 +42,7 @@ export function LogoutConfirmDialog({
           onClick={onClose}
           disabled={loggingOut}
           className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)] transition-colors"
-          aria-label="Cancel logout"
+          aria-label={isNepali ? "लगआउट रद्द गर्नुहोस्" : "Cancel logout"}
         >
           <X className="h-4 w-4" aria-hidden="true" />
         </button>
@@ -51,16 +53,18 @@ export function LogoutConfirmDialog({
           </div>
           <div>
             <h2 id="logout-dialog-title" className="font-display text-base font-bold text-[var(--text)]">
-              Sign Out of MediTrack?
+              {isNepali ? "मेडीट्रयाकबाट बाहिरिनुहुन्छ?" : "Sign Out of MediTrack?"}
             </h2>
             <p className="text-[11px] text-[var(--text-secondary)]">
-              Session Security Confirmation
+              {isNepali ? "सत्र सुरक्षा पुष्टि" : "Session Security Confirmation"}
             </p>
           </div>
         </div>
 
         <p id="logout-dialog-desc" className="text-xs text-[var(--text-secondary)] leading-relaxed mb-6">
-          Are you sure you want to log out? Your authenticated healthcare session and cached data will be cleared from this browser to keep your information secure.
+          {isNepali
+            ? "के तपाईं पक्का लगआउट गर्न चाहनुहुन्छ? तपाईंको स्वास्थ्य विवरण सुरक्षित राख्न यो ब्राउजरबाट तपाईंको सत्र समाप्त गरिनेछ।"
+            : "Are you sure you want to log out? Your authenticated healthcare session and cached data will be cleared from this browser to keep your information secure."}
         </p>
 
         <div className="flex items-center justify-end gap-2.5">
@@ -72,7 +76,7 @@ export function LogoutConfirmDialog({
             disabled={loggingOut}
             className="text-xs"
           >
-            Cancel
+            {t.common.cancel}
           </Button>
           <Button
             type="button"
@@ -83,10 +87,11 @@ export function LogoutConfirmDialog({
             className="text-xs font-bold gap-1.5"
           >
             <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
-            {loggingOut ? "Signing out..." : "Log Out"}
+            {loggingOut ? (isNepali ? "बाहिरिँदै..." : "Signing out...") : t.settings.signOutBtn}
           </Button>
         </div>
       </Card>
     </div>
   );
 }
+

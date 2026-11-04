@@ -8,6 +8,7 @@ import {
   ChevronRight,
   HelpCircle,
   KeyRound,
+  Languages,
   LogOut,
   Settings,
   ShieldCheck,
@@ -22,6 +23,8 @@ import {
   AccountManagementModal,
   type AccountTab,
 } from "@/components/profile/AccountManagementModal";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export interface ProfileDropdownProps {
   user: { id: string; name?: string; email?: string; role: UserRole } | null;
@@ -39,6 +42,8 @@ export function ProfileDropdown({
   onUserUpdated,
 }: ProfileDropdownProps) {
   const router = useRouter();
+  const { t, isNepali } = useTranslation();
+
   const [isOpen, setIsOpen] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -86,12 +91,12 @@ export function ProfileDropdown({
 
   const roleBadge =
     user?.role === "professional_caregiver"
-      ? "Care Pro"
+      ? isNepali ? "हेरचाह विज्ञ" : "Care Pro"
       : user?.role === "family_caregiver"
-        ? "Family Care"
+        ? isNepali ? "परिवार" : "Family Care"
         : user?.role === "admin"
           ? "Admin"
-          : "Patient";
+          : isNepali ? "बिरामी" : "Patient";
 
   function handleAction(action: () => void) {
     setIsOpen(false);
@@ -101,50 +106,50 @@ export function ProfileDropdown({
   const menuItems = [
     {
       id: "overview",
-      label: "Profile Overview",
-      description: "View personal information",
+      label: isNepali ? "प्रोफाइल विवरण" : "Profile Overview",
+      description: isNepali ? "व्यक्तिगत जानकारी हेर्नुहोस्" : "View personal information",
       icon: User,
       onClick: () => setAccountModalTab("overview"),
     },
     {
       id: "account",
-      label: "My Account",
-      description: "Manage name & contact details",
+      label: isNepali ? "मेरो खाता" : "My Account",
+      description: isNepali ? "नाम र फोन नम्बर मिलाउनुहोस्" : "Manage name & contact details",
       icon: UserCheck,
       onClick: () => setAccountModalTab("account"),
     },
     {
       id: "settings",
-      label: "Settings",
-      description: "Manage application preferences",
+      label: t.nav.settings,
+      description: isNepali ? "भाषा, आवाज तथा रङ छनोट" : "Manage application preferences",
       icon: Settings,
       onClick: () => router.push("/settings"),
     },
     {
       id: "change-password",
-      label: "Change Password",
-      description: "Securely update your password",
+      label: isNepali ? "पासवर्ड परिवर्तन" : "Change Password",
+      description: isNepali ? "सुरक्षित रूपमा पासवर्ड फेर्नुहोस्" : "Securely update your password",
       icon: KeyRound,
       onClick: () => setShowPasswordModal(true),
     },
     {
       id: "notifications",
-      label: "Notifications",
-      description: "Audio & reminder preferences",
+      label: isNepali ? "सूचना तथा घण्टी" : "Notifications",
+      description: isNepali ? "घण्टीको आवाज र सूचना व्यवस्थापन" : "Audio & reminder preferences",
       icon: Bell,
       onClick: () => setAccountModalTab("notifications"),
     },
     {
       id: "privacy",
-      label: "Privacy & Security",
-      description: "Data isolation & session security",
+      label: isNepali ? "गोपनीयता र सुरक्षा" : "Privacy & Security",
+      description: isNepali ? "पारिवारिक अनुमति र डेटा सुरक्षा" : "Data isolation & session security",
       icon: ShieldCheck,
       onClick: () => setAccountModalTab("privacy"),
     },
     {
       id: "help",
-      label: "Help & Support",
-      description: "Clinical guidelines & FAQ",
+      label: isNepali ? "सहयोग तथा FAQ" : "Help & Support",
+      description: isNepali ? "निर्देशिका र प्रयोग विधि" : "Clinical guidelines & FAQ",
       icon: HelpCircle,
       onClick: () => setAccountModalTab("help"),
     },
@@ -185,7 +190,7 @@ export function ProfileDropdown({
         {!compact && (
           <div className="min-w-0 flex-1 text-left">
             <p className="truncate font-display text-xs font-bold text-[var(--text)] group-hover:text-[#20D6C2] transition-colors">
-              {user?.name || "Patient Member"}
+              {user?.name || (isNepali ? "सदस्य" : "Patient Member")}
             </p>
             <div className="flex items-center gap-1.5">
               <span className="font-mono text-[10px] text-[var(--text-muted)] truncate max-w-[100px]">
@@ -229,7 +234,7 @@ export function ProfileDropdown({
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-1">
                 <h3 className="truncate font-display text-xs font-bold text-[var(--text)]">
-                  {user?.name || "Patient Member"}
+                  {user?.name || (isNepali ? "सदस्य" : "Patient Member")}
                 </h3>
                 <span className="shrink-0 rounded-md border border-[#16A36A]/30 bg-[#16A36A]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982]">
                   {roleBadge}
@@ -241,10 +246,19 @@ export function ProfileDropdown({
               <div className="mt-1 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#20D6C2] shadow-[0_0_6px_#20D6C2]" />
                 <span className="text-[10px] font-medium text-[var(--text-secondary)]">
-                  Protected Healthcare Session
+                  {isNepali ? "सुरक्षित स्वास्थ्य सेसन" : "Protected Healthcare Session"}
                 </span>
               </div>
             </div>
+          </div>
+
+          {/* Quick Language Switcher Inside Profile Menu */}
+          <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-[var(--surface-elevated)]/50 border border-[var(--border-subtle)] mb-1">
+            <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text)]">
+              <Languages className="h-3.5 w-3.5 text-[#16A36A] dark:text-[#20C982]" />
+              <span>{t.common.language}</span>
+            </div>
+            <LanguageSwitcher variant="toggle" showIcon={false} />
           </div>
 
           {/* Menu Items List */}
@@ -287,7 +301,7 @@ export function ProfileDropdown({
           {/* Separator Divider */}
           <div className="my-1.5 border-t border-[var(--border)]" />
 
-          {/* Logout Option (Styled in subtle red as recommended) */}
+          {/* Logout Option */}
           <button
             type="button"
             role="menuitem"
@@ -302,9 +316,9 @@ export function ProfileDropdown({
                 <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
               </span>
               <div>
-                <span className="block font-bold">Logout</span>
+                <span className="block font-bold">{t.nav.signOut}</span>
                 <span className="block text-[10px] text-rose-500/80 dark:text-[#FB7185]/80">
-                  Securely sign out of your account
+                  {isNepali ? "खाताबाट सुरक्षित रूपमा बाहिरिनुहोस्" : "Securely sign out of your account"}
                 </span>
               </div>
             </div>

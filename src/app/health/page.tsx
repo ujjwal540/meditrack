@@ -7,15 +7,17 @@ import { Card } from "@/components/ui/Card";
 import { ProgressRing } from "@/components/ui/ProgressRing";
 import { WeeklyChart } from "@/components/dashboard/WeeklyChart";
 import { useMediTrack } from "@/components/reminders/ReminderProvider";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 export default function HealthPage() {
   const { ready, stats, weekly } = useMediTrack();
+  const { t, formatNumber } = useTranslation();
   const pct = stats.total ? Math.round((stats.taken / stats.total) * 100) : 0;
 
   return (
     <PageShell
-      title="Health & Adherence"
-      subtitle="Track your consistency trends and medication compliance."
+      title={t.health.pageTitle}
+      subtitle={t.health.pageSubtitle}
     >
       {!ready ? (
         <div className="skeleton h-64" aria-busy="true" />
@@ -26,30 +28,28 @@ export default function HealthPage() {
             <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-6 text-center sm:text-left">
               <ProgressRing value={pct} size={120} stroke={11}>
                 <span className="font-mono text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text)] tabular-nums">
-                  {pct}%
+                  {formatNumber(pct)}%
                 </span>
               </ProgressRing>
               <div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982]">
-                  Today&apos;s Adherence
+                  {t.health.todayAdherenceTitle}
                 </span>
                 <h2 className="mt-1 font-display text-xl sm:text-2xl font-bold text-[var(--text)]">
-                  {stats.taken} of {stats.total} Doses Confirmed
+                  {formatNumber(stats.taken)} / {formatNumber(stats.total)} {t.health.confirmedDosesMsg}
                 </h2>
                 <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                  {pct >= 80
-                    ? "Optimal adherence routine. Keep up the great work!"
-                    : "Consistent timing reinforces long-term wellness."}
+                  {pct >= 80 ? t.health.optimalMsg : t.dashboard.keepGoingMsg}
                 </p>
               </div>
             </div>
 
             <div className="w-full sm:w-auto rounded-2xl border border-[#16A36A]/20 bg-[#16A36A]/10 px-4 sm:px-5 py-3.5 sm:py-4 text-left">
               <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#16A36A] dark:text-[#A3EAC1]">
-                <TrendingUp className="h-4 w-4 shrink-0" /> Routine Health
+                <TrendingUp className="h-4 w-4 shrink-0" /> {t.health.routineHealthTitle}
               </span>
               <p className="mt-1 text-xs text-[var(--text-secondary)] max-w-xs">
-                Your medication adherence data is stored securely in your browser space.
+                {t.health.routineHealthDesc}
               </p>
             </div>
           </Card>
@@ -59,10 +59,10 @@ export default function HealthPage() {
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <h3 className="font-display text-lg font-bold text-[var(--text)]">
-                  Weekly Adherence Overview
+                  {t.health.weeklyChartTitle}
                 </h3>
                 <p className="text-xs text-[var(--text-secondary)]">
-                  Daily comparison of scheduled versus confirmed doses over the last 7 days.
+                  {t.health.weeklyChartSubtitle}
                 </p>
               </div>
             </div>
@@ -77,10 +77,10 @@ export default function HealthPage() {
               </div>
               <div>
                 <h4 className="font-display text-sm font-bold text-[var(--text)]">
-                  Clinical &amp; Safety Notice
+                  {t.health.clinicalNoticeTitle}
                 </h4>
                 <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
-                  MediTrack tracks adherence routines for self-management and caregiver reassurance. MediTrack does not provide clinical diagnoses, therapeutic alterations, or substitute professional healthcare advice.
+                  {t.health.clinicalNoticeBody}
                 </p>
               </div>
             </div>
@@ -96,7 +96,7 @@ export default function HealthPage() {
                 <Sparkles className="h-4 w-4" />
               </span>
               <span className="font-display text-sm font-bold text-[var(--text)]">
-                View Complete Historical Dose Logs
+                {t.health.viewFullHistory}
               </span>
             </div>
             <ChevronRight className="h-4 w-4 text-[var(--text-muted)] group-hover:text-[#16A36A] dark:group-hover:text-[#20C982] transition-colors" />
@@ -106,3 +106,4 @@ export default function HealthPage() {
     </PageShell>
   );
 }
+

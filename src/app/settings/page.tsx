@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useMediTrack } from "@/components/reminders/ReminderProvider";
 import { useAccessibility } from "@/components/layout/AccessibilityProvider";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { useTranslation } from "@/i18n/LanguageContext";
 import {
   Accessibility,
   CheckCircle2,
+  Languages,
   LogOut,
   Moon,
   Paintbrush,
@@ -17,18 +20,20 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getActiveUser, signOut } from "@/lib/auth";
+import { getActiveUser } from "@/lib/auth";
 import { LogoutConfirmDialog } from "@/components/profile/LogoutConfirmDialog";
 import type { UserRole } from "@/types";
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { t, isNepali, formatNumber } = useTranslation();
   const [currentUser, setCurrentUser] = useState<{ id: string; name?: string; email?: string; role: UserRole } | null>(null);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   useEffect(() => {
     void getActiveUser().then(setCurrentUser);
   }, []);
+
   const {
     settings,
     updateSettings,
@@ -51,10 +56,29 @@ export default function SettingsPage() {
 
   return (
     <PageShell
-      title="Application Preferences"
-      subtitle="Configure notifications, audio guidance, appearance, and accessibility."
+      title={t.settings.pageTitle}
+      subtitle={t.settings.pageSubtitle}
     >
       <div className="max-w-2xl space-y-6">
+        {/* Prominent Bilingual Language Switcher Card */}
+        <Card className="p-5 sm:p-6 border-[#16A36A]/40 bg-gradient-to-br from-[var(--surface)] to-[var(--surface-elevated)]">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="icon-badge bg-[#16A36A]/15 text-[#16A36A] dark:text-[#20C982] border border-[#16A36A]/30">
+              <Languages className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div>
+              <h2 className="font-display text-lg font-bold text-[var(--text)]">
+                {t.settings.languageSectionTitle}
+              </h2>
+              <p className="text-xs text-[var(--text-secondary)]">
+                {t.settings.languageSectionDesc}
+              </p>
+            </div>
+          </div>
+
+          <LanguageSwitcher variant="cards" />
+        </Card>
+
         {/* Appearance & Theme Preference */}
         <Card className="p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-4">
@@ -63,10 +87,10 @@ export default function SettingsPage() {
             </span>
             <div>
               <h2 className="font-display text-lg font-bold text-[var(--text)]">
-                Theme &amp; Appearance
+                {t.settings.themeSectionTitle}
               </h2>
               <p className="text-xs text-[var(--text-secondary)]">
-                Choose your preferred visual styling. Medical Emerald (Dark Forest) is the official default.
+                {t.settings.themeSectionDesc}
               </p>
             </div>
           </div>
@@ -82,7 +106,7 @@ export default function SettingsPage() {
               }`}
             >
               <Moon className="h-4 w-4" />
-              <span>Medical Emerald (Dark)</span>
+              <span>{t.settings.themeDark}</span>
             </button>
 
             <button
@@ -95,7 +119,7 @@ export default function SettingsPage() {
               }`}
             >
               <Sun className="h-4 w-4" />
-              <span>Clinical Light (Emerald)</span>
+              <span>{t.settings.themeLight}</span>
             </button>
           </div>
         </Card>
@@ -109,10 +133,10 @@ export default function SettingsPage() {
               </span>
               <div>
                 <h2 className="font-display text-lg font-bold text-[var(--text)]">
-                  Easy Mode
+                  {t.settings.easyModeTitle}
                 </h2>
                 <p className="mt-1 text-xs text-[var(--text-secondary)] max-w-sm">
-                  Larger fonts, high-contrast buttons, simplified controls, and bold reminders designed for elderly adults.
+                  {t.settings.easyModeDesc}
                 </p>
               </div>
             </div>
@@ -141,7 +165,7 @@ export default function SettingsPage() {
               className="mt-4 flex items-center gap-2 rounded-xl bg-[#16A36A]/15 border border-[#16A36A]/30 p-3 text-xs font-semibold text-[#16A36A] dark:text-[#A3EAC1]"
             >
               <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-              <span>Easy Mode is active across all MediTrack views.</span>
+              <span>{t.settings.easyModeActiveMsg}</span>
             </p>
           )}
         </Card>
@@ -149,7 +173,7 @@ export default function SettingsPage() {
         {/* Snooze & Grace Period Intervals */}
         <Card className="space-y-4 p-6">
           <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-            Snooze Reminder Interval
+            {t.settings.snoozeIntervalTitle}
             <select
               className={selectStyle}
               value={settings.snoozeMinutes}
@@ -157,14 +181,14 @@ export default function SettingsPage() {
             >
               {[5, 10, 15, 30].map((m) => (
                 <option key={m} value={m} className="bg-[var(--surface-elevated)] text-[var(--text)]">
-                  {m} minutes
+                  {formatNumber(m)} {t.common.minutes}
                 </option>
               ))}
             </select>
           </label>
 
           <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
-            Caregiver Notification Grace Period
+            {t.settings.caregiverGraceTitle}
             <select
               className={selectStyle}
               value={settings.graceMinutes}
@@ -172,7 +196,7 @@ export default function SettingsPage() {
             >
               {[15, 30, 45, 60].map((m) => (
                 <option key={m} value={m} className="bg-[var(--surface-elevated)] text-[var(--text)]">
-                  {m} minutes
+                  {formatNumber(m)} {t.common.minutes}
                 </option>
               ))}
             </select>
@@ -182,10 +206,10 @@ export default function SettingsPage() {
         {/* Reminder Modalities & Hardware Tests */}
         <Card className="p-6">
           <h2 className="font-display text-lg font-bold text-[var(--text)]">
-            Audio &amp; Notification Hardware
+            {t.settings.hardwareSectionTitle}
           </h2>
           <p className="mt-1 text-xs text-[var(--text-secondary)]">
-            Current Browser Permission: <strong className="capitalize text-[#16A36A] dark:text-[#20C982]">{notificationPermission}</strong>
+            {t.settings.currentPermission}: <strong className="capitalize text-[#16A36A] dark:text-[#20C982]">{notificationPermission}</strong>
           </p>
 
           {notificationPermission !== "unsupported" && notificationPermission !== "denied" && (
@@ -194,21 +218,25 @@ export default function SettingsPage() {
               variant="primary"
               className="mt-3 text-xs"
               onClick={requestNotifications}
-              disabled={notificationPermission !== "granted"}
+              disabled={notificationPermission === "granted"}
             >
-              {notificationPermission === "granted" ? "Notifications Enabled" : "Request Notifications"}
+              {notificationPermission === "granted" ? t.settings.alertsEnabledBtn : t.settings.requestAlertsBtn}
             </Button>
           )}
 
           {notificationPermission === "denied" && (
             <p className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-500 dark:text-amber-300">
-              Browser alerts are blocked. Allow notifications for this origin in browser settings, then reload. Sound and vibration remain testable below.
+              {isNepali
+                ? "ब्राउजरमा सूचनाहरू बन्द छन्। ब्राउजर सेटिङबाट खोल्न सक्नुहुन्छ।"
+                : "Browser alerts are blocked. Allow notifications for this origin in browser settings, then reload."}
             </p>
           )}
 
           {notificationPermission === "unsupported" && (
             <p className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 text-xs text-[var(--text-secondary)]">
-              Browser notification popups are unavailable on this device or context.
+              {isNepali
+                ? "यस उपकरणमा ब्राउजर सूचना उपलब्ध छैन।"
+                : "Browser notification popups are unavailable on this device or context."}
             </p>
           )}
 
@@ -216,8 +244,8 @@ export default function SettingsPage() {
           <div className="mt-5 grid gap-3 sm:grid-cols-2 text-xs">
             <label className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
               <span>
-                <strong className="block text-[var(--text)]">Browser Notifications</strong>
-                <span className="text-[11px] text-[var(--text-muted)]">Popups at scheduled dose time</span>
+                <strong className="block text-[var(--text)]">{isNepali ? "ब्राउजर सूचना (Popups)" : "Browser Notifications"}</strong>
+                <span className="text-[11px] text-[var(--text-muted)]">{isNepali ? "तोकिएको समयमा स्क्रीनमा सन्देश" : "Popups at scheduled dose time"}</span>
               </span>
               <input
                 type="checkbox"
@@ -229,9 +257,9 @@ export default function SettingsPage() {
 
             <label className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
               <span>
-                <strong className="block text-[var(--text)]">Voice Assistance</strong>
+                <strong className="block text-[var(--text)]">{t.settings.voiceAnnounceTitle}</strong>
                 <span className="text-[11px] text-[var(--text-muted)]">
-                  {voiceSupported ? "Spoken dose announcements" : "Not supported in browser"}
+                  {voiceSupported ? t.settings.voiceAnnounceDesc : (isNepali ? "उपकरणमा आवाज उपलब्ध छैन" : "Not supported in browser")}
                 </span>
               </span>
               <input
@@ -244,9 +272,9 @@ export default function SettingsPage() {
 
             <label className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
               <span>
-                <strong className="block text-[var(--text)]">Audio Chimes</strong>
+                <strong className="block text-[var(--text)]">{t.settings.soundChimeTitle}</strong>
                 <span className="text-[11px] text-[var(--text-muted)]">
-                  {soundSupported ? "Gentle chime sound" : "Not supported"}
+                  {soundSupported ? t.settings.soundChimeDesc : (isNepali ? "उपलब्ध छैन" : "Not supported")}
                 </span>
               </span>
               <input
@@ -259,9 +287,9 @@ export default function SettingsPage() {
 
             <label className="flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
               <span>
-                <strong className="block text-[var(--text)]">Haptic Vibration</strong>
+                <strong className="block text-[var(--text)]">{isNepali ? "कम्पन (Vibration)" : "Haptic Vibration"}</strong>
                 <span className="text-[11px] text-[var(--text-muted)]">
-                  {vibrationSupported ? "Mobile vibration pulse" : "Not supported on this device"}
+                  {vibrationSupported ? (isNepali ? "मोबाइल कम्पन" : "Mobile vibration pulse") : (isNepali ? "उपलब्ध छैन" : "Not supported")}
                 </span>
               </span>
               <input
@@ -274,7 +302,7 @@ export default function SettingsPage() {
 
             <label className="sm:col-span-2 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]/50 p-3.5">
               <span className="font-semibold text-[var(--text)] block text-xs">
-                Chime Volume: {Math.round(settings.soundVolume * 100)}%
+                {t.settings.volumeSliderLabel}: {formatNumber(Math.round(settings.soundVolume * 100))}%
               </span>
               <input
                 type="range"
@@ -297,7 +325,7 @@ export default function SettingsPage() {
               disabled={notificationPermission !== "granted"}
               className="text-xs"
             >
-              Test Notification
+              {isNepali ? "सूचना परीक्षण" : "Test Notification"}
             </Button>
             <Button
               size="sm"
@@ -306,16 +334,16 @@ export default function SettingsPage() {
               disabled={!soundSupported || !settings.soundEnabled}
               className="text-xs"
             >
-              Test Sound
+              {t.settings.testChimeBtn}
             </Button>
             <Button
               size="sm"
               variant="outline"
-              onClick={() => speak("This is a MediTrack voice assistance test.")}
+              onClick={() => speak(isNepali ? "यो मेडीट्रयाक आवाज परीक्षण हो। तपाईंको आवाज सहायता राम्ररी काम गर्दैछ।" : "This is a MediTrack voice assistance test.")}
               disabled={!voiceSupported || !settings.voiceEnabled}
               className="text-xs"
             >
-              Test Voice
+              {t.settings.testVoiceBtn}
             </Button>
             <Button
               size="sm"
@@ -324,7 +352,7 @@ export default function SettingsPage() {
               disabled={!vibrationSupported || !settings.vibrationEnabled}
               className="text-xs"
             >
-              Test Vibration
+              {t.settings.testVibrationBtn}
             </Button>
           </div>
 
@@ -342,13 +370,13 @@ export default function SettingsPage() {
               </span>
               <div>
                 <h2 className="font-display text-lg font-bold text-[var(--text)]">
-                  Account &amp; Security Session
+                  {t.settings.accountSectionTitle}
                 </h2>
                 <div className="mt-1 space-y-0.5 text-xs text-[var(--text-secondary)]">
-                  <p>Signed in as: <strong className="text-[var(--text)]">{currentUser?.name || "Patient Member"}</strong></p>
+                  <p>{isNepali ? "लगइन गरिएको खाता:" : "Signed in as:"} <strong className="text-[var(--text)]">{currentUser?.name || (isNepali ? "बिरामी सदस्य" : "Patient Member")}</strong></p>
                   {currentUser?.email && <p className="font-mono text-[11px] text-[var(--text-muted)]">{currentUser.email}</p>}
                   <p className="inline-block mt-1 rounded-md bg-[#16A36A]/10 border border-[#20D6C2]/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#20D6C2]">
-                    Role: {currentUser?.role?.replace("_", " ") || "Patient"}
+                    {isNepali ? "भूमिका" : "Role"}: {currentUser?.role?.replace("_", " ") || "Patient"}
                   </p>
                 </div>
               </div>
@@ -360,11 +388,13 @@ export default function SettingsPage() {
               onClick={() => setShowLogoutDialog(true)}
               className="text-xs font-bold gap-2 self-start sm:self-auto"
             >
-              <LogOut className="h-4 w-4" /> Sign Out
+              <LogOut className="h-4 w-4" /> {t.settings.signOutBtn}
             </Button>
           </div>
           <p className="mt-4 text-[11px] text-[var(--text-muted)] border-t border-[var(--border-subtle)] pt-3">
-            Signing out clears your private session and cached medical timetable from this browser to prevent cross-account data leakage.
+            {isNepali
+              ? "लगआउट गर्दा तपाईंको सुरक्षित स्वास्थ्य सेसन र विवरण यस ब्राउजरबाट सुरक्षित रूपमा हटाइनेछ।"
+              : "Signing out clears your private session and cached medical timetable from this browser to prevent cross-account data leakage."}
           </p>
         </Card>
       </div>

@@ -11,6 +11,7 @@ export interface AuthResult {
     email?: string;
     name?: string;
     role?: UserRole;
+    preferredLanguage?: "en" | "ne";
   };
 }
 
@@ -39,6 +40,7 @@ export async function signUp(
   password: string,
   accountType: AccountType = "patient",
   proData?: ProfessionalRegisterData,
+  preferredLanguage: "en" | "ne" = "en",
 ): Promise<AuthResult> {
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -49,9 +51,16 @@ export async function signUp(
       name: name.trim(),
       email: normalizedEmail,
       role: accountType,
+      preferredLanguage,
     };
     try {
       localStorage.setItem(USER_SESSION_KEY, JSON.stringify(demoUser));
+      localStorage.setItem(`meditrack.lang.${demoUser.id}`, preferredLanguage);
+      localStorage.setItem("meditrack.language", preferredLanguage);
+      if (typeof document !== "undefined") {
+        document.documentElement.lang = preferredLanguage;
+        document.documentElement.setAttribute("data-lang", preferredLanguage);
+      }
     } catch {}
     return { ok: true, demo: true, role: accountType, user: demoUser };
   }
@@ -63,6 +72,7 @@ export async function signUp(
       data: {
         name: name.trim(),
         role: accountType,
+        preferred_language: preferredLanguage,
         phone: proData?.phone || null,
         qualifications: proData?.qualifications || null,
         service_location: proData?.serviceLocation || null,
@@ -112,14 +122,29 @@ export async function signIn(email: string, password: string): Promise<AuthResul
       }
     } catch {}
 
-    const demoUser = {
+    const demoUser: {
+      id: string;
+      name?: string;
+      email: string;
+      role: UserRole;
+      preferredLanguage?: "en" | "ne";
+    } = {
       id: "demo-" + normalizedEmail.replace(/[^a-zA-Z0-9]/g, ""),
       name: storedName,
       email: normalizedEmail,
       role: (normalizedEmail.includes("pro") ? "professional_caregiver" : normalizedEmail.includes("family") || normalizedEmail.includes("care") ? "family_caregiver" : "patient") as UserRole,
     };
+    const userLang = (localStorage.getItem(`meditrack.lang.${demoUser.id}`) as "en" | "ne") ||
+      (localStorage.getItem("meditrack.language") as "en" | "ne") ||
+      "en";
+    demoUser.preferredLanguage = userLang;
     try {
       localStorage.setItem(USER_SESSION_KEY, JSON.stringify(demoUser));
+      localStorage.setItem("meditrack.language", userLang);
+      if (typeof document !== "undefined") {
+        document.documentElement.lang = userLang;
+        document.documentElement.setAttribute("data-lang", userLang);
+      }
     } catch {}
     return { ok: true, demo: true, role: demoUser.role, user: demoUser };
   }
@@ -133,20 +158,41 @@ export async function signIn(email: string, password: string): Promise<AuthResul
 
   let role: UserRole = "patient";
   let exactName: string | undefined = undefined;
+  let userLanguage: "en" | "ne" = "en";
+
   if (data.user) {
     role = (data.user.user_metadata?.role as UserRole) || "patient";
     if (data.user.user_metadata?.name?.trim()) {
       exactName = data.user.user_metadata.name.trim();
     }
+    if (data.user.user_metadata?.preferred_language === "ne" || data.user.user_metadata?.preferred_language === "en") {
+      userLanguage = data.user.user_metadata.preferred_language;
+    } else {
+      const stored = localStorage.getItem(`meditrack.lang.${data.user.id}`);
+      if (stored === "en" || stored === "ne") userLanguage = stored;
+    }
+
+    try {
+      localStorage.setItem(`meditrack.lang.${data.user.id}`, userLanguage);
+      localStorage.setItem("meditrack.language", userLanguage);
+      if (typeof document !== "undefined") {
+        document.documentElement.lang = userLanguage;
+        document.documentElement.setAttribute("data-lang", userLanguage);
+      }
+    } catch {}
+
     // Check users table if available
     try {
-      const { data: profile } = await supabase.from("users").select("role, name").eq("id", data.user.id).maybeSingle();
+      const { data: profile } = await supabase.from("users").select("role, name, preferred_language").eq("id", data.user.id).maybeSingle();
       if (profile?.role) role = profile.role as UserRole;
       if (profile?.name?.trim()) exactName = profile.name.trim();
+      if (profile?.preferred_language === "en" || profile?.preferred_language === "ne") {
+        userLanguage = profile.preferred_language;
+      }
     } catch {}
   }
 
-  return { ok: true, role, user: data.user ? { id: data.user.id, email: data.user.email, name: exactName, role } : undefined };
+  return { ok: true, role, user: data.user ? { id: data.user.id, email: data.user.email, name: exactName, role, preferredLanguage: userLanguage } : undefined };
 }
 
 /**
@@ -156,10 +202,9 @@ export async function signIn(email: string, password: string): Promise<AuthResul
 export async function signOut(): Promise<void> {
   try {
     if (typeof window !== "undefined") {
-      // Clear all user-specific storage keys to prevent cross-account cache leakage
+      // Clear user session, preserving generic settings
       localStorage.removeItem(USER_SESSION_KEY);
       localStorage.removeItem("meditrack.current_user");
-      // Keep app settings like theme and sound, but clean transient cache
     }
     if (supabase) {
       await supabase.auth.signOut();
@@ -172,22 +217,31 @@ export async function signOut(): Promise<void> {
 /**
  * Retrieves the currently active user profile and role
  */
-export async function getActiveUser(): Promise<{ id: string; email?: string; name?: string; role: UserRole } | null> {
+export async function getActiveUser(): Promise<{ id: string; email?: string; name?: string; role: UserRole; preferredLanguage?: "en" | "ne" } | null> {
   if (supabase) {
     const { data } = await supabase.auth.getUser();
     if (data.user) {
       let role: UserRole = (data.user.user_metadata?.role as UserRole) || "patient";
       let exactName: string | undefined = data.user.user_metadata?.name?.trim() || undefined;
+      let userLang: "en" | "ne" = (data.user.user_metadata?.preferred_language as "en" | "ne") || "en";
+
+      const localUserLang = localStorage.getItem(`meditrack.lang.${data.user.id}`);
+      if (localUserLang === "en" || localUserLang === "ne") {
+        userLang = localUserLang;
+      }
 
       try {
-        const { data: profile } = await supabase.from("users").select("name, role").eq("id", data.user.id).maybeSingle();
+        const { data: profile } = await supabase.from("users").select("name, role, preferred_language").eq("id", data.user.id).maybeSingle();
         if (profile?.role) role = profile.role as UserRole;
         if (profile?.name && profile.name.trim().length > 0) {
           exactName = profile.name.trim();
         }
+        if (profile?.preferred_language === "en" || profile?.preferred_language === "ne") {
+          userLang = profile.preferred_language;
+        }
       } catch {}
 
-      return { id: data.user.id, email: data.user.email, name: exactName, role };
+      return { id: data.user.id, email: data.user.email, name: exactName, role, preferredLanguage: userLang };
     }
   }
 
@@ -309,24 +363,46 @@ export async function changeUserPassword(
 export async function updateUserProfile(
   name: string,
   phone?: string,
-): Promise<{ ok: boolean; error?: string; user?: { id: string; email?: string; name: string; role: UserRole } }> {
+  preferredLanguage?: "en" | "ne",
+): Promise<{ ok: boolean; error?: string; user?: { id: string; email?: string; name: string; role: UserRole; preferredLanguage?: "en" | "ne" } }> {
   const cleanName = name.trim();
   if (!cleanName) {
     return { ok: false, error: "Full name cannot be empty." };
+  }
+
+  if (preferredLanguage) {
+    try {
+      localStorage.setItem("meditrack.language", preferredLanguage);
+      if (typeof document !== "undefined") {
+        document.documentElement.lang = preferredLanguage;
+        document.documentElement.setAttribute("data-lang", preferredLanguage);
+      }
+    } catch {}
   }
 
   if (supabase) {
     try {
       const { data: userData } = await supabase.auth.getUser();
       if (userData?.user) {
+        const updateData: Record<string, any> = {
+          name: cleanName,
+          phone: phone?.trim() || null,
+        };
+        if (preferredLanguage) {
+          updateData.preferred_language = preferredLanguage;
+          localStorage.setItem(`meditrack.lang.${userData.user.id}`, preferredLanguage);
+        }
+
         const { error: authErr } = await supabase.auth.updateUser({
-          data: { name: cleanName, phone: phone?.trim() || null },
+          data: updateData,
         });
 
         if (authErr) return { ok: false, error: authErr.message };
 
         try {
-          await supabase.from("users").update({ name: cleanName }).eq("id", userData.user.id);
+          const dbUpdate: Record<string, any> = { name: cleanName };
+          if (preferredLanguage) dbUpdate.preferred_language = preferredLanguage;
+          await supabase.from("users").update(dbUpdate).eq("id", userData.user.id);
         } catch {}
 
         const updated = {
@@ -334,6 +410,7 @@ export async function updateUserProfile(
           email: userData.user.email,
           name: cleanName,
           role: ((userData.user.user_metadata?.role as UserRole) || "patient"),
+          preferredLanguage: preferredLanguage || (userData.user.user_metadata?.preferred_language as "en" | "ne") || "en",
         };
 
         return { ok: true, user: updated };
@@ -352,6 +429,10 @@ export async function updateUserProfile(
         const u = JSON.parse(raw);
         u.name = cleanName;
         if (phone !== undefined) u.phone = phone.trim();
+        if (preferredLanguage) {
+          u.preferredLanguage = preferredLanguage;
+          if (u.id) localStorage.setItem(`meditrack.lang.${u.id}`, preferredLanguage);
+        }
         localStorage.setItem(USER_SESSION_KEY, JSON.stringify(u));
         return { ok: true, user: u };
       }

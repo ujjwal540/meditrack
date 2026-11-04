@@ -14,8 +14,10 @@ import {
   Users,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 import { AIAssistantWidget } from "@/components/ai/AIAssistantWidget";
 import { Logo } from "@/components/ui/Logo";
+import { useTranslation } from "@/i18n/LanguageContext";
 
 function ensureDemoSession() {
   if (typeof window !== "undefined" && !localStorage.getItem("meditrack.current_user")) {
@@ -32,6 +34,8 @@ function ensureDemoSession() {
 }
 
 export default function Home() {
+  const { t, isNepali } = useTranslation();
+
   return (
     <div className="relative min-h-screen bg-[var(--bg-app)] text-[var(--text)] selection:bg-[#16A36A] selection:text-white overflow-x-hidden font-sans transition-colors duration-300">
       {/* Background Ambient Glows & Grid */}
@@ -41,49 +45,49 @@ export default function Home() {
 
       {/* Top Navigation Bar */}
       <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--surface-glass)] backdrop-blur-xl transition-colors duration-300">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
           {/* Zone 1: Brand wordmark with Medical Emerald Icon */}
           <Link href="/" className="shrink-0 transition-transform hover:scale-[1.02]">
             <Logo variant="full" size="md" glow={true} />
           </Link>
 
           {/* Zone 2: Navigation Links */}
-          <nav className="hidden md:flex items-center gap-7 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
             <a href="#features" className="hover:text-[#16A36A] dark:hover:text-[#20C982] transition-colors whitespace-nowrap shrink-0">
-              Features
+              {isNepali ? "विशेषताहरू" : "Features"}
             </a>
             <a href="#how-it-works" className="hover:text-[#16A36A] dark:hover:text-[#20C982] transition-colors whitespace-nowrap shrink-0">
-              How It Works
+              {isNepali ? "कसरी काम गर्छ" : "How It Works"}
             </a>
             <a href="#family-care" className="hover:text-[#16A36A] dark:hover:text-[#20C982] transition-colors whitespace-nowrap shrink-0">
-              Family Circle
+              {isNepali ? "परिवार समूह" : "Family Circle"}
             </a>
             <Link href="/marketplace" className="hover:text-[#20D6C2] text-[#20D6C2]/90 transition-colors whitespace-nowrap shrink-0 font-bold">
-              Care Pros
+              {isNepali ? "हेरचाहकर्मी" : "Care Pros"}
             </Link>
             <a href="#ai-assistant" className="hover:text-[#A78BFA] transition-colors whitespace-nowrap shrink-0">
-              AI Companion
+              {isNepali ? "स्वास्थ्य साथी" : "AI Companion"}
             </a>
           </nav>
 
-          {/* Zone 3: Theme Toggle & Primary Action */}
-          <div className="flex items-center gap-3 shrink-0">
-            {/* Premium Medical Dark/Light Mode Toggle */}
-            <ThemeToggle showLabel={true} />
+          {/* Zone 3: Language Switcher, Theme Toggle & Primary Action */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <LanguageSwitcher variant="minimal" />
+            <ThemeToggle showLabel={false} />
 
             <Link
               href="/login"
               className="hidden sm:inline-flex min-h-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-xs font-semibold text-[var(--text)] hover:border-[#16A36A]/50 hover:text-[#16A36A] dark:hover:text-[#20C982] transition-all whitespace-nowrap shadow-sm"
             >
-              Sign In
+              {t.nav.signIn}
             </Link>
 
             <Link
               href="/dashboard"
               onClick={ensureDemoSession}
-              className="inline-flex min-h-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-5 text-xs font-bold text-white shadow-[0_0_20px_rgba(22,163,106,0.35)] hover:shadow-[0_0_28px_rgba(32,201,130,0.5)] hover:brightness-105 active:scale-95 transition-all whitespace-nowrap"
+              className="inline-flex min-h-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-4 sm:px-5 text-xs font-bold text-white shadow-[0_0_20px_rgba(22,163,106,0.35)] hover:shadow-[0_0_28px_rgba(32,201,130,0.5)] hover:brightness-105 active:scale-95 transition-all whitespace-nowrap"
             >
-              Launch Demo
+              {isNepali ? "ड्यासबोर्ड खोल्नुहोस्" : "Launch Demo"}
             </Link>
           </div>
         </div>
@@ -95,20 +99,37 @@ export default function Home() {
           {/* Eyebrow Kicker */}
           <div className="inline-flex items-center gap-2 rounded-full border border-[#16A36A]/30 bg-[#16A36A]/10 px-4 py-1.5 text-xs font-semibold tracking-wide text-[#16A36A] dark:text-[#A3EAC1] mb-8 backdrop-blur-md shadow-sm">
             <Sparkles className="h-3.5 w-3.5 text-[#20C982]" />
-            <span>Intelligent Medication &amp; Family Care Platform</span>
+            <span>
+              {isNepali
+                ? "स्मार्ट औषधि स्मरण तथा पारिवारिक हेरचाह प्रणाली"
+                : "Intelligent Medication & Family Care Platform"}
+            </span>
           </div>
 
           {/* Main Headline */}
           <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[var(--text)] leading-[1.08] text-balance">
-            Never Miss a Dose.{" "}
-            <span className="bg-gradient-to-r from-[#16A36A] via-[#20C982] to-[#A3EAC1] bg-clip-text text-transparent">
-              Empower Your Daily Health.
-            </span>
+            {isNepali ? (
+              <>
+                औषधि कहिल्यै नछुटोस्।{" "}
+                <span className="bg-gradient-to-r from-[#16A36A] via-[#20C982] to-[#A3EAC1] bg-clip-text text-transparent">
+                  दैनिक स्वास्थ्यलाई मजबुत बनाउनुहोस्।
+                </span>
+              </>
+            ) : (
+              <>
+                Never Miss a Dose.{" "}
+                <span className="bg-gradient-to-r from-[#16A36A] via-[#20C982] to-[#A3EAC1] bg-clip-text text-transparent">
+                  Empower Your Daily Health.
+                </span>
+              </>
+            )}
           </h1>
 
           {/* Subtitle */}
           <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg leading-relaxed text-[var(--text-secondary)] text-balance">
-            Precision reminders, timetable scheduling, consent-based family caregiver updates, and an AI healthcare assistant crafted around medical trust and clarity.
+            {isNepali
+              ? "सटीक औषधि अनुस्मारक, दैनिक तालिका, सहमतिमा आधारित पारिवारिक हेरचाह समन्वय र आवाज प्रणालीका साथ सहज स्वास्थ्य व्यवस्थापन।"
+              : "Precision reminders, timetable scheduling, consent-based family caregiver updates, and an AI healthcare assistant crafted around medical trust and clarity."}
           </p>
 
           {/* Call to Actions */}
@@ -117,7 +138,7 @@ export default function Home() {
               href="/register"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-7 text-sm font-bold text-white shadow-[0_4px_22px_rgba(22,163,106,0.35)] hover:shadow-[0_6px_30px_rgba(32,201,130,0.5)] hover:brightness-105 active:scale-95 transition-all"
             >
-              <span>Get Started Free</span>
+              <span>{isNepali ? "निःशुल्क सुरु गर्नुहोस्" : "Get Started Free"}</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
 
@@ -126,18 +147,21 @@ export default function Home() {
               onClick={ensureDemoSession}
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-6 text-sm font-semibold text-[var(--text)] hover:border-[#16A36A]/40 hover:text-[#16A36A] dark:hover:text-[#20C982] active:scale-95 transition-all backdrop-blur-sm shadow-sm"
             >
-              <span>Explore Interactive Demo</span>
+              <span>{isNepali ? "अन्तर्क्रियात्मक डेमो हेर्नुहोस्" : "Explore Interactive Demo"}</span>
             </Link>
           </div>
 
           {/* Trust Highlights */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-[var(--text-secondary)]">
             <span className="flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-[#16A36A] dark:text-[#20C982]" /> No Credit Card Required
+              <ShieldCheck className="h-4 w-4 text-[#16A36A] dark:text-[#20C982]" />
+              {isNepali ? "कुनै क्रेडिट कार्ड आवश्यक छैन" : "No Credit Card Required"}
             </span>
             <span className="flex items-center gap-1.5">
-              <Lock className="h-4 w-4 text-[#16A36A] dark:text-[#20C982]" /> Strict Consent-Based Privacy
+              <Lock className="h-4 w-4 text-[#16A36A] dark:text-[#20C982]" />
+              {isNepali ? "पूर्ण सहमतिमा आधारित गोपनीयता" : "Strict Consent-Based Privacy"}
             </span>
+
             <span className="flex items-center gap-1.5">
               <CheckCircle2 className="h-4 w-4 text-[#16A36A] dark:text-[#20C982]" /> Web &amp; Mobile PWA Ready
             </span>

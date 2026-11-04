@@ -21,7 +21,8 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { updateUserProfile } from "@/lib/auth";
 import { useMediTrack } from "@/components/reminders/ReminderProvider";
-import type { UserRole } from "@/types";
+import { useTranslation } from "@/i18n/LanguageContext";
+import type { UserRole, SupportedLanguage } from "@/types";
 
 export type AccountTab = "overview" | "account" | "notifications" | "privacy" | "help";
 
@@ -35,14 +36,16 @@ export function AccountManagementModal({
 }: {
   isOpen: boolean;
   initialTab?: AccountTab;
-  user: { id: string; name?: string; email?: string; role: UserRole } | null;
+  user: { id: string; name?: string; email?: string; role: UserRole; preferredLanguage?: SupportedLanguage } | null;
   onClose: () => void;
   onOpenChangePassword: () => void;
-  onUserUpdated?: (updated: { id: string; name?: string; email?: string; role: UserRole }) => void;
+  onUserUpdated?: (updated: { id: string; name?: string; email?: string; role: UserRole; preferredLanguage?: SupportedLanguage }) => void;
 }) {
+  const { t, language, setLanguage, isNepali } = useTranslation();
   const [activeTab, setActiveTab] = useState<AccountTab>(initialTab);
   const [name, setName] = useState(user?.name || "");
   const [phone, setPhone] = useState("");
+  const [selectedLang, setSelectedLang] = useState<SupportedLanguage>(language);
   const [saving, setSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
@@ -65,7 +68,8 @@ export function AccountManagementModal({
 
   useEffect(() => {
     if (user?.name) setName(user.name);
-  }, [user]);
+    setSelectedLang(language);
+  }, [user, language]);
 
   if (!isOpen) return null;
 
@@ -74,17 +78,20 @@ export function AccountManagementModal({
     setSaving(true);
     setStatusMessage(null);
 
-    const res = await updateUserProfile(name, phone);
+    const res = await updateUserProfile(name, phone, selectedLang);
     setSaving(false);
 
     if (res.ok) {
-      setStatusMessage("Profile information updated successfully.");
+      if (selectedLang !== language) {
+        setLanguage(selectedLang);
+      }
+      setStatusMessage(t.profile.profileUpdatedMsg);
       if (res.user && onUserUpdated) {
         onUserUpdated(res.user);
       }
       setTimeout(() => setStatusMessage(null), 3000);
     } else {
-      setStatusMessage(res.error || "Failed to update profile.");
+      setStatusMessage(res.error || (isNepali ? "विवरण सुरक्षित गर्न सकिएन।" : "Failed to update profile."));
     }
   }
 
@@ -132,11 +139,11 @@ export function AccountManagementModal({
     .toUpperCase();
 
   const tabs: { id: AccountTab; label: string; icon: typeof User }[] = [
-    { id: "overview", label: "Profile Overview", icon: User },
-    { id: "account", label: "My Account", icon: UserCheck },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "privacy", label: "Privacy & Security", icon: ShieldCheck },
-    { id: "help", label: "Help & Support", icon: HelpCircle },
+    { id: "overview", label: t.profile.overviewTab, icon: User },
+    { id: "account", label: t.profile.accountTab, icon: UserCheck },
+    { id: "notifications", label: t.profile.notificationsTab, icon: Bell },
+    { id: "privacy", label: t.profile.privacyTab, icon: ShieldCheck },
+    { id: "help", label: t.profile.helpTab, icon: HelpCircle },
   ];
 
   return (
@@ -319,7 +326,7 @@ export function AccountManagementModal({
 
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
-                  Contact Phone (Optional)
+                  {t.profile.phoneLabel}
                 </label>
                 <div className="relative">
                   <Phone className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-muted)]" />
@@ -333,6 +340,38 @@ export function AccountManagementModal({
                 </div>
               </div>
 
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
+                  {t.profile.preferredLanguageLabel}
+                </label>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedLang("en")}
+                    className={`flex items-center justify-between rounded-xl border p-2.5 text-xs font-bold transition-all ${
+                      selectedLang === "en"
+                        ? "border-[#16A36A] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-sm"
+                        : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text)]"
+                    }`}
+                  >
+                    <span>English</span>
+                    {selectedLang === "en" && <CheckCircle2 className="h-4 w-4 text-[#16A36A]" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedLang("ne")}
+                    className={`flex items-center justify-between rounded-xl border p-2.5 text-xs font-bold transition-all ${
+                      selectedLang === "ne"
+                        ? "border-[#16A36A] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-sm"
+                        : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text)]"
+                    }`}
+                  >
+                    <span>नेपाली (Nepali)</span>
+                    {selectedLang === "ne" && <CheckCircle2 className="h-4 w-4 text-[#16A36A]" />}
+                  </button>
+                </div>
+              </div>
+
               <div className="pt-2 flex justify-end">
                 <Button
                   type="submit"
@@ -342,7 +381,7 @@ export function AccountManagementModal({
                   className="text-xs font-bold gap-1.5"
                 >
                   <Save className="h-3.5 w-3.5" />
-                  {saving ? "Saving..." : "Save Account Details"}
+                  {saving ? t.common.saving : t.profile.saveChangesBtn}
                 </Button>
               </div>
             </form>
