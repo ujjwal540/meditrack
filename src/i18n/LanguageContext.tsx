@@ -187,7 +187,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 export function useLanguage(): LanguageContextValue {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error("useLanguage must be used within a LanguageProvider");
+    return {
+      language: "en",
+      setLanguage: () => {},
+      isNepali: false,
+      t: en,
+      formatNumber: (n: number | string) => String(n),
+      formatTimeDisplay: (timeString: string) => timeString,
+    };
   }
   return context;
 }
