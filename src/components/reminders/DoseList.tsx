@@ -73,7 +73,7 @@ export function DoseList({
               {items.map((d) => (
                 <li
                   key={d.key}
-                  className="group relative flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 backdrop-blur-xl transition-all duration-200 hover:border-[#16A36A]/40 hover:bg-[var(--surface-elevated)] shadow-sm"
+                  className="group relative flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 backdrop-blur-xl transition-all duration-240 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.6),0_0_20px_rgba(32,214,194,0.25)] shadow-sm"
                 >
                   <div className="flex items-center gap-3.5 min-w-0 flex-1">
                     <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)]">
@@ -90,8 +90,8 @@ export function DoseList({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span className="font-mono text-sm font-bold tabular-nums text-[var(--text)] bg-[var(--surface-elevated)] px-3 py-1.5 rounded-lg border border-[var(--border)]">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-[var(--border-subtle)] pt-2.5 sm:pt-0">
+                    <span className="font-mono text-xs sm:text-sm font-bold tabular-nums text-[var(--text)] bg-[var(--surface-elevated)] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[var(--border)]">
                       {formatTime(d.time)}
                     </span>
                     <StatusBadge dose={d} />
@@ -100,9 +100,9 @@ export function DoseList({
                         size="sm"
                         variant="soft"
                         onClick={() => onRespond(d.key, "taken")}
-                        className="py-1 px-3 text-xs"
+                        className="py-1 px-2.5 text-xs font-semibold"
                       >
-                        <Check className="h-4 w-4" aria-hidden="true" /> Mark Taken
+                        <Check className="h-3.5 w-3.5" aria-hidden="true" /> Mark Taken
                       </Button>
                     )}
                   </div>

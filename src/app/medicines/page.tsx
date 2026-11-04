@@ -86,19 +86,19 @@ export default function MedicinesPage() {
             <ul className="space-y-3.5">
               {medicines.map((m) => (
                 <li key={m.id}>
-                  <Card className="flex flex-wrap items-center gap-4 p-5 hover:border-[#16A36A]/40 transition-all">
+                  <Card interactive={true} className="flex flex-wrap items-center gap-3.5 sm:gap-4 p-4 sm:p-5">
                     {/* Icon */}
-                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#16A36A]/10 border border-[#16A36A]/20">
-                      <PillIcon type={m.type ?? "tablet"} size={36} />
+                    <div className="grid h-11 w-11 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-xl bg-[#16A36A]/10 border border-[#16A36A]/20">
+                      <PillIcon type={m.type ?? "tablet"} size={32} />
                     </div>
 
                     {/* Basic Info */}
                     <div className="min-w-0 flex-1 basis-56">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-display text-lg font-bold text-[var(--text)] truncate">
+                        <h3 className="font-display text-base sm:text-lg font-bold text-[var(--text)] truncate">
                           {m.name}
                         </h3>
-                        <span className="font-mono text-xs text-[#16A36A] dark:text-[#A3EAC1] font-semibold bg-[#16A36A]/10 px-2 py-0.5 rounded-md border border-[#16A36A]/20">
+                        <span className="font-mono text-[11px] sm:text-xs text-[#16A36A] dark:text-[#A3EAC1] font-semibold bg-[#16A36A]/10 px-2 py-0.5 rounded-md border border-[#16A36A]/20">
                           {m.dosage}
                         </span>
                       </div>
@@ -112,7 +112,7 @@ export default function MedicinesPage() {
                     </div>
 
                     {/* Quick Action Buttons */}
-                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <div className="flex w-full sm:w-auto flex-wrap items-center justify-start sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--border-subtle)] shrink-0">
                       <Button
                         size="sm"
                         variant="outline"

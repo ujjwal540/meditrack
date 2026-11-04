@@ -29,7 +29,7 @@ export function CaregiverCard({
   const statusInfo = LABEL[c.consentStatus];
 
   return (
-    <Card className="flex flex-wrap items-center justify-between gap-4 p-5 hover:border-[#16A36A]/40">
+    <Card interactive={true} className="flex flex-wrap items-center justify-between gap-4 p-5">
       <div className="flex items-center gap-3.5 min-w-0 flex-1 basis-56">
         <div
           className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-tr from-[#16A36A] to-[#20C982] font-display text-sm font-bold text-white shadow-sm"

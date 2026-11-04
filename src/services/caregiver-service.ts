@@ -111,3 +111,79 @@ export async function removeConnection(id: string): Promise<void> {
   const { error } = await supabase.from("caregiver_connections").delete().eq("id", id);
   if (error) throw new Error(`Could not remove family connection: ${error.message}`);
 }
+
+// Scheduled Caregiver Calls & Visits
+const SCHEDULES_KEY = "meditrack.caregiver_schedules";
+const REPORTS_KEY = "meditrack.care_reports";
+
+import type { CaregiverSchedule, CareReport } from "@/types";
+
+export function getCaregiverSchedules(): CaregiverSchedule[] {
+  return readJSON<CaregiverSchedule[]>(SCHEDULES_KEY, [
+    {
+      id: "demo-sched-1",
+      type: "call",
+      patientName: "Eleanor Vance (Mom)",
+      patientEmail: "mom@meditrack.app",
+      date: "Today",
+      time: "10:30",
+      notes: "Check in on morning blood pressure medication and breakfast routine.",
+      status: "scheduled",
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "demo-sched-2",
+      type: "visit",
+      patientName: "Eleanor Vance (Mom)",
+      patientEmail: "mom@meditrack.app",
+      date: "Tomorrow",
+      time: "14:00",
+      notes: "In-person visit: Pillbox refill check & weekly grocery delivery.",
+      status: "scheduled",
+      createdAt: new Date().toISOString(),
+    },
+  ]);
+}
+
+export function addCaregiverSchedule(input: Omit<CaregiverSchedule, "id" | "createdAt">): CaregiverSchedule {
+  const item: CaregiverSchedule = {
+    ...input,
+    id: uid(),
+    createdAt: new Date().toISOString(),
+  };
+  writeJSON(SCHEDULES_KEY, [item, ...getCaregiverSchedules()]);
+  return item;
+}
+
+export function updateCaregiverScheduleStatus(id: string, status: CaregiverSchedule["status"]): void {
+  const list = getCaregiverSchedules();
+  writeJSON(
+    SCHEDULES_KEY,
+    list.map((s) => (s.id === id ? { ...s, status } : s)),
+  );
+}
+
+export function getCareReports(): CareReport[] {
+  return readJSON<CareReport[]>(REPORTS_KEY, [
+    {
+      id: "report-1",
+      patientName: "Eleanor Vance (Mom)",
+      date: "Yesterday",
+      visitType: "call",
+      adherenceObserved: "100% adherence confirmed",
+      notes: "Mom reported no dizziness with morning Atorvastatin. Water intake is optimal.",
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
+    },
+  ]);
+}
+
+export function addCareReport(input: Omit<CareReport, "id" | "createdAt">): CareReport {
+  const report: CareReport = {
+    ...input,
+    id: uid(),
+    createdAt: new Date().toISOString(),
+  };
+  writeJSON(REPORTS_KEY, [report, ...getCareReports()]);
+  return report;
+}
+

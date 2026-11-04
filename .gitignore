@@ -1,9 +1,8 @@
-node_modules
-.next
-out
-.env*.local
-.env
+node_modules/
+build/
+dist/
+coverage/
 .DS_Store
-*.tsbuildinfo
-next-env.d.ts
-coverage
+*.log
+.env*
+!.env.example

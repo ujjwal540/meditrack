@@ -33,10 +33,11 @@ export function MedicineTypePicker({
               aria-pressed={selected}
               onClick={() => onChange(o.id)}
               className={cn(
-                "group relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all duration-200 active:scale-95",
+                "group relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl border p-4 text-sm font-bold transition-all duration-200 ease-out active:scale-95",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#20D6C2]",
                 selected
-                  ? "border-[#16A36A] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-[0_0_20px_rgba(22,163,106,0.2)]"
-                  : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:border-[#16A36A]/30 hover:text-[var(--text)]",
+                  ? "border-[#20D6C2] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-[0_0_22px_rgba(32,214,194,0.32)] -translate-y-0.5"
+                  : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:text-[var(--text)] hover:-translate-y-1 hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.5),0_0_18px_rgba(32,214,194,0.22)]",
               )}
             >
               <PillIcon type={o.id} size={44} />

@@ -1,7 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from "lucide-react";
+import {
+  Briefcase,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  HeartHandshake,
+  LockKeyhole,
+  Mail,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  User,
+  UserRound,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthShell } from "@/components/auth/AuthShell";
@@ -9,7 +22,7 @@ import { Button } from "@/components/ui/Button";
 import { type AccountType, signUp } from "@/lib/auth";
 
 const field =
-  "mt-1.5 min-h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-4 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] shadow-sm transition focus:border-[#16A36A] focus:outline-none focus:ring-2 focus:ring-[#16A36A]/20";
+  "mt-1.5 min-h-12 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-4 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] shadow-sm transition focus:border-[#20D6C2] focus:outline-none focus:ring-2 focus:ring-[#20D6C2]/20";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -20,6 +33,15 @@ export default function RegisterPage() {
   const [accountType, setAccountType] = useState<AccountType>("patient");
   const [showPassword, setShowPassword] = useState(false);
   const [terms, setTerms] = useState(false);
+
+  // Professional Caregiver specific fields
+  const [phone, setPhone] = useState("");
+  const [serviceLocation, setServiceLocation] = useState("");
+  const [qualifications, setQualifications] = useState("");
+  const [yearsExperience, setYearsExperience] = useState<number>(3);
+  const [hourlyRate, setHourlyRate] = useState<number>(35);
+  const [bio, setBio] = useState("");
+
   const [error, setError] = useState<string | null>(null);
   const [demo, setDemo] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,23 +51,83 @@ export default function RegisterPage() {
     if (password !== confirmPassword) return setError("Passwords do not match.");
     if (password.length < 8) return setError("Use at least 8 characters for your password.");
     if (!terms) return setError("Please agree to the terms and privacy notice to continue.");
+
+    if (accountType === "professional_caregiver") {
+      if (!serviceLocation.trim()) return setError("Please enter your primary service location.");
+      if (!qualifications.trim()) return setError("Please enter your qualifications or license.");
+    }
+
     setError(null);
     setDemo(false);
     setLoading(true);
-    const res = await signUp(name.trim(), email.trim(), password, accountType);
+
+    const proData = accountType === "professional_caregiver" ? {
+      phone: phone.trim() || undefined,
+      serviceLocation: serviceLocation.trim(),
+      qualifications: qualifications.trim(),
+      yearsExperience,
+      hourlyRate,
+      bio: bio.trim() || undefined,
+    } : undefined;
+
+    const res = await signUp(name.trim(), email.trim(), password, accountType, proData);
     setLoading(false);
-    if (res.ok) return router.push("/dashboard");
+
+    if (res.ok) {
+      if (accountType === "professional_caregiver") {
+        return router.push("/marketplace?role=professional");
+      } else if (accountType === "family_caregiver") {
+        return router.push("/family");
+      }
+      return router.push("/dashboard");
+    }
+
     setError(res.error ?? "We could not create your account. Please try again.");
     setDemo(Boolean(res.demo));
   }
 
   return (
     <AuthShell
-      eyebrow="Get Started"
+      eyebrow="Join MediTrack"
       title="Create your care space"
-      subtitle="A calmer way to manage medicines and stay connected with family."
+      subtitle="A calmer, safer way to manage medicines and coordinate care."
     >
       <form onSubmit={submit} className="space-y-4">
+        {/* Role Selection Tabs */}
+        <fieldset>
+          <legend className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+            I am registering as:
+          </legend>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { id: "patient", label: "Patient", Icon: User, desc: "Personal care" },
+              { id: "family_caregiver", label: "Family Caregiver", Icon: HeartHandshake, desc: "Trusted circle" },
+              { id: "professional_caregiver", label: "Professional", Icon: Briefcase, desc: "Licensed care" },
+            ].map(({ id, label, Icon, desc }) => (
+              <label
+                key={id}
+                className={`cursor-pointer rounded-xl border p-2.5 text-center transition-all ${
+                  accountType === id
+                    ? "border-[#20D6C2] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-[0_0_15px_rgba(32,214,194,0.22)]"
+                    : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:border-[#20D6C2]/40"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="accountType"
+                  value={id}
+                  checked={accountType === id}
+                  onChange={() => setAccountType(id as AccountType)}
+                  className="sr-only"
+                />
+                <Icon className="h-4 w-4 mx-auto mb-1" />
+                <span className="block text-xs font-bold truncate">{label}</span>
+                <span className="block text-[10px] opacity-75 truncate">{desc}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
         <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
           Full Name
           <span className="relative block">
@@ -56,7 +138,7 @@ export default function RegisterPage() {
             <input
               required
               autoComplete="name"
-              placeholder="Your full legal name"
+              placeholder="Your full name"
               className={`${field} pl-10`}
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -83,35 +165,86 @@ export default function RegisterPage() {
           </span>
         </label>
 
-        <fieldset>
-          <legend className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1.5">
-            I am registering as
-          </legend>
-          <div className="grid grid-cols-2 gap-2.5">
-            {([["patient", "Patient"], ["caregiver", "Family Caregiver"]] as const).map(
-              ([value, label]) => (
-                <label
-                  key={value}
-                  className={`cursor-pointer rounded-xl border p-2.5 text-center text-xs font-bold transition-all ${
-                    accountType === value
-                      ? "border-[#16A36A] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-[0_0_15px_rgba(22,163,106,0.2)]"
-                      : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text)] hover:border-[#16A36A]/30"
-                  }`}
+        {/* Professional Caregiver Fields */}
+        {accountType === "professional_caregiver" && (
+          <div className="rounded-2xl border border-[#20D6C2]/30 bg-[#20D6C2]/5 p-4 space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#16A36A] dark:text-[#20D6C2]">
+              <Briefcase className="h-4 w-4" />
+              <span>Professional Credentials &amp; Verification</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <label className="block text-[11px] font-semibold text-[var(--text-secondary)]">
+                Contact Phone
+                <input
+                  type="tel"
+                  placeholder="(555) 012-3456"
+                  className={field}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </label>
+
+              <label className="block text-[11px] font-semibold text-[var(--text-secondary)]">
+                Service Location
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. New York, NY"
+                  className={field}
+                  value={serviceLocation}
+                  onChange={(e) => setServiceLocation(e.target.value)}
+                />
+              </label>
+            </div>
+
+            <label className="block text-[11px] font-semibold text-[var(--text-secondary)]">
+              Qualifications &amp; Licenses
+              <input
+                type="text"
+                required
+                placeholder="e.g. RN (Registered Nurse), CNA, Geriatric Care Specialist"
+                className={field}
+                value={qualifications}
+                onChange={(e) => setQualifications(e.target.value)}
+              />
+            </label>
+
+            <div className="grid grid-cols-2 gap-2.5">
+              <label className="block text-[11px] font-semibold text-[var(--text-secondary)]">
+                Years of Experience
+                <select
+                  value={yearsExperience}
+                  onChange={(e) => setYearsExperience(Number(e.target.value))}
+                  className={field}
                 >
-                  <input
-                    type="radio"
-                    name="accountType"
-                    value={value}
-                    checked={accountType === value}
-                    onChange={() => setAccountType(value)}
-                    className="sr-only"
-                  />
-                  {label}
-                </label>
-              ),
-            )}
+                  <option value={1}>1 year</option>
+                  <option value={2}>2 years</option>
+                  <option value={3}>3–5 years</option>
+                  <option value={6}>6–10 years</option>
+                  <option value={10}>10+ years</option>
+                </select>
+              </label>
+
+              <label className="block text-[11px] font-semibold text-[var(--text-secondary)]">
+                Hourly Rate ($/hr)
+                <input
+                  type="number"
+                  min={15}
+                  max={250}
+                  value={hourlyRate}
+                  onChange={(e) => setHourlyRate(Number(e.target.value))}
+                  className={field}
+                />
+              </label>
+            </div>
+
+            <p className="text-[10px] text-[var(--text-muted)] flex items-center gap-1.5 pt-1">
+              <ShieldCheck className="h-3.5 w-3.5 text-[#20D6C2] shrink-0" />
+              <span>Professional credentials remain in pending status until verification documents are reviewed.</span>
+            </p>
           </div>
-        </fieldset>
+        )}
 
         <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
           Password
@@ -133,7 +266,7 @@ export default function RegisterPage() {
             <button
               type="button"
               aria-label={showPassword ? "Hide password" : "Show password"}
-              onClick={() => setShowPassword((value) => !value)}
+              onClick={() => setShowPassword((v) => !v)}
               className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[var(--text-muted)] hover:text-[var(--text)]"
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -182,7 +315,7 @@ export default function RegisterPage() {
           variant="primary"
           className="w-full text-sm font-bold mt-2"
         >
-          {loading ? "Creating Account..." : "Create Free Account"}
+          {loading ? "Creating Account..." : "Create Account"}
         </Button>
       </form>
 

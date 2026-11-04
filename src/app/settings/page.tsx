@@ -8,12 +8,27 @@ import { useAccessibility } from "@/components/layout/AccessibilityProvider";
 import {
   Accessibility,
   CheckCircle2,
+  LogOut,
   Moon,
   Paintbrush,
+  ShieldCheck,
   Sun,
+  UserCheck,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getActiveUser, signOut } from "@/lib/auth";
+import { LogoutConfirmDialog } from "@/components/profile/LogoutConfirmDialog";
+import type { UserRole } from "@/types";
 
 export default function SettingsPage() {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<{ id: string; name?: string; email?: string; role: UserRole } | null>(null);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
+  useEffect(() => {
+    void getActiveUser().then(setCurrentUser);
+  }, []);
   const {
     settings,
     updateSettings,
@@ -41,7 +56,7 @@ export default function SettingsPage() {
     >
       <div className="max-w-2xl space-y-6">
         {/* Appearance & Theme Preference */}
-        <Card className="p-6">
+        <Card className="p-5 sm:p-6">
           <div className="flex items-center gap-3 mb-4">
             <span className="icon-badge">
               <Paintbrush className="h-5 w-5" aria-hidden="true" />
@@ -56,7 +71,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setTheme("dark")}
@@ -317,7 +332,47 @@ export default function SettingsPage() {
             Push Background Status: <strong className="capitalize text-[var(--text-secondary)]">{pushStatus}</strong>.
           </p>
         </Card>
+
+        {/* Account Profile & Session Isolation Section */}
+        <Card className="p-5 sm:p-6 border-[#20D6C2]/30">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <span className="icon-badge">
+                <ShieldCheck className="h-5 w-5 text-[#20D6C2]" aria-hidden="true" />
+              </span>
+              <div>
+                <h2 className="font-display text-lg font-bold text-[var(--text)]">
+                  Account &amp; Security Session
+                </h2>
+                <div className="mt-1 space-y-0.5 text-xs text-[var(--text-secondary)]">
+                  <p>Signed in as: <strong className="text-[var(--text)]">{currentUser?.name || "Patient Member"}</strong></p>
+                  {currentUser?.email && <p className="font-mono text-[11px] text-[var(--text-muted)]">{currentUser.email}</p>}
+                  <p className="inline-block mt-1 rounded-md bg-[#16A36A]/10 border border-[#20D6C2]/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#20D6C2]">
+                    Role: {currentUser?.role?.replace("_", " ") || "Patient"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => setShowLogoutDialog(true)}
+              className="text-xs font-bold gap-2 self-start sm:self-auto"
+            >
+              <LogOut className="h-4 w-4" /> Sign Out
+            </Button>
+          </div>
+          <p className="mt-4 text-[11px] text-[var(--text-muted)] border-t border-[var(--border-subtle)] pt-3">
+            Signing out clears your private session and cached medical timetable from this browser to prevent cross-account data leakage.
+          </p>
+        </Card>
       </div>
+
+      <LogoutConfirmDialog
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+      />
     </PageShell>
   );
 }

@@ -38,11 +38,11 @@ function HistoryContent() {
             <table className="w-full text-left text-xs">
               <thead className="border-b border-[var(--border)] bg-[var(--surface-elevated)]/60 text-[var(--text-muted)] uppercase tracking-wider font-semibold">
                 <tr>
-                  <th className="p-4">Date</th>
-                  <th className="p-4">Scheduled</th>
-                  <th className="p-4">Medicine</th>
-                  <th className="p-4">Status</th>
-                  <th className="p-4">Recorded At</th>
+                  <th className="px-3.5 py-3 sm:px-4 sm:py-3.5 whitespace-nowrap">Date</th>
+                  <th className="px-3.5 py-3 sm:px-4 sm:py-3.5 whitespace-nowrap">Scheduled</th>
+                  <th className="px-3.5 py-3 sm:px-4 sm:py-3.5 whitespace-nowrap">Medicine</th>
+                  <th className="px-3.5 py-3 sm:px-4 sm:py-3.5 whitespace-nowrap">Status</th>
+                  <th className="px-3.5 py-3 sm:px-4 sm:py-3.5 whitespace-nowrap">Recorded At</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-subtle)]">
@@ -51,19 +51,19 @@ function HistoryContent() {
                     key={r.key}
                     className="hover:bg-[var(--surface-elevated)]/50 transition-colors"
                   >
-                    <td className="p-4 font-mono tabular-nums text-[var(--text)]">
+                    <td className="px-3.5 py-3 sm:px-4 sm:py-3.5 font-mono tabular-nums text-[var(--text)] whitespace-nowrap">
                       {r.date}
                     </td>
-                    <td className="p-4 font-mono font-bold tabular-nums text-[#16A36A] dark:text-[#20C982]">
+                    <td className="px-3.5 py-3 sm:px-4 sm:py-3.5 font-mono font-bold tabular-nums text-[#16A36A] dark:text-[#20C982] whitespace-nowrap">
                       {formatTime(r.time)}
                     </td>
-                    <td className="p-4 font-semibold text-[var(--text)]">
+                    <td className="px-3.5 py-3 sm:px-4 sm:py-3.5 font-semibold text-[var(--text)] whitespace-nowrap">
                       {names.get(r.medicineId) ?? "Prescription"}
                     </td>
-                    <td className="p-4">
+                    <td className="px-3.5 py-3 sm:px-4 sm:py-3.5 whitespace-nowrap">
                       <StatusBadge dose={{ status: r.status, isDue: false }} />
                     </td>
-                    <td className="p-4 font-mono tabular-nums text-[var(--text-muted)]">
+                    <td className="px-3.5 py-3 sm:px-4 sm:py-3.5 font-mono tabular-nums text-[var(--text-muted)] whitespace-nowrap">
                       {r.recordedAt ? new Date(r.recordedAt).toLocaleTimeString() : "—"}
                     </td>
                   </tr>

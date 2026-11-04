@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { AppSettings, DoseLog, DoseStatus, Medicine } from "@/types";
+import type { AppSettings, DoseLog, DoseStatus, Medicine, UserRole } from "@/types";
 import { addMedicine, deleteMedicine, getMedicines, updateMedicine } from "@/services/medicine-service";
 import {
   DEFAULT_SETTINGS,
@@ -19,9 +19,11 @@ import {
   weeklyAdherence,
 } from "@/utils/date-utils";
 import { useNotifications } from "@/hooks/use-notifications";
+import { getActiveUser } from "@/lib/auth";
 
 export function useReminders() {
   const [ready, setReady] = useState(false);
+  const [user, setUser] = useState<{ id: string; email?: string; name?: string; role: UserRole } | null>(null);
   const [medicines, setMedicines] = useState<Medicine[]>([]);
   const [logs, setLogs] = useState<Record<string, DoseLog>>({});
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -49,6 +51,7 @@ export function useReminders() {
 
   useEffect(() => {
     refresh();
+    void getActiveUser().then(setUser);
     setNow(new Date());
     setReady(true);
   }, [refresh]);
@@ -82,9 +85,10 @@ export function useReminders() {
       const id = `${d.key}|${d.snoozedUntil ?? ""}`;
       if (notified.current.has(id)) continue;
       notified.current.add(id);
-      notify(`Time for ${d.medicineName}`, `${d.dosage}. ${d.instructions || "Follow the prescribed instructions."}`);
+      const title = user?.name ? `${user.name}, Time for ${d.medicineName}` : `Time for ${d.medicineName}`;
+      notify(title, `${d.dosage}. ${d.instructions || "Follow the prescribed instructions."}`);
     }
-  }, [dueDoses, notify]);
+  }, [dueDoses, notify, user?.name]);
 
   useEffect(() => {
     const overdue = doses.filter((dose) => dose.status === "not_confirmed" && !logs[dose.key]);
@@ -121,9 +125,15 @@ export function useReminders() {
       });
       setLogs(getLogs());
       setNow(new Date());
-      if (status === "taken") speak("Your medicine has been marked as taken.");
+      if (status === "taken") {
+        speak(
+          user?.name
+            ? `Thank you, ${user.name}. Your medicine has been marked as taken.`
+            : "Your medicine has been marked as taken.",
+        );
+      }
     },
-    [doses, speak],
+    [doses, speak, user?.name],
   );
 
   const add = useCallback(
@@ -157,6 +167,8 @@ export function useReminders() {
 
   return {
     ready,
+    user,
+    userName: user?.name,
     now,
     medicines,
     logs,

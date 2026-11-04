@@ -39,7 +39,8 @@ export function StatCards({
       {items.map(({ label, value, Icon, color, bg }) => (
         <Card
           key={label}
-          className="relative overflow-hidden p-5 transition-all duration-200 hover:scale-[1.01]"
+          interactive={true}
+          className="relative overflow-hidden p-5"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">

@@ -17,6 +17,20 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { AIAssistantWidget } from "@/components/ai/AIAssistantWidget";
 import { Logo } from "@/components/ui/Logo";
 
+function ensureDemoSession() {
+  if (typeof window !== "undefined" && !localStorage.getItem("meditrack.current_user")) {
+    localStorage.setItem(
+      "meditrack.current_user",
+      JSON.stringify({
+        id: "demo-patient",
+        name: "Eleanor Vance",
+        email: "eleanor.vance@example.com",
+        role: "patient",
+      }),
+    );
+  }
+}
+
 export default function Home() {
   return (
     <div className="relative min-h-screen bg-[var(--bg-app)] text-[var(--text)] selection:bg-[#16A36A] selection:text-white overflow-x-hidden font-sans transition-colors duration-300">
@@ -44,6 +58,9 @@ export default function Home() {
             <a href="#family-care" className="hover:text-[#16A36A] dark:hover:text-[#20C982] transition-colors whitespace-nowrap shrink-0">
               Family Circle
             </a>
+            <Link href="/marketplace" className="hover:text-[#20D6C2] text-[#20D6C2]/90 transition-colors whitespace-nowrap shrink-0 font-bold">
+              Care Pros
+            </Link>
             <a href="#ai-assistant" className="hover:text-[#A78BFA] transition-colors whitespace-nowrap shrink-0">
               AI Companion
             </a>
@@ -63,6 +80,7 @@ export default function Home() {
 
             <Link
               href="/dashboard"
+              onClick={ensureDemoSession}
               className="inline-flex min-h-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-5 text-xs font-bold text-white shadow-[0_0_20px_rgba(22,163,106,0.35)] hover:shadow-[0_0_28px_rgba(32,201,130,0.5)] hover:brightness-105 active:scale-95 transition-all whitespace-nowrap"
             >
               Launch Demo
@@ -105,6 +123,7 @@ export default function Home() {
 
             <Link
               href="/dashboard"
+              onClick={ensureDemoSession}
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-6 text-sm font-semibold text-[var(--text)] hover:border-[#16A36A]/40 hover:text-[#16A36A] dark:hover:text-[#20C982] active:scale-95 transition-all backdrop-blur-sm shadow-sm"
             >
               <span>Explore Interactive Demo</span>
@@ -249,7 +268,7 @@ export default function Home() {
 
           <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {/* Bento Card 1: Precision Timetable */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl hover:border-[#16A36A]/40 transition-all shadow-[var(--shadow-card)]">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_22px_rgba(32,214,194,0.28)] shadow-[var(--shadow-card)]">
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] border border-[#16A36A]/25">
                 <Bell className="h-6 w-6" />
               </div>
@@ -260,7 +279,7 @@ export default function Home() {
             </div>
 
             {/* Bento Card 2: AI Healthcare Companion */}
-            <div className="rounded-2xl border border-[#A78BFA]/30 bg-[var(--surface)] p-7 backdrop-blur-xl hover:border-[#A78BFA]/50 transition-all shadow-[var(--shadow-card)]">
+            <div className="rounded-2xl border border-[#A78BFA]/30 bg-[var(--surface)] p-7 backdrop-blur-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_22px_rgba(32,214,194,0.28)] shadow-[var(--shadow-card)]">
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-[#A78BFA]/15 text-[#A78BFA] border border-[#A78BFA]/25">
                 <Sparkles className="h-6 w-6" />
               </div>
@@ -271,7 +290,7 @@ export default function Home() {
             </div>
 
             {/* Bento Card 3: Connected Family Circle */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl hover:border-[#16A36A]/40 transition-all shadow-[var(--shadow-card)]">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_22px_rgba(32,214,194,0.28)] shadow-[var(--shadow-card)]">
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-emerald-500/15 text-[#16A36A] dark:text-[#36D399] border border-emerald-500/25">
                 <HeartHandshake className="h-6 w-6" />
               </div>
@@ -282,7 +301,7 @@ export default function Home() {
             </div>
 
             {/* Bento Card 4: Accessibility & Easy Mode */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl hover:border-[#16A36A]/40 transition-all shadow-[var(--shadow-card)]">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_22px_rgba(32,214,194,0.28)] shadow-[var(--shadow-card)]">
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-amber-500/15 text-amber-500 dark:text-[#FBBF24] border border-amber-500/25">
                 <Activity className="h-6 w-6" />
               </div>
@@ -293,7 +312,7 @@ export default function Home() {
             </div>
 
             {/* Bento Card 5: Full History & Adherence */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl hover:border-[#16A36A]/40 transition-all shadow-[var(--shadow-card)]">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_22px_rgba(32,214,194,0.28)] shadow-[var(--shadow-card)]">
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-blue-500/15 text-blue-500 dark:text-[#60A5FA] border border-blue-500/25">
                 <Clock className="h-6 w-6" />
               </div>
@@ -304,7 +323,7 @@ export default function Home() {
             </div>
 
             {/* Bento Card 6: Privacy by Design */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl hover:border-[#16A36A]/40 transition-all shadow-[var(--shadow-card)]">
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-7 backdrop-blur-xl transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_22px_rgba(32,214,194,0.28)] shadow-[var(--shadow-card)]">
               <div className="grid h-12 w-12 place-items-center rounded-xl bg-[#16A36A]/15 text-[#16A36A] dark:text-[#20C982] border border-[#16A36A]/25">
                 <ShieldCheck className="h-6 w-6" />
               </div>
@@ -329,7 +348,7 @@ export default function Home() {
           </div>
 
           <div className="mt-14 grid gap-8 sm:grid-cols-3">
-            <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 backdrop-blur-md shadow-[var(--shadow-card)]">
+            <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 backdrop-blur-md shadow-[var(--shadow-card)] transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_20px_rgba(32,214,194,0.25)]">
               <span className="font-mono text-3xl font-extrabold text-[#16A36A] dark:text-[#20C982] opacity-75">01</span>
               <h3 className="mt-4 font-display text-lg font-bold text-[var(--text)]">Add Your Schedule</h3>
               <p className="mt-2 text-xs text-[var(--text-secondary)]">
@@ -337,7 +356,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 backdrop-blur-md shadow-[var(--shadow-card)]">
+            <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 backdrop-blur-md shadow-[var(--shadow-card)] transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_20px_rgba(32,214,194,0.25)]">
               <span className="font-mono text-3xl font-extrabold text-[#16A36A] dark:text-[#20C982] opacity-75">02</span>
               <h3 className="mt-4 font-display text-lg font-bold text-[var(--text)]">Receive Gentle Alerts</h3>
               <p className="mt-2 text-xs text-[var(--text-secondary)]">
@@ -345,7 +364,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 backdrop-blur-md shadow-[var(--shadow-card)]">
+            <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 backdrop-blur-md shadow-[var(--shadow-card)] transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_20px_rgba(32,214,194,0.25)]">
               <span className="font-mono text-3xl font-extrabold text-[#A78BFA] opacity-75">03</span>
               <h3 className="mt-4 font-display text-lg font-bold text-[var(--text)]">Stay Reassured</h3>
               <p className="mt-2 text-xs text-[var(--text-secondary)]">

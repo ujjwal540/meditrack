@@ -20,6 +20,7 @@ export function ReminderProvider({ children }: { children: ReactNode }) {
         dose={value.dueDoses[0]}
         remaining={value.dueDoses.length}
         snoozeMinutes={value.settings.snoozeMinutes}
+        userName={value.userName}
         onRespond={value.respond}
       />
     </ReminderContext.Provider>

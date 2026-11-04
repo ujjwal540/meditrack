@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { CheckCircle2, HeartHandshake, Pill, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 export function AuthShell({
   eyebrow,
@@ -25,7 +26,7 @@ export function AuthShell({
 
       <div className="relative z-10 mx-auto grid w-full max-w-5xl overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-card)] backdrop-blur-2xl lg:grid-cols-[1.05fr_1fr]">
         {/* Left Visual Panel */}
-        <section className="relative flex flex-col justify-between overflow-hidden border-b lg:border-b-0 lg:border-r border-[var(--border)] bg-gradient-to-br from-[var(--surface-elevated)] via-[var(--bg-secondary)] to-[var(--surface)] p-8 sm:p-12">
+        <section className="relative flex flex-col justify-between overflow-hidden border-b lg:border-b-0 lg:border-r border-[var(--border)] bg-gradient-to-br from-[var(--surface-elevated)] via-[var(--bg-secondary)] to-[var(--surface)] p-5 sm:p-8 md:p-12">
           <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#16A36A]/15 blur-3xl" />
 
           <div>
@@ -33,22 +34,22 @@ export function AuthShell({
               <Logo variant="full" size="md" glow={true} />
             </Link>
 
-            <div className="mt-12 sm:mt-16">
+            <div className="mt-8 sm:mt-12 md:mt-16">
               <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982]">
                 Healthcare, Made Human
               </span>
-              <h1 className="mt-3 font-display text-3xl sm:text-4xl font-extrabold text-[var(--text)] leading-tight">
+              <h1 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-extrabold text-[var(--text)] leading-tight">
                 Your Health, Our Priority.
               </h1>
-              <p className="mt-3 text-sm text-[var(--text-secondary)] leading-relaxed max-w-md">
+              <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-md">
                 Precision medication scheduling and family circle coordination in one calm, secure platform.
               </p>
             </div>
           </div>
 
           {/* Floating Showcase Cards */}
-          <div className="my-8 space-y-3">
-            <div className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 text-xs backdrop-blur-md shadow-sm">
+          <div className="my-6 space-y-2.5 sm:my-8 sm:space-y-3">
+            <div className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-3.5 sm:p-4 text-xs backdrop-blur-md shadow-sm transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.6),0_0_18px_rgba(32,214,194,0.22)]">
               <div className="flex items-center gap-3">
                 <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#16A36A]/20 text-[#16A36A] dark:text-[#A3EAC1]">
                   <Pill className="h-4 w-4" />
@@ -61,7 +62,7 @@ export function AuthShell({
               <CheckCircle2 className="h-5 w-5 text-emerald-500 dark:text-[#36D399]" />
             </div>
 
-            <div className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-4 text-xs backdrop-blur-md shadow-sm">
+            <div className="flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--surface)]/80 p-3.5 sm:p-4 text-xs backdrop-blur-md shadow-sm transition-all duration-250 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.6),0_0_18px_rgba(32,214,194,0.22)]">
               <div className="flex items-center gap-3">
                 <span className="grid h-8 w-8 place-items-center rounded-lg bg-[#A78BFA]/20 text-[#A78BFA]">
                   <HeartHandshake className="h-4 w-4" />
@@ -84,11 +85,14 @@ export function AuthShell({
         </section>
 
         {/* Right Form Container */}
-        <section className="p-8 sm:p-12 flex flex-col justify-center bg-[var(--surface)]">
-          <p className="text-xs font-bold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982]">{eyebrow}</p>
-          <h2 className="mt-1 font-display text-2xl sm:text-3xl font-extrabold text-[var(--text)]">{title}</h2>
-          <p className="mt-2 text-xs sm:text-sm text-[var(--text-secondary)]">{subtitle}</p>
-          <div className="mt-6">{children}</div>
+        <section className="relative p-5 sm:p-8 md:p-12 flex flex-col justify-center bg-[var(--surface)]">
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+            <ThemeToggle showLabel={false} />
+          </div>
+          <p className="text-xs font-bold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982] pr-12">{eyebrow}</p>
+          <h2 className="mt-1 font-display text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--text)] pr-12">{title}</h2>
+          <p className="mt-1.5 text-xs sm:text-sm text-[var(--text-secondary)]">{subtitle}</p>
+          <div className="mt-5 sm:mt-6">{children}</div>
         </section>
       </div>
     </main>

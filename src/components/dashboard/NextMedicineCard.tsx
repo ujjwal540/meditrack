@@ -73,16 +73,16 @@ export function NextMedicineCard({
       </div>
 
       {/* Dose Main Info */}
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-5">
-        <div className="flex items-center gap-4">
-          <div className="grid h-20 w-20 shrink-0 place-items-center rounded-2xl bg-gradient-to-tr from-[#16A36A]/20 to-[#20C982]/10 border border-[#16A36A]/30 shadow-inner">
-            <PillIcon type={dose.type} size={52} />
+      <div className="mt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="grid h-16 w-16 sm:h-20 sm:w-20 shrink-0 place-items-center rounded-2xl bg-gradient-to-tr from-[#16A36A]/20 to-[#20C982]/10 border border-[#16A36A]/30 shadow-inner">
+            <PillIcon type={dose.type} size={44} />
           </div>
-          <div>
-            <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-[var(--text)]">
+          <div className="min-w-0">
+            <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--text)] truncate">
               {dose.medicineName}
             </h2>
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+            <p className="mt-0.5 text-xs sm:text-sm text-[var(--text-secondary)] truncate">
               {dose.dosage}
               {dose.instructions ? ` · ${dose.instructions}` : ""}
             </p>
@@ -90,11 +90,11 @@ export function NextMedicineCard({
         </div>
 
         {/* Scheduled Time Badge */}
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/60 px-5 py-3 text-right">
-          <span className="block text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/60 px-4 py-2.5 sm:px-5 sm:py-3 text-left sm:text-right shrink-0">
+          <span className="block text-[10px] sm:text-[11px] font-medium text-[var(--text-muted)] uppercase tracking-wider">
             Scheduled Time
           </span>
-          <span className="font-mono text-2xl sm:text-3xl font-bold tracking-tight text-[#16A36A] dark:text-[#A3EAC1] tabular-nums">
+          <span className="font-mono text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-[#16A36A] dark:text-[#A3EAC1] tabular-nums">
             {formatTime(dose.time)}
           </span>
         </div>

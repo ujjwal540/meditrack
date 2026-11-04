@@ -22,10 +22,10 @@ export function ThemeToggle({
       aria-label={`Current theme is ${theme}. Click to switch to ${isDark ? "light" : "dark"} mode`}
       onClick={toggleTheme}
       className={cn(
-        "group relative inline-flex items-center gap-2 rounded-xl p-1.5 transition-all duration-300",
+        "group relative inline-flex items-center gap-2 rounded-xl p-1.5 transition-all duration-200 ease-out",
         "border border-[var(--border)] bg-[var(--surface-elevated)]/80 backdrop-blur-md",
-        "hover:border-[var(--primary)] hover:shadow-[0_0_16px_var(--primary-glow)]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]",
+        "hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(32,214,194,0.3)]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#20D6C2] active:translate-y-0",
         className,
       )}
     >
@@ -56,7 +56,7 @@ export function ThemeToggle({
       </div>
 
       {showLabel && (
-        <span className="pr-2 text-xs font-semibold tracking-wide text-[var(--text-secondary)]">
+        <span className="hidden sm:inline-block pr-2 text-xs font-semibold tracking-wide text-[var(--text-secondary)]">
           {isDark ? "Dark" : "Light"}
         </span>
       )}

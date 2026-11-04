@@ -6,11 +6,14 @@ import {
   Bot,
   RotateCcw,
   Send,
+  ShieldCheck,
   Sparkles,
   User,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getTimeOfDayGreeting } from "@/utils/greeting";
+import { getActiveUser } from "@/lib/auth";
 
 type Message = {
   id: string;
@@ -26,41 +29,67 @@ const SUGGESTED_QUESTIONS = [
   "Tips for setting up a consistent daily routine",
 ];
 
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: "init-1",
-    sender: "assistant",
-    text: "Hello! I am your MediTrack AI Companion. I can help answer routine questions about setting reminders, taking medicine with food, or organizing your care schedule.",
-    timestamp: "Just now",
-  },
-];
+function getWelcomeMessage(userName?: string): string {
+  const timeGreeting = getTimeOfDayGreeting(new Date());
+  if (userName && userName.trim()) {
+    return `${timeGreeting}, ${userName.trim()}! How are you feeling today? I am your MediTrack AI Companion. How can I assist you with your health routine today?`;
+  }
+  return `Hello! Welcome to MediTrack. How can I help you with your health today? I can answer questions about setting reminders, taking medicine with food, or organizing your care schedule.`;
+}
 
-function getAssistantResponse(prompt: string): string {
+function getAssistantResponse(prompt: string, userName?: string): string {
   const lower = prompt.toLowerCase();
+  const namePrefix = userName ? `, ${userName}` : "";
+
   if (lower.includes("miss") || lower.includes("forgot") || lower.includes("skip")) {
-    return "If you miss a dose, take it as soon as you remember, unless it is already almost time for your next scheduled dose. Never double up on your medicine to make up for a missed dose. When in doubt, check your prescription label or call your pharmacist.";
+    return `If you miss a dose${namePrefix}, take it as soon as you remember, unless it is already almost time for your next scheduled dose. Never double up on your medicine to make up for a missed dose. When in doubt, check your prescription label or call your pharmacist.`;
   }
   if (lower.includes("food") || lower.includes("empty stomach") || lower.includes("eat") || lower.includes("water")) {
     return "Medicines marked 'with food' are usually meant to be taken during or right after a meal or snack to protect your stomach lining or improve absorption. Always take oral tablets with a full glass of water unless your doctor instructed otherwise.";
   }
   if (lower.includes("family") || lower.includes("caregiver") || lower.includes("sharing") || lower.includes("consent")) {
-    return "MediTrack uses strict consent-based sharing. When you invite a family member or caregiver, they cannot see your dose activity until you explicitly tap 'Allow them to see my doses'. You can revoke access at any time from the Family page.";
+    return `MediTrack uses strict consent-based sharing${namePrefix}. When you invite a family member or caregiver, they cannot see your dose activity until you explicitly tap 'Allow them to see my doses'. You can revoke access at any time from the Family page.`;
   }
   if (lower.includes("routine") || lower.includes("schedule") || lower.includes("remember") || lower.includes("tips")) {
-    return "Pairing medicine times with daily anchors—such as morning breakfast, brushing teeth, or evening bedtime—creates strong habits. You can also turn on MediTrack browser notifications and voice announcements in Settings!";
+    return `Welcome back${namePrefix}! Pairing medicine times with daily anchors—such as morning breakfast, brushing teeth, or evening bedtime—creates strong habits. You can also turn on MediTrack browser notifications and voice announcements in Settings!`;
   }
   if (lower.includes("side effect") || lower.includes("pain") || lower.includes("emergency") || lower.includes("doctor")) {
-    return "If you are experiencing severe symptoms, unusual side effects, or an emergency, please contact your doctor or local emergency services immediately. MediTrack AI cannot provide diagnostic opinions or adjust dosages.";
+    return `If you are experiencing severe symptoms, unusual side effects, or an emergency${namePrefix}, please contact your doctor or local emergency services immediately. MediTrack AI cannot provide diagnostic opinions or adjust dosages.`;
   }
-  return "That's a helpful question! For specific treatment guidelines, always follow your prescription label. In MediTrack, you can record custom doctor instructions, configure reminder intervals, and invite caregivers to stay in the loop.";
+  return `That's a helpful question${namePrefix}! For specific treatment guidelines, always follow your prescription label. In MediTrack, you can record custom doctor instructions, configure reminder intervals, and invite caregivers to stay in the loop.`;
 }
 
 export function AIAssistantWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  const [userName, setUserName] = useState<string | undefined>(undefined);
+  const [messages, setMessages] = useState<Message[]>(() => [
+    {
+      id: "init-1",
+      sender: "assistant",
+      text: getWelcomeMessage(),
+      timestamp: "Just now",
+    },
+  ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    void getActiveUser().then((u) => {
+      if (u?.name?.trim()) {
+        const clean = u.name.trim();
+        setUserName(clean);
+        setMessages([
+          {
+            id: "init-1",
+            sender: "assistant",
+            text: getWelcomeMessage(clean),
+            timestamp: "Just now",
+          },
+        ]);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -84,7 +113,7 @@ export function AIAssistantWidget() {
     setIsTyping(true);
 
     setTimeout(() => {
-      const reply = getAssistantResponse(query);
+      const reply = getAssistantResponse(query, userName);
       const assistantMsg: Message = {
         id: `a-${Date.now()}`,
         sender: "assistant",
@@ -97,16 +126,16 @@ export function AIAssistantWidget() {
   }
 
   return (
-    <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40">
+    <div className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 z-40">
       {/* Floating Trigger Button */}
       {!isOpen && (
         <button
           type="button"
           onClick={() => setIsOpen(true)}
           aria-label="Open MediTrack AI Assistant"
-          className="group relative flex items-center gap-2.5 rounded-full border border-[#A78BFA]/40 bg-[var(--surface-elevated)] px-4 py-3 text-[var(--text)] shadow-[0_8px_30px_rgba(167,139,250,0.35)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-[#A78BFA] active:scale-95"
+          className="group relative flex items-center gap-2.5 rounded-full border border-[#A78BFA]/40 bg-[var(--surface-elevated)] px-3.5 sm:px-4 py-2.5 sm:py-3 text-[var(--text)] shadow-[0_8px_30px_rgba(167,139,250,0.35)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-[#A78BFA] active:scale-95"
         >
-          <div className="relative grid h-8 w-8 place-items-center rounded-full bg-gradient-to-tr from-[#A78BFA] to-[#A3EAC1] text-[#07130E]">
+          <div className="relative grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-full bg-gradient-to-tr from-[#A78BFA] to-[#A3EAC1] text-[#07130E]">
             <Sparkles className="h-4 w-4" />
           </div>
           <span className="hidden sm:inline text-xs font-bold tracking-wide">
@@ -124,7 +153,7 @@ export function AIAssistantWidget() {
         <div
           role="dialog"
           aria-label="MediTrack AI Assistant"
-          className="flex h-[32rem] max-h-[85vh] w-[90vw] sm:w-[24rem] md:w-[26rem] flex-col rounded-3xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-card)] backdrop-blur-2xl transition-all"
+          className="flex h-[32rem] max-h-[82vh] sm:max-h-[85vh] w-[calc(100vw-1.5rem)] sm:w-[24rem] md:w-[26rem] flex-col rounded-3xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] shadow-[var(--shadow-card)] backdrop-blur-2xl transition-all"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4">
@@ -145,7 +174,16 @@ export function AIAssistantWidget() {
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                onClick={() => setMessages(INITIAL_MESSAGES)}
+                onClick={() =>
+                  setMessages([
+                    {
+                      id: `init-${Date.now()}`,
+                      sender: "assistant",
+                      text: getWelcomeMessage(userName),
+                      timestamp: "Just now",
+                    },
+                  ])
+                }
                 title="Reset conversation"
                 className="grid h-8 w-8 place-items-center rounded-lg text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)]"
               >
@@ -160,14 +198,6 @@ export function AIAssistantWidget() {
                 <X className="h-5 w-5" />
               </button>
             </div>
-          </div>
-
-          {/* Medical Disclaimer Banner */}
-          <div className="flex items-start gap-2.5 bg-[#A78BFA]/10 px-4 py-2.5 text-[11px] leading-relaxed text-[#A78BFA] border-b border-[#A78BFA]/20">
-            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-            <span>
-              <strong>Medical Disclaimer:</strong> For informational guidance only. Not medical diagnosis. Never change dosage without consulting your doctor or pharmacist.
-            </span>
           </div>
 
           {/* Messages Feed */}
@@ -237,6 +267,16 @@ export function AIAssistantWidget() {
               </div>
             </div>
           )}
+
+          {/* Dedicated Compact Medical Disclaimer Section */}
+          <div className="mx-3.5 mb-2 rounded-xl border border-[#16A36A]/20 bg-[#16A36A]/10 px-3 py-2 text-[10px] leading-relaxed text-[var(--text-secondary)] shadow-sm">
+            <div className="flex items-start gap-2">
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0 mt-0.5 text-[#16A36A] dark:text-[#20D6C2]" aria-hidden="true" />
+              <span>
+                Medical Disclaimer: For informational guidance only. Not medical diagnosis. Never change dosage without consulting your doctor or pharmacist.
+              </span>
+            </div>
+          </div>
 
           {/* Input Form */}
           <form

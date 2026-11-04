@@ -22,10 +22,10 @@ export default function HealthPage() {
       ) : (
         <div className="space-y-6">
           {/* Today's Overview Glass Card */}
-          <Card className="flex flex-wrap items-center justify-between gap-6 p-6 sm:p-8">
-            <div className="flex items-center gap-6">
-              <ProgressRing value={pct} size={130} stroke={12}>
-                <span className="font-mono text-3xl font-bold tracking-tight text-[var(--text)] tabular-nums">
+          <Card className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 p-5 sm:p-8">
+            <div className="flex flex-col sm:flex-row items-center gap-5 sm:gap-6 text-center sm:text-left">
+              <ProgressRing value={pct} size={120} stroke={11}>
+                <span className="font-mono text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text)] tabular-nums">
                   {pct}%
                 </span>
               </ProgressRing>
@@ -33,7 +33,7 @@ export default function HealthPage() {
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982]">
                   Today&apos;s Adherence
                 </span>
-                <h2 className="mt-1 font-display text-2xl font-bold text-[var(--text)]">
+                <h2 className="mt-1 font-display text-xl sm:text-2xl font-bold text-[var(--text)]">
                   {stats.taken} of {stats.total} Doses Confirmed
                 </h2>
                 <p className="mt-1 text-xs text-[var(--text-secondary)]">
@@ -44,9 +44,9 @@ export default function HealthPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[#16A36A]/20 bg-[#16A36A]/10 px-5 py-4 text-left">
+            <div className="w-full sm:w-auto rounded-2xl border border-[#16A36A]/20 bg-[#16A36A]/10 px-4 sm:px-5 py-3.5 sm:py-4 text-left">
               <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#16A36A] dark:text-[#A3EAC1]">
-                <TrendingUp className="h-4 w-4" /> Routine Health
+                <TrendingUp className="h-4 w-4 shrink-0" /> Routine Health
               </span>
               <p className="mt-1 text-xs text-[var(--text-secondary)] max-w-xs">
                 Your medication adherence data is stored securely in your browser space.

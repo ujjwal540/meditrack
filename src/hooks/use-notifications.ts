@@ -125,7 +125,8 @@ export function useNotifications({
   }, [voiceEnabled]);
 
   const registerPush = useCallback(async () => {
-    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    const env = typeof process !== "undefined" && process?.env ? process.env : (import.meta as any)?.env || {};
+    const vapidKey = env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || (import.meta as any)?.env?.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
     if (!vapidKey || !("serviceWorker" in navigator) || !("PushManager" in window)) {
       setPushStatus("unavailable");
       return;

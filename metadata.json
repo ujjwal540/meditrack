@@ -1,6 +1,6 @@
 {
-  "name": "MediTrack",
-  "description": "A caring medicine companion for seniors and their families. Never miss a medicine again.",
-  "permissions": [],
-  "capabilities": []
+  "name": "MediTrack - Smart Medicine Reminder & Family Care",
+  "description": "Never miss a dose. Precision medicine scheduling, adherence tracking, and consent-based family caregiver coordination.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

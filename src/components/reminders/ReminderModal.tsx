@@ -13,11 +13,13 @@ export function ReminderModal({
   dose,
   remaining,
   snoozeMinutes,
+  userName,
   onRespond,
 }: {
   dose?: Dose;
   remaining: number;
   snoozeMinutes: number;
+  userName?: string;
   onRespond: (key: string, status: DoseStatus, snoozeMinutes?: number) => void;
 }) {
   const { speak } = useVoice();
@@ -26,10 +28,13 @@ export function ReminderModal({
 
   /* chime + optional spoken reminder once per reminder */
   useEffect(() => {
-    if (!id) return;
+    if (!id || !name) return;
     playChime();
-    speak(`It is time to take your ${name}.`);
-  }, [id, name, speak]);
+    const spokenMessage = userName
+      ? `${userName}, it is time for your scheduled medication: ${name}.`
+      : `It is time to take your ${name}.`;
+    speak(spokenMessage);
+  }, [id, name, userName, speak]);
 
   if (!dose) return null;
 
@@ -47,7 +52,7 @@ export function ReminderModal({
         <div className="flex items-center justify-between text-xs font-bold tracking-wider uppercase text-[#16A36A] dark:text-[#20C982]">
           <div className="flex items-center gap-2">
             <BellRing className="h-4 w-4 animate-bounce" aria-hidden="true" />
-            <span>Medication Due</span>
+            <span>{userName ? `${userName}, it's time for your medication` : "Medication Due"}</span>
           </div>
           <span className="font-mono text-sm bg-[#16A36A]/15 border border-[#16A36A]/30 px-3 py-1 rounded-full text-[#16A36A] dark:text-[#A3EAC1]">
             {formatTime(dose.time)}
@@ -82,7 +87,11 @@ export function ReminderModal({
             variant="primary"
             onClick={() => {
               onRespond(dose.key, "taken");
-              speak("Thank you. I have marked this dose as taken.");
+              speak(
+                userName
+                  ? `Thank you, ${userName}. I have marked this dose as taken.`
+                  : "Thank you. I have marked this dose as taken.",
+              );
             }}
           >
             <Check className="h-6 w-6 stroke-[2.5]" aria-hidden="true" />

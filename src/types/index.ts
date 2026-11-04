@@ -78,3 +78,82 @@ export interface Appointment {
   time?: string;
   note?: string;
 }
+
+export interface CaregiverSchedule {
+  id: string;
+  type: "call" | "visit";
+  patientName: string;
+  patientEmail?: string;
+  date: string;
+  time: string;
+  notes?: string;
+  status: "scheduled" | "completed" | "cancelled";
+  createdAt: string;
+}
+
+export type UserRole = "patient" | "family_caregiver" | "professional_caregiver" | "admin";
+
+export interface CareReport {
+  id: string;
+  patientId?: string;
+  caregiverId?: string;
+  patientName: string;
+  date: string;
+  adherenceObserved: string;
+  notes: string;
+  visitType: "call" | "visit" | "checkin";
+  bookingId?: string;
+  createdAt: string;
+}
+
+export interface ProfessionalCaregiver {
+  id: string;
+  userId: string;
+  fullName: string;
+  email?: string;
+  phone?: string;
+  bio: string;
+  qualifications: string;
+  yearsExperience: number;
+  languages: string[];
+  serviceLocation: string;
+  hourlyRate: number;
+  verificationStatus: "pending" | "verified" | "rejected";
+  rating: number;
+  reviewCount: number;
+  availability: "weekdays" | "weekends" | "weekdays_and_weekends" | "on_call";
+  avatarUrl?: string;
+  createdAt: string;
+}
+
+export interface ProfessionalBooking {
+  id: string;
+  patientId: string;
+  caregiverId: string;
+  patientName?: string;
+  caregiverName?: string;
+  serviceType: "call" | "visit" | "checkin" | "routine_care";
+  scheduledDate: string;
+  scheduledTime: string;
+  durationMinutes: number;
+  hourlyRate: number;
+  totalAmount: number;
+  careRequirements?: string;
+  status: "requested" | "confirmed" | "in_progress" | "completed" | "cancelled" | "rejected";
+  patientContactPhone?: string;
+  serviceAddress?: string;
+  createdAt: string;
+}
+
+export interface ProfessionalReview {
+  id: string;
+  caregiverId: string;
+  reviewerId: string;
+  reviewerName?: string;
+  bookingId?: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
+

@@ -16,10 +16,12 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ProgressRing } from "@/components/ui/ProgressRing";
 import { NextMedicineCard } from "@/components/dashboard/NextMedicineCard";
+import { StatCards } from "@/components/dashboard/StatCards";
 import { DoseList } from "@/components/reminders/DoseList";
 import { useMediTrack } from "@/components/reminders/ReminderProvider";
 import { useVoice } from "@/hooks/use-voice";
 import { formatTime } from "@/utils/date-utils";
+import { getPersonalizedGreeting } from "@/utils/greeting";
 
 const TILES = [
   {
@@ -27,32 +29,32 @@ const TILES = [
     label: "Medicines",
     hint: "Manage prescriptions & dosages",
     Icon: Pill,
-    glow: "group-hover:border-[#16A36A]/40 group-hover:shadow-[0_0_20px_rgba(22,163,106,0.18)]",
-    badgeBg: "bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1]",
+    glow: "group-hover:border-[#20D6C2] group-hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.6),0_0_20px_rgba(32,214,194,0.32)] group-hover:bg-[var(--surface-hover)]",
+    badgeBg: "bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] group-hover:bg-[#20D6C2]/20 group-hover:text-[#20D6C2]",
   },
   {
     href: "/schedule",
     label: "Timetable",
     hint: "View daily chronological schedule",
     Icon: CalendarDays,
-    glow: "group-hover:border-[#20C982]/40 group-hover:shadow-[0_0_20px_rgba(32,201,130,0.18)]",
-    badgeBg: "bg-[#20C982]/15 text-[#20C982]",
+    glow: "group-hover:border-[#20D6C2] group-hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.6),0_0_20px_rgba(32,214,194,0.32)] group-hover:bg-[var(--surface-hover)]",
+    badgeBg: "bg-[#20C982]/15 text-[#20C982] group-hover:bg-[#20D6C2]/20 group-hover:text-[#20D6C2]",
   },
   {
     href: "/health",
     label: "Health Stats",
     hint: "Weekly adherence & trends",
     Icon: HeartPulse,
-    glow: "group-hover:border-emerald-500/40 group-hover:shadow-[0_0_20px_rgba(54,211,153,0.18)]",
-    badgeBg: "bg-emerald-500/15 text-emerald-500 dark:text-[#36D399]",
+    glow: "group-hover:border-[#20D6C2] group-hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.6),0_0_20px_rgba(32,214,194,0.32)] group-hover:bg-[var(--surface-hover)]",
+    badgeBg: "bg-emerald-500/15 text-emerald-500 dark:text-[#36D399] group-hover:bg-[#20D6C2]/20 group-hover:text-[#20D6C2]",
   },
   {
     href: "/family",
     label: "Family Care",
     hint: "Connected caregivers & circle",
     Icon: Users,
-    glow: "group-hover:border-[#A78BFA]/40 group-hover:shadow-[0_0_20px_rgba(167,139,250,0.18)]",
-    badgeBg: "bg-[#A78BFA]/15 text-[#A78BFA]",
+    glow: "group-hover:border-[#20D6C2] group-hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.6),0_0_20px_rgba(32,214,194,0.32)] group-hover:bg-[var(--surface-hover)]",
+    badgeBg: "bg-[#A78BFA]/15 text-[#A78BFA] group-hover:bg-[#20D6C2]/20 group-hover:text-[#20D6C2]",
   },
 ];
 
@@ -68,13 +70,11 @@ export default function DashboardPage() {
     respond,
     notificationPermission,
     requestNotifications,
+    userName,
   } = useMediTrack();
   const { speak } = useVoice();
 
-  const hour = now.getHours();
-  const greeting =
-    hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
-  const name = "Friend";
+  const greetingData = getPersonalizedGreeting(userName, now);
   const target = dueDoses[0] ?? nextDose;
   const pct = stats.total ? Math.round((stats.taken / stats.total) * 100) : 0;
   const remaining = stats.total - stats.taken;
@@ -87,8 +87,10 @@ export default function DashboardPage() {
 
   const summary =
     stats.total === 0
-      ? `Hello ${name}. You have no medicines scheduled today.`
-      : `${greeting}, ${name}. You have ${remaining} ${remaining === 1 ? "medicine" : "medicines"} remaining today.` +
+      ? greetingData.hasName
+        ? `Hello ${greetingData.name}. You have no medicines scheduled today.`
+        : "Hello. You have no medicines scheduled today."
+      : `${greetingData.greeting} You have ${remaining} ${remaining === 1 ? "medicine" : "medicines"} remaining today.` +
         (nextDose
           ? ` Your next medicine reminder is at ${formatTime(nextDose.time)}.`
           : "");
@@ -115,11 +117,25 @@ export default function DashboardPage() {
                   <span className="h-1.5 w-1.5 rounded-full bg-[#20C982] shadow-[0_0_8px_#20C982]" />
                   <span>{dateFormatted}</span>
                 </div>
-                <h1 className="mt-2 font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-[var(--text)]">
-                  {greeting}, <span className="text-[#16A36A] dark:text-[#A3EAC1]">{name}</span>
+                <h1 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--text)]">
+                  {greetingData.hasName ? (
+                    <>
+                      {greetingData.timeGreeting},{" "}
+                      <span className="text-[#16A36A] dark:text-[#A3EAC1]">
+                        {greetingData.name}!
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      Welcome to{" "}
+                      <span className="text-[#16A36A] dark:text-[#A3EAC1]">
+                        MediTrack
+                      </span>
+                    </>
+                  )}
                 </h1>
                 <p className="mt-1.5 text-sm sm:text-base text-[var(--text-secondary)] max-w-lg">
-                  MediTrack is active. Your treatment routine is synchronized across your devices.
+                  {greetingData.subtitle}
                 </p>
               </div>
 
@@ -172,8 +188,15 @@ export default function DashboardPage() {
             </Card>
           )}
 
+          {/* Quick Metrics Statistics Strip */}
+          <StatCards
+            total={stats.total}
+            taken={stats.taken}
+            pending={remaining}
+          />
+
           {/* Daily Adherence Progress Overview */}
-          <Card className="flex flex-wrap items-center gap-6 sm:gap-8 p-6 sm:p-7">
+          <Card className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 sm:gap-8 p-5 sm:p-7">
             <ProgressRing value={pct} size={140} stroke={12}>
               <div className="font-mono text-3xl font-extrabold tracking-tight text-[var(--text)] tabular-nums">
                 {pct}%
@@ -183,29 +206,29 @@ export default function DashboardPage() {
               </div>
             </ProgressRing>
 
-            <div className="min-w-0 flex-1 basis-64">
-              <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-center sm:justify-start gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982]">
                   Daily Overview
                 </span>
               </div>
-              <h2 className="mt-1 font-display text-2xl font-bold text-[var(--text)]">
+              <h2 className="mt-1 font-display text-xl sm:text-2xl font-bold text-[var(--text)]">
                 Today&apos;s Medications
               </h2>
-              <div className="mt-3 flex flex-wrap gap-4 text-sm">
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2">
+              <div className="mt-3.5 flex flex-wrap justify-center sm:justify-start gap-3 sm:gap-4 text-sm">
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2 text-left">
                   <span className="text-[11px] text-[var(--text-muted)] block">Completed</span>
                   <span className="font-mono text-base font-bold text-emerald-500 dark:text-[#36D399] tabular-nums">
                     {stats.taken} of {stats.total}
                   </span>
                 </div>
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2">
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2 text-left">
                   <span className="text-[11px] text-[var(--text-muted)] block">Remaining</span>
                   <span className="font-mono text-base font-bold text-amber-500 dark:text-[#FBBF24] tabular-nums">
                     {remaining} doses
                   </span>
                 </div>
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2">
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 py-2 text-left">
                   <span className="text-[11px] text-[var(--text-muted)] block">Next Scheduled</span>
                   <span className="font-mono text-base font-bold text-[#16A36A] dark:text-[#20C982] tabular-nums">
                     {nextDose ? formatTime(nextDose.time) : "None remaining"}
