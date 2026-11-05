@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  ArrowLeft,
   Bot,
   Clock,
   MessageSquarePlus,
@@ -238,8 +239,31 @@ export function AIAssistantWidget() {
           className="flex h-[35rem] max-h-[calc(100dvh-6.5rem)] sm:max-h-[38rem] w-[calc(100vw-1.5rem)] sm:w-[25.5rem] md:w-[27rem] flex-col rounded-3xl border border-emerald-500/30 dark:border-emerald-500/30 bg-[var(--surface)] text-[var(--text)] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65),0_0_0_1px_rgba(32,214,194,0.2)] overflow-hidden transition-all animate-in fade-in zoom-in-95 duration-200"
         >
           {/* Section 1: Header */}
-          <header className="shrink-0 flex items-center justify-between border-b border-[var(--border)] px-4 py-3 bg-[var(--surface-elevated)]/70 backdrop-blur-md">
-            <div className="flex items-center gap-2.5 min-w-0">
+          <header className="shrink-0 flex items-center justify-between border-b border-[var(--border)] px-3 sm:px-4 py-2.5 sm:py-3 bg-[var(--surface-elevated)]/70 backdrop-blur-md">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <button
+                type="button"
+                onClick={() => {
+                  if (messages.length > 0) {
+                    handleResetChat();
+                  } else {
+                    setIsOpen(false);
+                  }
+                }}
+                aria-label={
+                  messages.length > 0
+                    ? (isNepali ? "विषय सूचीमा फर्कनुहोस्" : "Back to topics")
+                    : (isNepali ? "असिस्टेन्ट बन्द गर्नुहोस्" : "Close assistant")
+                }
+                title={
+                  messages.length > 0
+                    ? (isNepali ? "विषय सूचीमा फर्कनुहोस्" : "Back to topics")
+                    : (isNepali ? "असिस्टेन्ट बन्द गर्नुहोस्" : "Close assistant")
+                }
+                className="grid h-8 w-8 sm:h-9 sm:w-9 place-items-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[#16A36A] dark:text-[#20C982] hover:border-[#16A36A] hover:bg-[#16A36A]/15 hover:shadow-[0_2px_10px_rgba(22,163,106,0.2)] transition-all active:scale-95 shrink-0"
+              >
+                <ArrowLeft className="h-4 w-4 sm:h-4.5 sm:w-4.5 stroke-[2.2]" aria-hidden="true" />
+              </button>
               <div className="relative grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-gradient-to-tr from-[#16A36A] via-[#10B981] to-[#20D6C2] text-white shadow-sm">
                 <Sparkles className="h-4 w-4" aria-hidden="true" />
                 <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">

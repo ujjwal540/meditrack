@@ -13,6 +13,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   soundEnabled: true,
   soundVolume: 0.35,
   vibrationEnabled: true,
+  familyAlertsEnabled: true,
+  repeatReminderInterval: 45,
 };
 
 export function getLogs(): Record<string, DoseLog> {
@@ -36,7 +38,7 @@ export function getSettings(): AppSettings {
     snoozeMinutes: [5, 10, 15, 30].includes(stored.snoozeMinutes ?? -1)
       ? stored.snoozeMinutes!
       : DEFAULT_SETTINGS.snoozeMinutes,
-    graceMinutes: [15, 30, 45, 60].includes(stored.graceMinutes ?? -1)
+    graceMinutes: [5, 10, 15, 30, 45, 60].includes(stored.graceMinutes ?? -1)
       ? stored.graceMinutes!
       : DEFAULT_SETTINGS.graceMinutes,
     notificationsEnabled: typeof stored.notificationsEnabled === "boolean"
@@ -51,6 +53,12 @@ export function getSettings(): AppSettings {
     vibrationEnabled: typeof stored.vibrationEnabled === "boolean"
       ? stored.vibrationEnabled
       : DEFAULT_SETTINGS.vibrationEnabled,
+    familyAlertsEnabled: typeof stored.familyAlertsEnabled === "boolean"
+      ? stored.familyAlertsEnabled
+      : DEFAULT_SETTINGS.familyAlertsEnabled,
+    repeatReminderInterval: [30, 45, 60].includes(stored.repeatReminderInterval ?? -1)
+      ? stored.repeatReminderInterval
+      : DEFAULT_SETTINGS.repeatReminderInterval,
   };
 }
 

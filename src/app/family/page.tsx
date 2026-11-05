@@ -41,10 +41,14 @@ import {
   setConsent,
   updateCaregiverScheduleStatus,
 } from "@/services/caregiver-service";
-import { formatTime } from "@/utils/date-utils";
 import Image from "next/image";
 import { waitForSupabaseAuth } from "@/lib/supabase";
 import { useTranslation } from "@/i18n/LanguageContext";
+import {
+  acknowledgeFamilyAlert,
+  getFamilyAlerts,
+  type FamilyAlert,
+} from "@/services/escalation-service";
 
 type RemoteActivity = {
   medicineName: string;
@@ -109,6 +113,9 @@ export default function FamilyPage() {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(true);
 
+  // Family Care Escalation Alerts state
+  const [familyAlerts, setFamilyAlerts] = useState<FamilyAlert[]>([]);
+
   // Caregiver features: Schedules & Reports state
   const [schedules, setSchedules] = useState<CaregiverSchedule[]>([]);
   const [reports, setReports] = useState<CareReport[]>([]);
@@ -131,6 +138,7 @@ export default function FamilyPage() {
   async function reload() {
     setError(null);
     setLoading(true);
+    setFamilyAlerts(getFamilyAlerts());
     try {
       const session = await waitForSupabaseAuth();
       if (supabase && !session) {
@@ -158,6 +166,7 @@ export default function FamilyPage() {
 
   useEffect(() => {
     void reload();
+    setFamilyAlerts(getFamilyAlerts());
     setSchedules(getCaregiverSchedules());
     setReports(getCareReports());
   }, []);
@@ -174,7 +183,6 @@ export default function FamilyPage() {
   }, [remoteActivity, doses, isNepali]);
 
   const missed = activity.filter((item) => item.status === "not_confirmed");
-  const upcoming = doses.filter((dose) => dose.status === "pending").slice(0, 3);
 
   async function run(action: () => Promise<void>) {
     setError(null);
@@ -311,6 +319,132 @@ export default function FamilyPage() {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Family Care Escalation Alerts & Live Adherence Section */}
+        <section aria-labelledby="escalations-heading" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <span className="icon-badge bg-rose-500/10 text-rose-500 dark:text-[#FB7185] border border-rose-500/25">
+                <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <div>
+                <h2 id="escalations-heading" className="font-display text-lg font-bold text-[var(--text)]">
+                  {isNepali ? "पारिवारिक हेरचाह सूचना तथा अलर्ट (Escalation Alerts)" : "Family Care Escalation Alerts"}
+                </h2>
+                <p className="text-xs text-[var(--text-secondary)]">
+                  {isNepali
+                    ? "समयमा औषधि पुष्टि नभएमा परिवारका सदस्यलाई पठाइने स्वचालित सुरक्षा सूचनाहरू।"
+                    : "Automatic safety notifications triggered when a dose is not confirmed within grace period."}
+                </p>
+              </div>
+            </div>
+            {familyAlerts.length > 0 && (
+              <span className="rounded-full bg-rose-500/15 border border-rose-500/30 px-2.5 py-0.5 text-xs font-bold text-rose-500 dark:text-[#FB7185]">
+                {formatNumber(familyAlerts.filter((a) => a.status === "escalated").length)} {isNepali ? "सक्रिय" : "Active"}
+              </span>
+            )}
+          </div>
+
+          {familyAlerts.length === 0 ? (
+            <Card className="p-4 sm:p-5 border border-emerald-500/30 bg-emerald-500/5">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" aria-hidden="true" />
+                <div className="text-xs">
+                  <p className="font-bold text-[var(--text)]">
+                    {isNepali ? "सबै पारिवारिक सदस्यहरूको औषधि समयमै व्यवस्थित छ" : "All Family Members on Track"}
+                  </p>
+                  <p className="text-[var(--text-secondary)] mt-0.5">
+                    {isNepali
+                      ? "हाल कुनै पनि छुटेको औषधि वा सक्रिय अलर्ट छैन। बिरामीले समयमै औषधि खाइरहेका छन्।"
+                      : "No active missed dose escalations. Automatic notifications will appear here if a scheduled dose is missed."}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {familyAlerts.map((alert) => (
+                <Card
+                  key={alert.id}
+                  className={`p-4 sm:p-5 border transition-all ${
+                    alert.status === "escalated"
+                      ? "border-rose-500/40 bg-rose-500/5 shadow-[0_0_20px_rgba(244,63,94,0.15)]"
+                      : alert.status === "confirmed_late"
+                        ? "border-emerald-500/30 bg-emerald-500/5"
+                        : "border-[var(--border)] bg-[var(--surface-elevated)]"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                          alert.status === "escalated"
+                            ? "bg-rose-500/15 text-rose-500 dark:text-[#FB7185] border border-rose-500/30"
+                            : alert.status === "confirmed_late"
+                              ? "bg-emerald-500/15 text-emerald-500 dark:text-[#36D399] border border-emerald-500/30"
+                              : "bg-slate-500/15 text-[var(--text-muted)] border border-[var(--border)]"
+                        }`}
+                      >
+                        {alert.status === "escalated" ? (
+                          <>
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
+                            </span>
+                            <span>{isNepali ? "तत्काल सम्पर्क आवश्यक" : "Missed Dose Escalation"}</span>
+                          </>
+                        ) : alert.status === "confirmed_late" ? (
+                          <>
+                            <CheckCircle2 className="h-3 w-3" />
+                            <span>{isNepali ? "ढिलो पुष्टि भयो" : "Confirmed Late"}</span>
+                          </>
+                        ) : (
+                          <span>{isNepali ? "हेरिएको" : "Acknowledged"}</span>
+                        )}
+                      </span>
+                    </div>
+                    <span className="font-mono text-[11px] text-[var(--text-muted)]">
+                      {formatTimeDisplay(alert.scheduledTime)}
+                    </span>
+                  </div>
+
+                  <div className="mt-3">
+                    <h3 className="font-display text-sm sm:text-base font-bold text-[var(--text)]">
+                      {alert.patientName}: {alert.medicineName} ({alert.dosage})
+                    </h3>
+                    <p className="mt-1 text-xs text-[var(--text-secondary)] leading-relaxed">
+                      {alert.message}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2">
+                    <a
+                      href="tel:"
+                      className="inline-flex min-h-[34px] items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#16A36A] to-[#20C982] px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:brightness-105"
+                    >
+                      <PhoneCall className="h-3.5 w-3.5" />
+                      <span>{isNepali ? "बिरामीलाई कल गर्नुहोस्" : "Call Patient"}</span>
+                    </a>
+                    {alert.status === "escalated" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          acknowledgeFamilyAlert(alert.id);
+                          setFamilyAlerts(getFamilyAlerts());
+                        }}
+                        className="text-xs py-1 px-3"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        <span>{isNepali ? "जानकारी टिपियो" : "Acknowledge"}</span>
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Invite Form Card */}

@@ -14,11 +14,9 @@ export default function SchedulePage() {
       title={t.schedule.pageTitle}
       subtitle={t.schedule.pageSubtitle}
       action={
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-bold text-[#16A36A] dark:text-[#A3EAC1] bg-[#16A36A]/10 border border-[#16A36A]/20 px-3 py-1.5 rounded-xl">
-            {formatNumber(stats.taken)} / {formatNumber(stats.total)} {t.schedule.completedTodayCount}
-          </span>
-        </div>
+        <span className="font-mono text-xs font-bold text-[#16A36A] dark:text-[#20C982] bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/25 px-2.5 py-0.5 rounded-lg whitespace-nowrap shadow-xs">
+          {formatNumber(stats.taken)} / {formatNumber(stats.total)} {t.schedule.completedTodayCount}
+        </span>
       }
     >
       <div className="space-y-6">

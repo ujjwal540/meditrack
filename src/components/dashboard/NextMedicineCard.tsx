@@ -81,18 +81,24 @@ export function NextMedicineCard({
 
       {/* Dose Main Info */}
       <div className="mt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5 min-w-0">
+        <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
           <div className="grid h-16 w-16 sm:h-20 sm:w-20 shrink-0 place-items-center rounded-2xl bg-gradient-to-tr from-[#16A36A]/20 to-[#20C982]/10 border border-[#16A36A]/30 shadow-inner">
             <PillIcon type={dose.type} size={44} />
           </div>
-          <div className="min-w-0">
-            <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--text)] truncate">
-              {dose.medicineName}
-            </h2>
-            <p className="mt-0.5 text-xs sm:text-sm text-[var(--text-secondary)] truncate">
-              {dose.dosage}
-              {dose.instructions ? ` · ${dose.instructions}` : ""}
-            </p>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-display text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--text)] break-words leading-tight">
+                {dose.medicineName}
+              </h2>
+              <span className="font-mono text-xs sm:text-sm font-bold text-[#16A36A] dark:text-[#A3EAC1] bg-[#16A36A]/15 px-2.5 py-0.5 rounded-lg border border-[#16A36A]/30 shrink-0">
+                {dose.dosage}
+              </span>
+            </div>
+            {dose.instructions && (
+              <p className="mt-1 text-xs sm:text-sm text-[var(--text-secondary)] break-words leading-relaxed font-medium">
+                {dose.instructions}
+              </p>
+            )}
           </div>
         </div>
 

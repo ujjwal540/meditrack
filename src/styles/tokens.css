@@ -143,6 +143,100 @@ html[data-theme="dark"] {
   --shadow-glow: 0 0 35px -5px rgba(32, 214, 194, 0.35);
 }
 
+/* =========================================================================
+   LIGHT THEME + HIGH CONTRAST (WCAG 2.2 AA / AAA Compliant)
+   Bright, crisp clinical white with deep high-contrast emerald borders and black text
+   ========================================================================= */
+html[data-theme="light"][data-contrast="high"],
+html:not(.dark):not([data-theme="dark"])[data-contrast="high"] {
+  --bg-app: #FFFFFF;
+  --bg-secondary: #EAF3EE;
+  --surface: #FFFFFF;
+  --surface-elevated: #F0F6F2;
+  --surface-hover: #E3EFE8;
+  --surface-glass: rgba(255, 255, 255, 0.98);
+  --border: #0B5E38;
+  --border-subtle: #147A4D;
+  --border-glow: #084A2D;
+  --teal-accent: #0B7C6E;
+  --border-hover: #053A23;
+
+  --primary: #0A663C;              /* Deep medical emerald, 6.5:1 contrast against white */
+  --primary-dark: #054326;
+  --primary-light: #0E7A4A;
+  --primary-glow: rgba(10, 102, 60, 0.25);
+
+  --secondary: #0A663C;
+  --mint: #D2EFE2;
+  --ai-accent: #5B21B6;            /* Deep accessible purple, 7.5:1 contrast */
+  --ai-accent-glow: rgba(91, 33, 182, 0.20);
+
+  --text: #000000;                 /* Absolute crisp black, 21:1 contrast against white */
+  --text-secondary: #12261B;       /* Ultra-dark green-black, 14:1 contrast against white */
+  --text-muted: #234533;           /* Crisp dark muted, 8.2:1 contrast against white */
+
+  --success: #0A663C;
+  --warning: #854D0E;              /* Deep amber, 5.2:1 contrast against white */
+  --danger: #9F1239;               /* Deep crimson, 6.4:1 contrast against white */
+  --info: #1E40AF;                 /* Deep sapphire blue, 7.2:1 contrast against white */
+
+  --forest: #0A663C;
+  --sage: #0E7A4A;
+  --background: #FFFFFF;
+  --cream: #FFFFFF;
+
+  --shadow-card: 0 0 0 1.5px var(--border), 0 2px 8px rgba(0, 0, 0, 0.10);
+  --shadow-hover: 0 0 0 2.5px var(--border-hover), 0 6px 16px rgba(0, 0, 0, 0.16);
+  --shadow-glow: 0 0 0 2px var(--primary);
+}
+
+/* =========================================================================
+   DARK THEME + HIGH CONTRAST (WCAG 2.2 AA / AAA Compliant)
+   Pitch black OLED background with luminous emerald borders and pure white text
+   ========================================================================= */
+html.dark[data-contrast="high"],
+html[data-theme="dark"][data-contrast="high"] {
+  --bg-app: #000000;
+  --bg-secondary: #050E09;
+  --surface: #07150E;
+  --surface-elevated: #0C2016;
+  --surface-hover: #143523;
+  --surface-glass: rgba(7, 21, 14, 0.95);
+  --border: #34D399;              /* Luminous high-contrast emerald border, 8.5:1 against #07150E */
+  --border-subtle: rgba(52, 211, 153, 0.50);
+  --border-glow: #2DFCE6;
+  --teal-accent: #2DFCE6;
+  --border-hover: #2DFCE6;
+
+  --primary: #20E092;              /* Bright luminous emerald green */
+  --primary-dark: #16A36A;
+  --primary-light: #42F5AA;
+  --primary-glow: rgba(32, 224, 146, 0.35);
+
+  --secondary: #42F5AA;
+  --mint: #B6FFD8;
+  --ai-accent: #DDD6FE;            /* Bright legible lilac, > 11:1 against black */
+  --ai-accent-glow: rgba(221, 214, 254, 0.30);
+
+  --text: #FFFFFF;                 /* Pure white, 21:1 contrast against black */
+  --text-secondary: #E2EDE6;       /* Bright ultra-clear secondary text, > 14:1 */
+  --text-muted: #B4CEBF;           /* Clear readable muted text, > 9:1 */
+
+  --success: #34D399;
+  --warning: #FDE047;              /* Bright yellow, > 12:1 against black */
+  --danger: #FDA4AF;               /* Bright rose, > 10:1 against black */
+  --info: #93C5FD;                 /* Bright sky blue, > 10:1 against black */
+
+  --forest: #20E092;
+  --sage: #42F5AA;
+  --background: #000000;
+  --cream: #000000;
+
+  --shadow-card: 0 0 0 1.5px var(--border), 0 8px 24px rgba(0, 0, 0, 0.95);
+  --shadow-hover: 0 0 0 2.5px var(--teal-accent), 0 12px 32px rgba(0, 0, 0, 0.98);
+  --shadow-glow: 0 0 0 2px var(--teal-accent);
+}
+
 @media (max-width: 767px) {
   :root {
     --section-gap: 36px;

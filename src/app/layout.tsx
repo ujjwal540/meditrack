@@ -23,6 +23,13 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var p=JSON.parse(localStorage.getItem("meditrack.a11y")||"{}");var d=document.documentElement;if(p.theme==="light"){d.dataset.theme="light";d.classList.remove("dark");}else{d.dataset.theme="dark";d.classList.add("dark");}if(p.contrast){d.dataset.contrast="high";}else{d.dataset.contrast="normal";}if(p.easy){d.dataset.easy="true";}}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className="font-sans antialiased">
         <LanguageProvider>
           <AccessibilityProvider>

@@ -107,6 +107,7 @@ export default function ResetPasswordPage() {
       eyebrow={isNepali ? "सुरक्षित अद्यावधिक" : "Secure Update"}
       title={isNepali ? "नयाँ पासवर्ड सिर्जना गर्नुहोस्" : "Create new password"}
       subtitle={isNepali ? "कम्तीमा ८ अक्षरको बलियो पासवर्ड छान्नुहोस्।" : "Choose a strong password with at least 8 characters."}
+      backHref="/login"
     >
       {success ? (
         <div className="space-y-4 text-center">

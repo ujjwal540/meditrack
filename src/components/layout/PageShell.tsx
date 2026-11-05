@@ -2,9 +2,16 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { AccessibilityBar } from "@/components/layout/AccessibilityBar";
 import { Navbar } from "@/components/layout/Navbar";
 import { AIAssistantWidget } from "@/components/ai/AIAssistantWidget";
+import { BackButton } from "@/components/ui/BackButton";
+import { Logo } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { ProfileDropdown } from "@/components/profile/ProfileDropdown";
+import { useTranslation } from "@/i18n/LanguageContext";
 import { getActiveUser } from "@/lib/auth";
 import type { UserRole } from "@/types";
 
@@ -13,15 +20,24 @@ export function PageShell({
   subtitle,
   action,
   bare = false,
+  showBackButton,
+  backFallbackUrl = "/dashboard",
+  backLabel,
+  onBack,
   children,
 }: {
   title?: string;
   subtitle?: string;
   action?: ReactNode;
   bare?: boolean; /* true = page draws its own header (dashboard) */
+  showBackButton?: boolean;
+  backFallbackUrl?: string;
+  backLabel?: string;
+  onBack?: () => void;
   children: ReactNode;
 }) {
   const router = useRouter();
+  const { isNepali } = useTranslation();
   const [currentUser, setCurrentUser] = useState<{
     id: string;
     name?: string;
@@ -29,6 +45,8 @@ export function PageShell({
     role: UserRole;
   } | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
+
+  const shouldShowBack = showBackButton !== undefined ? showBackButton : !bare;
 
   useEffect(() => {
     let isMounted = true;
@@ -69,24 +87,75 @@ export function PageShell({
       <Navbar user={currentUser} onUserUpdated={setCurrentUser} />
 
       <div className="md:pl-64">
-        <main className="animate-rise mx-auto max-w-5xl px-3 xs:px-4 sm:px-6 md:px-8 pb-28 pt-4 sm:pt-5 md:pb-16 md:pt-8">
-          <AccessibilityBar user={currentUser} onUserUpdated={setCurrentUser} />
+        {/* Sticky Global Application Header (Linear / Stripe / Apple SaaS standard) */}
+        <header className="sticky top-0 z-40 flex min-h-14 sm:min-h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--surface)]/95 px-3 xs:px-4 sm:px-6 md:px-8 py-2 backdrop-blur-xl transition-colors shadow-xs">
+          {/* Left Zone: [Back Button] + [Title & Subtitle Stack] + [Status Badge] */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1 mr-2 sm:mr-4">
+            {shouldShowBack ? (
+              <BackButton
+                fallbackUrl={backFallbackUrl}
+                label={backLabel}
+                onClick={onBack}
+                size="md"
+              />
+            ) : (
+              !bare && (
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 md:hidden transition-transform hover:scale-105 shrink-0"
+                  aria-label="MediTrack Dashboard"
+                >
+                  <Logo variant="icon" size="sm" glow={true} />
+                </Link>
+              )
+            )}
 
-          {!bare && title && (
-            <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 border-b border-[var(--border)] pb-4 sm:pb-5">
-              <div className="min-w-0">
-                <h1 className="font-display text-xl xs:text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-[var(--text)]">
-                  {title}
+            {/* Title & Subtitle + Status Badge Block */}
+            <div className="flex flex-col justify-center min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <h1 className="font-display text-base sm:text-lg md:text-xl font-bold tracking-tight text-[var(--text)] whitespace-nowrap">
+                  {title || (isNepali ? "ड्यासबोर्ड" : "Dashboard")}
                 </h1>
-                {subtitle && (
-                  <p className="mt-1 text-xs sm:text-sm md:text-base text-[var(--text-secondary)]">
-                    {subtitle}
-                  </p>
+
+                {/* Status Badge: Displayed directly beside page title when space permits */}
+                {action && (
+                  <div className="hidden xs:inline-flex items-center shrink-0">
+                    {action}
+                  </div>
                 )}
               </div>
-              {action && <div className="shrink-0 w-full sm:w-auto">{action}</div>}
+
+              {subtitle && (
+                <p className="text-[11px] sm:text-xs text-[var(--text-secondary)] font-normal tracking-normal truncate max-w-[190px] xs:max-w-[280px] sm:max-w-md">
+                  {subtitle}
+                </p>
+              )}
             </div>
-          )}
+          </div>
+
+          {/* Right Zone: Controls (Language Selector + Theme Toggle + Profile Avatar) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <LanguageSwitcher variant="toggle" showIcon={false} />
+            <ThemeToggle showLabel={false} />
+            <ProfileDropdown
+              user={currentUser}
+              compact={true}
+              direction="down"
+              onUserUpdated={setCurrentUser}
+            />
+          </div>
+        </header>
+
+        <main className="animate-rise mx-auto max-w-5xl px-3 xs:px-4 sm:px-6 md:px-8 pb-28 pt-3 sm:pt-5 md:pb-16">
+          {/* Accessibility Controls Ribbon (Easy Mode, High Contrast, Voice Assistance) */}
+          <AccessibilityBar
+            user={currentUser}
+            onUserUpdated={setCurrentUser}
+            hideUtilityControls={true}
+          />
+
+          {/* On ultra-compact screens (<360px), display status badge here if hidden in header */}
+          {action && <div className="mb-3 xs:hidden">{action}</div>}
 
           {children}
         </main>

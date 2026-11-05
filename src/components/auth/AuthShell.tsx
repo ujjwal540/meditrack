@@ -6,17 +6,20 @@ import { CheckCircle2, HeartHandshake, Pill, ShieldCheck } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { BackButton } from "@/components/ui/BackButton";
 import { useTranslation } from "@/i18n/LanguageContext";
 
 export function AuthShell({
   eyebrow,
   title,
   subtitle,
+  backHref,
   children,
 }: {
   eyebrow: string;
   title: string;
   subtitle: string;
+  backHref?: string;
   children: ReactNode;
 }) {
   const { isNepali } = useTranslation();
@@ -108,6 +111,11 @@ export function AuthShell({
             <LanguageSwitcher variant="minimal" />
             <ThemeToggle showLabel={false} />
           </div>
+          {backHref && (
+            <div className="mb-3.5 flex items-center">
+              <BackButton fallbackUrl={backHref} size="sm" />
+            </div>
+          )}
           <p className="text-[11px] xs:text-xs font-bold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982] pr-20">{eyebrow}</p>
           <h2 className="mt-1 font-display text-lg xs:text-xl sm:text-2xl md:text-3xl font-extrabold text-[var(--text)] pr-20">{title}</h2>
           <p className="mt-1 sm:mt-1.5 text-xs sm:text-sm text-[var(--text-secondary)]">{subtitle}</p>

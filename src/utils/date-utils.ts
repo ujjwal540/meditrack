@@ -63,6 +63,8 @@ export function buildDosesForDate(
         isDue: status === "pending" && minutesLate >= 0,
         recordedAt: log?.recordedAt,
         snoozedUntil: log?.snoozedUntil,
+        reason: log?.reason,
+        escalated: log?.escalated,
       });
     }
   }
@@ -88,7 +90,12 @@ export function getNextDose(doses: Dose[], now: Date): Dose | undefined {
 export function summarize(doses: Dose[]) {
   const total = doses.length;
   const taken = doses.filter((d) => d.status === "taken").length;
-  return { total, taken, pending: total - taken };
+  const snoozed = doses.filter((d) => d.status === "snoozed").length;
+  const skipped = doses.filter((d) => d.status === "skipped").length;
+  const notConfirmed = doses.filter((d) => d.status === "not_confirmed").length;
+  const pending = doses.filter((d) => d.status === "pending").length;
+  const adherenceRate = total > 0 ? Math.round((taken / total) * 100) : 100;
+  return { total, taken, snoozed, skipped, notConfirmed, pending, adherenceRate };
 }
 
 export function weeklyAdherence(

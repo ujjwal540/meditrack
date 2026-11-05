@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
+  ArrowLeft,
   Award,
   BadgeCheck,
   Briefcase,
@@ -150,13 +151,11 @@ export default function MarketplacePage() {
       title={t.marketplace.pageTitle}
       subtitle={t.marketplace.pageSubtitle}
       action={
-        <div className="flex items-center gap-2">
-          {currentUser?.role === "professional_caregiver" && (
-            <span className="font-mono text-xs font-bold text-[#20D6C2] bg-[#20D6C2]/10 border border-[#20D6C2]/30 px-3 py-1.5 rounded-xl">
-              {isNepali ? "हेरचाहकर्ता कार्यस्थान सक्रिय" : "Caregiver Workspace Active"}
-            </span>
-          )}
-        </div>
+        currentUser?.role === "professional_caregiver" ? (
+          <span className="font-mono text-xs font-bold text-[#20D6C2] bg-[#20D6C2]/10 border border-[#20D6C2]/30 px-2.5 py-0.5 rounded-lg whitespace-nowrap shadow-xs">
+            {isNepali ? "कार्यस्थान सक्रिय" : "Pro Workspace"}
+          </span>
+        ) : undefined
       }
     >
       <div className="space-y-7">
@@ -596,12 +595,21 @@ export default function MarketplacePage() {
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-10 w-10 rounded-xl bg-[#16A36A]/20 flex items-center justify-center text-[#20D6C2]">
+              <div className="flex items-center gap-3 mb-4 pr-10">
+                <button
+                  type="button"
+                  onClick={() => setBookingTarget(null)}
+                  aria-label={isNepali ? "फर्कनुहोस्" : "Go back"}
+                  title={isNepali ? "फर्कनुहोस्" : "Go back"}
+                  className="grid h-9 w-9 place-items-center rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] text-[#16A36A] dark:text-[#20C982] hover:border-[#20D6C2] transition-colors active:scale-95 shrink-0"
+                >
+                  <ArrowLeft className="h-4.5 w-4.5" />
+                </button>
+                <div className="h-10 w-10 rounded-xl bg-[#16A36A]/20 flex items-center justify-center text-[#20D6C2] shrink-0">
                   <Calendar className="h-5 w-5" />
                 </div>
-                <div>
-                  <h3 className="font-display text-lg font-bold text-[var(--text)]">
+                <div className="min-w-0">
+                  <h3 className="font-display text-base sm:text-lg font-bold text-[var(--text)] truncate">
                     {isNepali ? `${bookingTarget.fullName} सँग हेरचाह तालिका बनाउनुहोस्` : `Schedule Care with ${bookingTarget.fullName}`}
                   </h3>
                   <span className="text-xs text-[#20D6C2] font-mono">
@@ -751,18 +759,27 @@ export default function MarketplacePage() {
                 <X className="h-5 w-5" />
               </button>
 
-              <div className="flex items-center gap-4 border-b border-[var(--border)] pb-4">
-                <div className="h-16 w-16 rounded-2xl bg-[#16A36A]/20 flex items-center justify-center text-[#20D6C2] font-display font-bold text-2xl">
+              <div className="flex items-center gap-3.5 border-b border-[var(--border)] pb-4 pr-10">
+                <button
+                  type="button"
+                  onClick={() => setProfileDetail(null)}
+                  aria-label={isNepali ? "फर्कनुहोस्" : "Go back"}
+                  title={isNepali ? "फर्कनुहोस्" : "Go back"}
+                  className="grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] text-[#16A36A] dark:text-[#20C982] hover:border-[#20D6C2] transition-colors active:scale-95 shrink-0"
+                >
+                  <ArrowLeft className="h-4.5 w-4.5" />
+                </button>
+                <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-[#16A36A]/20 flex items-center justify-center text-[#20D6C2] font-display font-bold text-xl sm:text-2xl shrink-0">
                   {profileDetail.fullName.substring(0, 2).toUpperCase()}
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <h3 className="font-display text-lg font-bold text-[var(--text)]">
+                    <h3 className="font-display text-base sm:text-lg font-bold text-[var(--text)] truncate">
                       {profileDetail.fullName}
                     </h3>
-                    <BadgeCheck className="h-4 w-4 text-[#20D6C2]" />
+                    <BadgeCheck className="h-4 w-4 text-[#20D6C2] shrink-0" />
                   </div>
-                  <p className="text-xs text-[#16A36A] dark:text-[#A3EAC1] font-semibold">
+                  <p className="text-xs text-[#16A36A] dark:text-[#A3EAC1] font-semibold truncate">
                     {profileDetail.qualifications}
                   </p>
                   <div className="flex items-center gap-3 text-xs text-[var(--text-muted)] font-mono mt-1">

@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
+  ArrowLeft,
   Bell,
   CheckCircle2,
   Download,
+  ExternalLink,
   HelpCircle,
   KeyRound,
   Mail,
@@ -41,6 +44,7 @@ export function AccountManagementModal({
   onOpenChangePassword: () => void;
   onUserUpdated?: (updated: { id: string; name?: string; email?: string; role: UserRole; preferredLanguage?: SupportedLanguage }) => void;
 }) {
+  const router = useRouter();
   const { t, language, setLanguage, isNepali } = useTranslation();
   const [activeTab, setActiveTab] = useState<AccountTab>(initialTab);
   const [name, setName] = useState(user?.name || "");
@@ -155,14 +159,23 @@ export function AccountManagementModal({
     >
       <Card className="relative w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0 bg-[var(--surface)] border border-[#16A36A]/30 shadow-2xl shadow-black/70">
         {/* Top Header */}
-        <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-4 bg-[var(--surface-elevated)]/50">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between border-b border-[var(--border)] px-4 sm:px-5 py-3.5 sm:py-4 bg-[var(--surface-elevated)]/50">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={isNepali ? "फर्कनुहोस्" : "Go back"}
+              title={isNepali ? "फर्कनुहोस्" : "Go back"}
+              className="grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[#16A36A] dark:text-[#20C982] hover:border-[#16A36A] hover:bg-[#16A36A]/15 hover:shadow-[0_2px_10px_rgba(22,163,106,0.2)] transition-all active:scale-95 shrink-0"
+            >
+              <ArrowLeft className="h-4.5 w-4.5 stroke-[2.2]" aria-hidden="true" />
+            </button>
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-tr from-[#16A36A] to-[#20C982] text-white font-bold text-sm shadow-md shadow-[#16A36A]/20">
               {initials}
             </div>
             <div>
               <h2 id="account-modal-title" className="font-display text-base sm:text-lg font-bold text-[var(--text)]">
-                Account &amp; Profile Center
+                {isNepali ? "खाता तथा प्रोफाइल केन्द्र" : "Account & Profile Center"}
               </h2>
               <p className="text-xs text-[var(--text-secondary)]">
                 {user?.email || "Authenticated Healthcare Session"}
@@ -170,14 +183,27 @@ export function AccountManagementModal({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)] transition-colors"
-            aria-label="Close modal"
-          >
-            <X className="h-5 w-5" aria-hidden="true" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                router.push("/profile");
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#16A36A]/30 bg-[#16A36A]/10 px-2.5 py-1 text-[11px] font-bold text-[#16A36A] dark:text-[#20C982] hover:bg-[#16A36A]/20 transition-colors"
+            >
+              <span>{isNepali ? "पूर्ण पृष्ठ" : "Full Page"}</span>
+              <ExternalLink className="h-3 w-3" />
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="grid h-8 w-8 place-items-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)] transition-colors"
+              aria-label="Close modal"
+            >
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation Strip */}

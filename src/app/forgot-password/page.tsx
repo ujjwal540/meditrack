@@ -41,6 +41,7 @@ export default function ForgotPasswordPage() {
       eyebrow={isNepali ? "खाता सुरक्षा" : "Account Security"}
       title={t.auth.resetPasswordTitle}
       subtitle={t.auth.resetPasswordSubtitle}
+      backHref="/login"
     >
       {submitted ? (
         <div className="space-y-5 text-center">

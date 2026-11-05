@@ -27,6 +27,7 @@ function HistoryContent() {
           ? `${t.history.pageSubtitleSingle} ${names.get(medicineId) ?? ""}`
           : t.history.pageSubtitle
       }
+      backFallbackUrl={medicineId ? "/medicines" : "/dashboard"}
     >
       {rows.length === 0 ? (
         <Card className="text-center p-8 border border-dashed border-[var(--border)]">

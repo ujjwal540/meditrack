@@ -10,6 +10,7 @@ import { useTranslation } from "@/i18n/LanguageContext";
 import {
   Accessibility,
   CheckCircle2,
+  Contrast,
   Languages,
   LogOut,
   Moon,
@@ -49,7 +50,7 @@ export default function SettingsPage() {
     pushStatus,
   } = useMediTrack();
 
-  const { theme, setTheme } = useAccessibility();
+  const { theme, setTheme, contrast, toggle } = useAccessibility();
 
   const selectStyle =
     "mt-1.5 min-h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3.5 text-xs text-[var(--text)] focus:border-[#16A36A] focus:outline-none";
@@ -124,6 +125,58 @@ export default function SettingsPage() {
           </div>
         </Card>
 
+        {/* High Contrast Accessibility Preference */}
+        <Card className={`p-5 sm:p-6 transition-all ${contrast ? "border-[var(--primary)] bg-[var(--primary)]/10" : ""}`}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <span className="icon-badge">
+                <Contrast className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div>
+                <h2 className="font-display text-lg font-bold text-[var(--text)]">
+                  {isNepali ? "गाढा रङ मोड (High Contrast)" : "High Contrast Mode"}
+                </h2>
+                <p className="mt-1 text-xs text-[var(--text-secondary)] max-w-sm">
+                  {isNepali
+                    ? "लाइट र डार्क दुवै थिममा अक्षर, बटन, कार्ड किनारा र इनपुटको स्पष्टता बढाउँछ। ज्येष्ठ नागरिक तथा आँखा कमजोर भएकाहरूका लागि उपयोगी।"
+                    : "Dramatically enhances readability, text contrast, card boundaries, and button visibility in both Light and Dark modes."}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              role="switch"
+              aria-checked={contrast}
+              aria-label={contrast ? t.accessibility.highContrastOn : t.accessibility.highContrastOff}
+              onClick={() => toggle("contrast")}
+              className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] ${
+                contrast ? "bg-[var(--primary)]" : "bg-slate-700"
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                  contrast ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+
+          {contrast && (
+            <p
+              role="status"
+              className="mt-4 flex items-center gap-2 rounded-xl bg-[var(--primary)]/15 border border-[var(--primary)]/30 p-3 text-xs font-semibold text-[var(--primary)] dark:text-[#A3EAC1]"
+            >
+              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+              <span>
+                {isNepali
+                  ? "गाढा रङ (High Contrast) सक्रिय छ। सबै पृष्ठहरूमा स्पष्टता बढेको छ।"
+                  : "High Contrast Mode is active across all MediTrack views."}
+              </span>
+            </p>
+          )}
+        </Card>
+
         {/* Easy Mode Switch */}
         <Card className={`p-6 transition-all ${settings.easyMode ? "border-[#16A36A]/40 bg-[#16A36A]/10" : ""}`}>
           <div className="flex items-start justify-between gap-4">
@@ -170,8 +223,28 @@ export default function SettingsPage() {
           )}
         </Card>
 
-        {/* Snooze & Grace Period Intervals */}
+        {/* Snooze, Grace Period & Family Escalation Settings */}
         <Card className="space-y-4 p-6">
+          <div className="flex items-start justify-between gap-4 pb-2 border-b border-[var(--border-subtle)]">
+            <div>
+              <strong className="block text-sm font-bold text-[var(--text)]">
+                {isNepali ? "पारिवारिक हेरचाह सूचना (Family Care Alerts)" : "Family Care Escalation"}
+              </strong>
+              <span className="text-xs text-[var(--text-secondary)]">
+                {isNepali
+                  ? "औषधि तोकिएको समयभित्र नखाएमा अनुमतिप्राप्त पारिवारिक सदस्यलाई सतर्क गराउने"
+                  : "Automatically alert connected caregivers if a scheduled dose remains unconfirmed"}
+              </span>
+            </div>
+            <input
+              type="checkbox"
+              aria-label={isNepali ? "पारिवारिक हेरचाह सूचना" : "Family Care Escalation"}
+              checked={settings.familyAlertsEnabled !== false}
+              onChange={(e) => updateSettings({ ...settings, familyAlertsEnabled: e.target.checked })}
+              className="h-5 w-5 rounded text-[#16A36A] focus:ring-[#16A36A] mt-1"
+            />
+          </div>
+
           <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
             {t.settings.snoozeIntervalTitle}
             <select
@@ -194,9 +267,24 @@ export default function SettingsPage() {
               value={settings.graceMinutes}
               onChange={(e) => updateSettings({ ...settings, graceMinutes: Number(e.target.value) })}
             >
-              {[15, 30, 45, 60].map((m) => (
+              {[5, 10, 15, 30, 45, 60].map((m) => (
                 <option key={m} value={m} className="bg-[var(--surface-elevated)] text-[var(--text)]">
                   {formatNumber(m)} {t.common.minutes}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+            {isNepali ? "घण्टी दोहोरिने अन्तराल (Alarm Repeat Interval)" : "Alarm Repeat Interval"}
+            <select
+              className={selectStyle}
+              value={settings.repeatReminderInterval ?? 45}
+              onChange={(e) => updateSettings({ ...settings, repeatReminderInterval: Number(e.target.value) })}
+            >
+              {[30, 45, 60].map((s) => (
+                <option key={s} value={s} className="bg-[var(--surface-elevated)] text-[var(--text)]">
+                  {formatNumber(s)} {isNepali ? "सेकेन्ड" : "Seconds"}
                 </option>
               ))}
             </select>
@@ -382,14 +470,24 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <Button
-              size="sm"
-              variant="danger"
-              onClick={() => setShowLogoutDialog(true)}
-              className="text-xs font-bold gap-2 self-start sm:self-auto"
-            >
-              <LogOut className="h-4 w-4" /> {t.settings.signOutBtn}
-            </Button>
+            <div className="flex flex-wrap sm:flex-col items-start sm:items-end gap-2 shrink-0">
+              <Button
+                size="sm"
+                variant="primary"
+                onClick={() => router.push("/profile")}
+                className="text-xs font-bold gap-1.5"
+              >
+                <UserCheck className="h-4 w-4" /> {isNepali ? "पूर्ण प्रोफाइल हेर्नुहोस्" : "Manage Profile"}
+              </Button>
+              <Button
+                size="sm"
+                variant="danger"
+                onClick={() => setShowLogoutDialog(true)}
+                className="text-xs font-bold gap-2"
+              >
+                <LogOut className="h-4 w-4" /> {t.settings.signOutBtn}
+              </Button>
+            </div>
           </div>
           <p className="mt-4 text-[11px] text-[var(--text-muted)] border-t border-[var(--border-subtle)] pt-3">
             {isNepali

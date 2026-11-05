@@ -169,14 +169,14 @@ export function ProfileDropdown({
       label: isNepali ? "प्रोफाइल विवरण" : "Profile Overview",
       description: isNepali ? "व्यक्तिगत जानकारी हेर्नुहोस्" : "View personal information",
       icon: User,
-      onClick: () => setAccountModalTab("overview"),
+      onClick: () => router.push("/profile?tab=overview"),
     },
     {
       id: "account",
       label: isNepali ? "मेरो खाता" : "My Account",
       description: isNepali ? "नाम र फोन नम्बर मिलाउनुहोस्" : "Manage name & contact details",
       icon: UserCheck,
-      onClick: () => setAccountModalTab("account"),
+      onClick: () => router.push("/profile?tab=personal"),
     },
     {
       id: "settings",
@@ -197,21 +197,21 @@ export function ProfileDropdown({
       label: isNepali ? "सूचना तथा घण्टी" : "Notifications",
       description: isNepali ? "घण्टीको आवाज र सूचना व्यवस्थापन" : "Audio & reminder preferences",
       icon: Bell,
-      onClick: () => setAccountModalTab("notifications"),
+      onClick: () => router.push("/profile?tab=preferences"),
     },
     {
       id: "privacy",
       label: isNepali ? "गोपनीयता र सुरक्षा" : "Privacy & Security",
       description: isNepali ? "पारिवारिक अनुमति र डेटा सुरक्षा" : "Data isolation & session security",
       icon: ShieldCheck,
-      onClick: () => setAccountModalTab("privacy"),
+      onClick: () => router.push("/profile?tab=privacy"),
     },
     {
       id: "help",
       label: isNepali ? "सहयोग तथा FAQ" : "Help & Support",
       description: isNepali ? "निर्देशिका र प्रयोग विधि" : "Clinical guidelines & FAQ",
       icon: HelpCircle,
-      onClick: () => setAccountModalTab("help"),
+      onClick: () => router.push("/profile?tab=overview"),
     },
   ];
 
@@ -293,14 +293,18 @@ export function ProfileDropdown({
               : "top-full right-0 mt-2.5 animate-dropdown-down origin-top-right",
           )}
         >
-          {/* Top Section: User Name, Email, Profile Picture */}
-          <div className="flex items-center gap-3 rounded-xl border border-emerald-500/20 dark:border-emerald-500/20 bg-emerald-50/70 dark:bg-[#10251A] p-3 mb-2">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-tr from-[#16A36A] to-[#20D6C2] text-white text-sm font-black shadow-md shadow-[#16A36A]/30">
+          {/* Top Section: User Name, Email, Profile Picture (Clickable to /profile) */}
+          <button
+            type="button"
+            onClick={() => handleAction(() => router.push("/profile"))}
+            className="w-full text-left group flex items-center gap-3 rounded-xl border border-emerald-500/20 dark:border-emerald-500/20 bg-emerald-50/70 dark:bg-[#10251A] p-3 mb-2 hover:border-[#20D6C2]/60 hover:bg-emerald-100/60 dark:hover:bg-[#163324] transition-all"
+          >
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-tr from-[#16A36A] to-[#20D6C2] text-white text-sm font-black shadow-md shadow-[#16A36A]/30 group-hover:scale-105 transition-transform">
               {initials}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-1">
-                <h3 className="truncate font-display text-xs font-bold text-[var(--text)]">
+                <h3 className="truncate font-display text-xs font-bold text-[var(--text)] group-hover:text-[#16A36A] dark:group-hover:text-[#20D6C2] transition-colors">
                   {user?.name || (isNepali ? "सदस्य" : "Patient Member")}
                 </h3>
                 <span className="shrink-0 rounded-md border border-[#16A36A]/30 bg-[#16A36A]/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982]">
@@ -313,11 +317,11 @@ export function ProfileDropdown({
               <div className="mt-1 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#20D6C2] shadow-[0_0_6px_#20D6C2]" />
                 <span className="text-[10px] font-medium text-[var(--text-secondary)]">
-                  {isNepali ? "सुरक्षित स्वास्थ्य सेसन" : "Protected Healthcare Session"}
+                  {isNepali ? "खाता केन्द्र खोल्नुहोस् →" : "Open Account Center →"}
                 </span>
               </div>
             </div>
-          </div>
+          </button>
 
           {/* Quick Language Switcher Inside Profile Menu */}
           <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 dark:bg-[#10251A]/80 border border-emerald-500/15 dark:border-emerald-500/15 mb-1.5">

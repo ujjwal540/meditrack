@@ -50,11 +50,9 @@ export default function MedicinesPage() {
       title={t.medicines.pageTitle}
       subtitle={t.medicines.pageSubtitle}
       action={
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-bold text-[#16A36A] dark:text-[#A3EAC1] bg-[#16A36A]/10 border border-[#16A36A]/20 px-3 py-1.5 rounded-xl">
-            {formatNumber(medicines.length)} {t.medicines.medicinesActiveCount}
-          </span>
-        </div>
+        <span className="font-mono text-xs font-bold text-[#16A36A] dark:text-[#20C982] bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/25 px-2.5 py-0.5 rounded-lg whitespace-nowrap shadow-xs">
+          {formatNumber(medicines.length)} {t.medicines.medicinesActiveCount}
+        </span>
       }
     >
       <div className="space-y-8">
@@ -91,72 +89,109 @@ export default function MedicinesPage() {
             <ul className="space-y-3.5">
               {medicines.map((m) => (
                 <li key={m.id}>
-                  <Card interactive={true} className="flex flex-wrap items-center gap-3.5 sm:gap-4 p-4 sm:p-5">
-                    {/* Icon */}
-                    <div className="grid h-11 w-11 sm:h-12 sm:w-12 shrink-0 place-items-center rounded-xl bg-[#16A36A]/10 border border-[#16A36A]/20">
-                      <PillIcon type={m.type ?? "tablet"} size={32} />
+                  <Card interactive={true} className="p-4 sm:p-6 transition-all duration-200">
+                    {/* Top Row: Pill icon, Title & Badges, Action Buttons */}
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      {/* Left: Icon & Medicine Info */}
+                      <div className="flex items-start gap-3.5 min-w-0 flex-1">
+                        <div className="grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl bg-[#16A36A]/10 border border-[#16A36A]/25 text-[#16A36A] dark:text-[#20C982] shadow-xs">
+                          <PillIcon type={m.type ?? "tablet"} size={36} />
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="font-display text-base sm:text-lg md:text-xl font-bold text-[var(--text)] break-words leading-tight">
+                              {m.name}
+                            </h3>
+                            <span className="font-mono text-xs font-bold text-[#16A36A] dark:text-[#A3EAC1] bg-[#16A36A]/15 px-2.5 py-0.5 rounded-lg border border-[#16A36A]/30 shrink-0">
+                              {m.dosage}
+                            </span>
+                            {m.type && (
+                              <span className="text-[11px] font-semibold text-[var(--text-muted)] bg-[var(--surface-elevated)] px-2 py-0.5 rounded-md border border-[var(--border)] capitalize shrink-0">
+                                {m.type}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Instructions callout - fully legible, never cut off */}
+                          <div className="mt-2.5 flex items-start gap-2 rounded-xl bg-[var(--surface-elevated)]/70 border border-[var(--border)] px-3 py-2 text-xs text-[var(--text)]">
+                            <Utensils className="h-3.5 w-3.5 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
+                            <p className="leading-relaxed break-words font-medium">
+                              {m.instructions || (isNepali ? "कुनै विशेष सल्लाह लेखिएको छैन (सामान्य निर्देशन पालना गर्नुहोस्)" : "No special directions noted. Follow standard regimen.")}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Quick Action Buttons (Always consistent & balanced) */}
+                      <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--border-subtle)] shrink-0">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setDetailsId(detailsId === m.id ? null : m.id)}
+                          className="text-xs py-1.5 px-3 min-h-[36px]"
+                        >
+                          <Eye className="h-3.5 w-3.5" aria-hidden="true" />
+                          <span>{detailsId === m.id ? t.common.hide : t.common.details}</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setEditingId(m.id)}
+                          className="text-xs py-1.5 px-3 min-h-[36px]"
+                        >
+                          <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+                          <span>{t.common.edit}</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="danger"
+                          aria-label={`${t.common.delete} ${m.name}`}
+                          onClick={() => remove(m.id, m.name)}
+                          className="text-xs py-1.5 px-3 min-h-[36px]"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                          <span>{t.common.delete}</span>
+                        </Button>
+                      </div>
                     </div>
 
-                    {/* Basic Info */}
-                    <div className="min-w-0 flex-1 basis-56">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-display text-base sm:text-lg font-bold text-[var(--text)] truncate">
-                          {m.name}
-                        </h3>
-                        <span className="font-mono text-[11px] sm:text-xs text-[#16A36A] dark:text-[#A3EAC1] font-semibold bg-[#16A36A]/10 px-2 py-0.5 rounded-md border border-[#16A36A]/20">
-                          {m.dosage}
+                    {/* Schedule & Duration Meta Strip */}
+                    <div className="mt-3.5 pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2.5 text-xs">
+                      {/* Reminder times chips */}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mr-1">
+                          {isNepali ? "समय:" : "Times:"}
+                        </span>
+                        {m.times.map((time) => (
+                          <span
+                            key={time}
+                            className="inline-flex items-center gap-1 rounded-lg bg-[#16A36A]/10 border border-[#16A36A]/25 px-2.5 py-1 font-mono text-xs font-semibold text-[#16A36A] dark:text-[#A3EAC1]"
+                          >
+                            <Clock3 className="h-3 w-3 shrink-0" />
+                            <span>{formatTimeDisplay(time)}</span>
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Course duration badge */}
+                      <div className="flex items-center gap-1.5 font-mono text-[11px] text-[var(--text-muted)] bg-[var(--surface-elevated)] px-2.5 py-1 rounded-lg border border-[var(--border)]">
+                        <CalendarDays className="h-3.5 w-3.5 text-[#16A36A] dark:text-[#20C982] shrink-0" />
+                        <span>
+                          {m.startDate} {m.endDate ? `→ ${m.endDate}` : `(${t.medicines.ongoing})`}
                         </span>
                       </div>
-                      <p className="mt-0.5 text-xs text-[var(--text-secondary)] truncate">
-                        {m.instructions || (isNepali ? "कुनै विशेष सल्लाह लेखिएको छैन" : "No specific instructions specified")}
-                      </p>
-                      <p className="mt-1 font-mono text-[11px] text-[var(--text-muted)]">
-                        {m.times.map(formatTimeDisplay).join(" · ")} · {isNepali ? "सुरु:" : "from"} {m.startDate}
-                        {m.endDate ? ` ${isNepali ? "देखि" : "to"} ${m.endDate}` : ""}
-                      </p>
-                    </div>
-
-                    {/* Quick Action Buttons */}
-                    <div className="flex w-full sm:w-auto flex-wrap items-center justify-start sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--border-subtle)] shrink-0">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setDetailsId(detailsId === m.id ? null : m.id)}
-                        className="text-xs py-1.5 px-3"
-                      >
-                        <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>{detailsId === m.id ? t.common.hide : t.common.details}</span>
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setEditingId(m.id)}
-                        className="text-xs py-1.5 px-3"
-                      >
-                        <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>{t.common.edit}</span>
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        aria-label={`${t.common.delete} ${m.name}`}
-                        onClick={() => remove(m.id, m.name)}
-                        className="text-xs py-1.5 px-3"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                        <span>{t.common.delete}</span>
-                      </Button>
                     </div>
 
                     {/* Expandable Details Tray */}
                     {detailsId === m.id && (
-                      <div className="basis-full rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4 mt-2">
-                        <div className="grid gap-3 text-xs sm:grid-cols-2 lg:grid-cols-4">
+                      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4 sm:p-5 mt-4">
+                        <div className="grid gap-3.5 text-xs sm:grid-cols-2 lg:grid-cols-4">
                           <div className="flex items-start gap-2.5">
                             <Clock3 className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
                             <div>
-                              <strong className="block text-[var(--text)]">{t.medicines.dailyFrequency}</strong>
-                              <span className="text-[var(--text-secondary)]">
+                              <strong className="block text-[var(--text)] font-bold">{t.medicines.dailyFrequency}</strong>
+                              <span className="text-[var(--text-secondary)] mt-0.5 block">
                                 {formatNumber(m.times.length)} {isNepali ? "पटक" : "doses daily"}
                               </span>
                             </div>
@@ -165,16 +200,16 @@ export default function MedicinesPage() {
                           <div className="flex items-start gap-2.5">
                             <Utensils className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
                             <div>
-                              <strong className="block text-[var(--text)]">{t.medicines.foodInstructions}</strong>
-                              <span className="text-[var(--text-secondary)]">{m.instructions || (isNepali ? "कुनै छैन" : "None noted")}</span>
+                              <strong className="block text-[var(--text)] font-bold">{t.medicines.foodInstructions}</strong>
+                              <span className="text-[var(--text-secondary)] mt-0.5 block break-words">{m.instructions || (isNepali ? "कुनै छैन" : "None noted")}</span>
                             </div>
                           </div>
 
                           <div className="flex items-start gap-2.5">
                             <CalendarDays className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
                             <div>
-                              <strong className="block text-[var(--text)]">{t.medicines.courseDuration}</strong>
-                              <span className="text-[var(--text-secondary)]">
+                              <strong className="block text-[var(--text)] font-bold">{t.medicines.courseDuration}</strong>
+                              <span className="text-[var(--text-secondary)] mt-0.5 block font-mono">
                                 {m.startDate} {m.endDate ? `– ${m.endDate}` : `– ${t.medicines.ongoing}`}
                               </span>
                             </div>
@@ -183,8 +218,8 @@ export default function MedicinesPage() {
                           <div className="flex items-start gap-2.5">
                             <Pill className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
                             <div>
-                              <strong className="block text-[var(--text)]">{t.medicines.nextDueDose}</strong>
-                              <span className="text-[var(--text-secondary)]">
+                              <strong className="block text-[var(--text)] font-bold">{t.medicines.nextDueDose}</strong>
+                              <span className="text-[var(--text-secondary)] mt-0.5 block font-mono">
                                 {doses.find((dose) => dose.medicineId === m.id && dose.status !== "taken")?.time
                                   ? formatTimeDisplay(doses.find((dose) => dose.medicineId === m.id && dose.status !== "taken")!.time)
                                   : t.medicines.completedForToday}
@@ -194,17 +229,18 @@ export default function MedicinesPage() {
                         </div>
 
                         {m.notes && (
-                          <p className="mt-3 text-xs text-[var(--text-secondary)] border-t border-[var(--border-subtle)] pt-2">
-                            <strong className="text-[var(--text)]">{t.common.notes}:</strong> {m.notes}
-                          </p>
+                          <div className="mt-3.5 text-xs text-[var(--text-secondary)] border-t border-[var(--border-subtle)] pt-2.5">
+                            <strong className="text-[var(--text)] font-bold">{t.common.notes}:</strong>{" "}
+                            <span className="break-words">{m.notes}</span>
+                          </div>
                         )}
 
-                        <div className="mt-3.5 flex flex-wrap items-center gap-2 pt-2 border-t border-[var(--border-subtle)]">
+                        <div className="mt-4 flex flex-wrap items-center gap-2 pt-3 border-t border-[var(--border-subtle)]">
                           {doses
                             .filter((dose) => dose.medicineId === m.id && dose.status !== "taken")
                             .map((dose) => (
                               <span key={dose.key} className="inline-flex flex-wrap gap-2">
-                                <Button size="sm" variant="primary" onClick={() => respond(dose.key, "taken")} className="text-xs py-1.5 px-3">
+                                <Button size="sm" variant="primary" onClick={() => respond(dose.key, "taken")} className="text-xs py-1.5 px-3 min-h-[36px]">
                                   <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
                                   {isNepali ? `${formatTimeDisplay(dose.time)} खाएको जनाउनुहोस्` : `Mark ${formatTimeDisplay(dose.time)} Taken`}
                                 </Button>
@@ -212,7 +248,7 @@ export default function MedicinesPage() {
                                   size="sm"
                                   variant="outline"
                                   onClick={() => respond(dose.key, "snoozed", settings.snoozeMinutes)}
-                                  className="text-xs py-1.5 px-3"
+                                  className="text-xs py-1.5 px-3 min-h-[36px]"
                                 >
                                   <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
                                   {isNepali ? `${formatNumber(settings.snoozeMinutes)} मिनेट पछि` : `Snooze (${settings.snoozeMinutes}m)`}
@@ -221,7 +257,7 @@ export default function MedicinesPage() {
                             ))}
                           <Link
                             href={`/history?medicineId=${encodeURIComponent(m.id)}`}
-                            className="inline-flex min-h-9 items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 text-xs font-semibold text-[#16A36A] dark:text-[#20C982] hover:border-[#16A36A]/40 transition-colors"
+                            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3.5 text-xs font-semibold text-[#16A36A] dark:text-[#20C982] hover:border-[#16A36A]/40 transition-colors"
                           >
                             <Eye className="h-3.5 w-3.5" aria-hidden="true" /> {t.medicines.doseHistory}
                           </Link>

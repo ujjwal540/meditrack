@@ -20,6 +20,8 @@ import {
 } from "@/utils/date-utils";
 import { useNotifications } from "@/hooks/use-notifications";
 import { getActiveUser } from "@/lib/auth";
+import { checkAndTriggerEscalations, markEscalationConfirmedLate } from "@/services/escalation-service";
+import { stopAlarmLoop } from "@/utils/sound";
 
 export function useReminders() {
   const [ready, setReady] = useState(false);
@@ -106,8 +108,16 @@ export function useReminders() {
     setLogs(getLogs());
   }, [doses, logs]);
 
+  // Family care escalation check: triggered periodically if family alerts enabled
+  useEffect(() => {
+    if (settings.familyAlertsEnabled === false || doses.length === 0) return;
+    void checkAndTriggerEscalations(doses, settings, user?.name);
+  }, [doses, settings, user?.name, now]);
+
   const respond = useCallback(
-    (key: string, status: DoseStatus, snoozeMinutes?: number) => {
+    (key: string, status: DoseStatus, snoozeMinutes?: number, reason?: string) => {
+      // Stop repeating alarm chime immediately upon any patient response
+      stopAlarmLoop();
       const dose = doses.find((d) => d.key === key);
       if (!dose) return;
       const nowIso = new Date().toISOString();
@@ -118,11 +128,18 @@ export function useReminders() {
         time: dose.time,
         status,
         recordedAt: nowIso,
+        reason,
         snoozedUntil:
           status === "snoozed" && snoozeMinutes
             ? new Date(Date.now() + snoozeMinutes * 60000).toISOString()
             : undefined,
       });
+
+      // If dose was previously escalated and now confirmed taken, update family alert
+      if (status === "taken") {
+        markEscalationConfirmedLate(key);
+      }
+
       setLogs(getLogs());
       setNow(new Date());
       if (status === "taken") {

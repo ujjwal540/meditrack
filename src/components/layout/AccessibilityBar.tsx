@@ -38,15 +38,21 @@ function Toggle({
       title={label}
       className={cn(
         "inline-flex min-h-9 sm:min-h-10 items-center gap-1.5 sm:gap-2 rounded-xl border px-2.5 sm:px-3 py-1.5 text-xs font-semibold tracking-wide transition-all duration-200 ease-out",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#20D6C2] focus-visible:ring-offset-1",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--border-hover)] focus-visible:ring-offset-1",
         on
-          ? "border-[#20D6C2] bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] shadow-[0_0_14px_rgba(32,214,194,0.3)] hover:-translate-y-0.5 hover:shadow-[0_4px_16px_rgba(32,214,194,0.4)]"
-          : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:text-[var(--text)] hover:-translate-y-0.5 hover:shadow-[0_4px_14px_rgba(32,214,194,0.18)] active:translate-y-0",
+          ? "border-2 border-[var(--primary)] bg-[var(--primary)]/15 text-[var(--primary)] dark:text-[#A3EAC1] font-bold shadow-[0_0_14px_rgba(22,163,106,0.25)] hover:-translate-y-0.5"
+          : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:bg-[var(--surface-hover)] hover:text-[var(--text)] hover:-translate-y-0.5 active:translate-y-0",
       )}
     >
       <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" aria-hidden="true" />
       <span className={cn(shortLabel ? "hidden sm:inline" : "inline")}>{label}</span>
       {shortLabel && <span className="sm:hidden text-[11px]">{shortLabel}</span>}
+      {on && (
+        <span
+          className="h-1.5 w-1.5 rounded-full bg-current shrink-0"
+          aria-hidden="true"
+        />
+      )}
     </button>
   );
 }
@@ -54,9 +60,13 @@ function Toggle({
 export function AccessibilityBar({
   user,
   onUserUpdated,
+  hideUtilityControls = false,
+  className,
 }: {
   user?: { id: string; name?: string; email?: string; role: UserRole } | null;
   onUserUpdated?: (u: { id: string; name?: string; email?: string; role: UserRole }) => void;
+  hideUtilityControls?: boolean;
+  className?: string;
 }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { easy, contrast, voice, toggle } = useAccessibility();
@@ -68,8 +78,10 @@ export function AccessibilityBar({
       role="group"
       aria-label="Display, theme, language, voice and account preferences"
       className={cn(
-        "relative mb-6 flex flex-wrap items-center justify-between gap-2 sm:gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface)]/85 p-2 sm:p-2.5 backdrop-blur-md shadow-sm transition-all duration-200",
+        "relative mb-5 flex flex-wrap items-center gap-2 sm:gap-2.5 rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)]/60 p-2 sm:p-2.5 backdrop-blur-md shadow-xs transition-all duration-200",
+        hideUtilityControls ? "justify-start" : "justify-between",
         isProfileOpen ? "z-50" : "z-30",
+        className,
       )}
     >
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -106,20 +118,22 @@ export function AccessibilityBar({
         />
       </div>
 
-      <div className="flex items-center gap-1.5 sm:gap-2.5">
-        {/* Global Instant Bilingual Language Switcher */}
-        <LanguageSwitcher variant="toggle" showIcon={true} />
+      {!hideUtilityControls && (
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
+          {/* Global Instant Bilingual Language Switcher */}
+          <LanguageSwitcher variant="toggle" showIcon={true} />
 
-        <ThemeToggle showLabel={false} />
+          <ThemeToggle showLabel={false} />
 
-        <ProfileDropdown
-          user={user ?? null}
-          compact={true}
-          direction="down"
-          onUserUpdated={onUserUpdated}
-          onOpenChange={setIsProfileOpen}
-        />
-      </div>
+          <ProfileDropdown
+            user={user ?? null}
+            compact={true}
+            direction="down"
+            onUserUpdated={onUserUpdated}
+            onOpenChange={setIsProfileOpen}
+          />
+        </div>
+      )}
     </div>
   );
 }

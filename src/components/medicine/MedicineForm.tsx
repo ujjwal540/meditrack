@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText, Plus, Trash2, Upload, X } from "lucide-react";
+import { ArrowLeft, FileText, Plus, Trash2, Upload, X } from "lucide-react";
 import type { Medicine } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -104,7 +104,18 @@ export function MedicineForm({
 
       {/* Header */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] border border-[#16A36A]/30">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            aria-label={isNepali ? "औषधि सूचीमा फर्कनुहोस्" : "Back to medicines"}
+            title={isNepali ? "औषधि सूचीमा फर्कनुहोस्" : "Back to medicines"}
+            className="grid h-10 w-10 place-items-center rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] text-[#16A36A] dark:text-[#20C982] hover:border-[#16A36A] hover:bg-[#16A36A]/10 transition-colors active:scale-95 shrink-0"
+          >
+            <ArrowLeft className="h-5 w-5 stroke-[2.2]" aria-hidden="true" />
+          </button>
+        )}
+        <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#16A36A]/15 text-[#16A36A] dark:text-[#A3EAC1] border border-[#16A36A]/30 shrink-0">
           <span className="text-lg">💊</span>
         </div>
         <div>
@@ -176,27 +187,35 @@ export function MedicineForm({
 
         {/* Times Timetable Picker */}
         <fieldset className="md:col-span-2">
-          <legend className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-2">
+          <legend className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-2.5">
             {t.medicines.timesLabel}
           </legend>
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
             {times.map((timeVal, i) => (
-              <div key={i} className="flex items-center gap-1.5">
-                <input
-                  type="time"
-                  aria-label={`Reminder time ${i + 1}`}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-sm font-mono text-[#16A36A] dark:text-[#A3EAC1] focus:border-[#16A36A] focus:outline-none"
-                  value={timeVal}
-                  onChange={(e) =>
-                    setTimes(times.map((x, j) => (j === i ? e.target.value : x)))
-                  }
-                />
+              <div
+                key={i}
+                className="flex items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-2 shadow-xs transition-colors hover:border-[#16A36A]/40"
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <span className="font-mono text-xs font-bold text-[var(--text-muted)] w-5 text-center shrink-0">
+                    #{i + 1}
+                  </span>
+                  <input
+                    type="time"
+                    aria-label={`Reminder time ${i + 1}`}
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-sm font-mono font-bold text-[#16A36A] dark:text-[#A3EAC1] focus:border-[#16A36A] focus:outline-none"
+                    value={timeVal}
+                    onChange={(e) =>
+                      setTimes(times.map((x, j) => (j === i ? e.target.value : x)))
+                    }
+                  />
+                </div>
                 {times.length > 1 && (
                   <button
                     type="button"
                     aria-label={`Remove reminder time ${i + 1}`}
                     onClick={() => setTimes(times.filter((_, j) => j !== i))}
-                    className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:bg-rose-500/15 hover:text-rose-500 hover:border-rose-500/30 transition-colors"
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-[var(--border)] text-[var(--text-muted)] hover:bg-rose-500/15 hover:text-rose-500 hover:border-rose-500/30 transition-colors"
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -208,9 +227,9 @@ export function MedicineForm({
               variant="outline"
               size="sm"
               onClick={() => setTimes([...times, "20:00"])}
-              className="text-xs py-2"
+              className="min-h-[46px] text-xs font-bold border-dashed border-2 hover:border-[#16A36A] hover:bg-[#16A36A]/10"
             >
-              <Plus className="h-3.5 w-3.5" aria-hidden="true" /> {t.medicines.addTime}
+              <Plus className="h-4 w-4" aria-hidden="true" /> {t.medicines.addTime}
             </Button>
           </div>
           {renderErr("times")}
@@ -219,7 +238,7 @@ export function MedicineForm({
         <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)] md:col-span-2">
           {t.medicines.notesLabel}
           <textarea
-            className={inputStyle + " py-2 h-20 resize-none"}
+            className={inputStyle + " py-2.5 h-20 resize-none leading-relaxed"}
             rows={2}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -228,51 +247,66 @@ export function MedicineForm({
         </label>
 
         {/* Prescription Attachment Preview Box */}
-        <div className="md:col-span-2 rounded-2xl border border-dashed border-[var(--border)] bg-[var(--surface-elevated)]/40 p-5">
-          <p className="text-xs font-bold uppercase tracking-wider text-[var(--text)]">
-            {isNepali ? "प्रेस्क्रिप्शन कागजात (ऐच्छिक)" : "Prescription Documentation (optional)"}
-          </p>
-          <p className="mt-1 text-xs text-[var(--text-secondary)]">
-            {isNepali
-              ? "डाक्टरको प्रेस्क्रिप्शन फोटो वा PDF यहाँ राख्न सक्नुहुन्छ।"
-              : "Upload an image or PDF of your doctor prescription to review against your schedule."}
-          </p>
-          <label className="mt-3 inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-xs font-semibold text-[var(--text)] hover:border-[#16A36A]/40 transition-colors">
-            <Upload className="h-4 w-4" aria-hidden="true" /> {isNepali ? "फाइल छान्नुहोस्" : "Choose File"}
-            <input
-              type="file"
-              className="sr-only"
-              accept=".jpg,.jpeg,.png,.pdf"
-              onChange={(e) => onFile(e.target.files?.[0])}
-            />
-          </label>
+        <div className="md:col-span-2 rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--surface-elevated)]/40 p-5 sm:p-6 transition-colors hover:border-[#16A36A]/40">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[var(--text)] flex items-center gap-2">
+                <FileText className="h-4 w-4 text-[#16A36A] dark:text-[#20C982]" />
+                <span>{isNepali ? "प्रेस्क्रिप्शन कागजात (ऐच्छिक)" : "Prescription Documentation (Optional)"}</span>
+              </p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                {isNepali
+                  ? "डाक्टरको प्रेस्क्रिप्शन फोटो वा PDF यहाँ राख्न सक्नुहुन्छ। ढाँचा: JPG, PNG, PDF (१० एमबी सम्म)"
+                  : "Attach your doctor prescription image or PDF to verify against dosages. Supports JPG, PNG, PDF up to 10MB."}
+              </p>
+            </div>
+            <label className="inline-flex min-h-[42px] cursor-pointer items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 text-xs font-bold text-[var(--text)] hover:border-[#16A36A] hover:bg-[#16A36A]/10 transition-colors shrink-0 shadow-xs">
+              <Upload className="h-4 w-4 text-[#16A36A]" aria-hidden="true" />
+              <span>{isNepali ? "फाइल छान्नुहोस्" : "Choose File"}</span>
+              <input
+                type="file"
+                className="sr-only"
+                accept=".jpg,.jpeg,.png,.pdf"
+                onChange={(e) => onFile(e.target.files?.[0])}
+              />
+            </label>
+          </div>
+
           {fileError && (
-            <p role="alert" className="mt-2 text-xs font-semibold text-rose-500 dark:text-[#FB7185]">
+            <p role="alert" className="mt-3 text-xs font-semibold text-rose-500 dark:text-[#FB7185]">
               {fileError}
             </p>
           )}
+
           {preview && (
-            <div className="mt-3.5 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3">
+            <div className="mt-4 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-xs">
               {preview.isPdf ? (
-                <p className="flex items-center gap-2 text-xs text-[var(--text)]">
-                  <FileText className="h-4 w-4 text-[#16A36A] dark:text-[#20C982]" aria-hidden="true" />
-                  <span>{preview.name} (PDF Selected)</span>
-                </p>
+                <div className="flex items-center gap-3 py-2">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs font-mono">
+                    PDF
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-[var(--text)] break-all">{preview.name}</p>
+                    <span className="text-[11px] text-[var(--text-muted)] font-mono">Portable Document Format</span>
+                  </div>
+                </div>
               ) : (
-                <img
-                  src={preview.url}
-                  alt="Prescription preview"
-                  className="block h-auto max-h-48 max-w-full rounded-lg border border-[var(--border)] object-contain"
-                />
+                <div className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-black/20 p-2 max-h-56 flex justify-center">
+                  <img
+                    src={preview.url}
+                    alt="Prescription preview"
+                    className="max-h-52 w-auto object-contain rounded-lg"
+                  />
+                </div>
               )}
-              <label className="mt-3 flex items-start gap-2 text-xs text-[var(--text-secondary)] cursor-pointer">
+              <label className="mt-3.5 flex items-start gap-2.5 text-xs text-[var(--text)] cursor-pointer pt-3 border-t border-[var(--border-subtle)]">
                 <input
                   type="checkbox"
-                  className="mt-0.5 h-4 w-4 rounded border-[var(--border)] text-[#16A36A] focus:ring-[#16A36A]"
+                  className="mt-0.5 h-4 w-4 rounded border-[var(--border)] text-[#16A36A] focus:ring-[#16A36A] shrink-0"
                   checked={verified}
                   onChange={(e) => setVerified(e.target.checked)}
                 />
-                <span>
+                <span className="leading-relaxed font-medium">
                   {isNepali
                     ? "म पुष्टि गर्दछु कि यी विवरणहरू डाक्टरको प्रेस्क्रिप्शनसँग मिल्छन्।"
                     : "I confirm that these entered details match my prescription."}

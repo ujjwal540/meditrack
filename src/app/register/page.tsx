@@ -96,6 +96,7 @@ export default function RegisterPage() {
       eyebrow={t.auth.joinMediTrack}
       title={t.auth.registerTitle}
       subtitle={t.auth.registerSubtitle}
+      backHref="/login"
     >
       <form onSubmit={submit} className="space-y-4">
         {/* Preferred Language Selection During Onboarding */}

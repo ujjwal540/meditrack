@@ -82,25 +82,36 @@ export function DoseList({
               {items.map((d) => (
                 <li
                   key={d.key}
-                  className="group relative flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 backdrop-blur-xl transition-all duration-240 ease-out hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_12px_28px_-6px_rgba(0,0,0,0.6),0_0_20px_rgba(32,214,194,0.25)] shadow-sm"
+                  className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-5 backdrop-blur-xl transition-all duration-200 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] shadow-sm"
                 >
-                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)]">
+                  <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[var(--surface-elevated)] border border-[var(--border)] shadow-xs">
                       <PillIcon type={d.type} size={32} />
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-display text-base font-bold text-[var(--text)] truncate">
-                        {d.medicineName}
-                      </p>
-                      <p className="text-xs text-[var(--text-secondary)] truncate">
-                        {d.dosage}
-                        {d.instructions ? ` · ${d.instructions}` : ""}
-                      </p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="font-display text-base font-bold text-[var(--text)] break-words leading-tight">
+                          {d.medicineName}
+                        </p>
+                        <span className="font-mono text-xs font-semibold text-[#16A36A] dark:text-[#A3EAC1] bg-[#16A36A]/10 px-2 py-0.5 rounded-md border border-[#16A36A]/20 shrink-0">
+                          {d.dosage}
+                        </span>
+                      </div>
+                      {d.instructions && (
+                        <p className="mt-1 text-xs text-[var(--text-secondary)] break-words leading-relaxed">
+                          {d.instructions}
+                        </p>
+                      )}
+                      {d.reason && (
+                        <p className="mt-1 text-[11px] font-medium text-amber-500 dark:text-amber-300">
+                          {d.reason}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-[var(--border-subtle)] pt-2.5 sm:pt-0">
-                    <span className="font-mono text-xs sm:text-sm font-bold tabular-nums text-[var(--text)] bg-[var(--surface-elevated)] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[var(--border)]">
+                  <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 shrink-0 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-[var(--border-subtle)]">
+                    <span className="font-mono text-xs sm:text-sm font-bold tabular-nums text-[var(--text)] bg-[var(--surface-elevated)] px-3 py-1.5 rounded-lg border border-[var(--border)]">
                       {formatTimeDisplay(d.time)}
                     </span>
                     <StatusBadge dose={d} />
@@ -109,7 +120,7 @@ export function DoseList({
                         size="sm"
                         variant="soft"
                         onClick={() => onRespond(d.key, "taken")}
-                        className="py-1 px-2.5 text-xs font-semibold"
+                        className="py-1 px-3 text-xs font-semibold min-h-[34px]"
                       >
                         <Check className="h-3.5 w-3.5" aria-hidden="true" /> {t.medicines.markTaken}
                       </Button>

@@ -30,12 +30,6 @@ html {
   max-width: 100vw;
 }
 html[data-easy="true"] { font-size: 20px; }
-html[data-contrast="high"] {
-  --text: #ffffff;
-  --text-secondary: #e2e8f0;
-  --border: rgba(255, 255, 255, 0.3);
-  --surface: #07130E;
-}
 
 body {
   margin: 0;
@@ -333,5 +327,323 @@ html:not(.dark):not([data-theme="dark"]) .skeleton {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* =========================================================================
+   UNIVERSAL HIGH CONTRAST MODE (WCAG 2.2 AA / AAA Standards)
+   Applied automatically when data-contrast="high" on html
+   ========================================================================= */
+html[data-contrast="high"] {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html[data-contrast="high"] .card,
+html[data-contrast="high"] .soft-card,
+html[data-contrast="high"] .glass-panel {
+  border-width: 1.5px !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow-card) !important;
+}
+
+/* Dim decorative blur orbs to eliminate reading interference */
+html[data-contrast="high"] .bg-grid-pattern {
+  opacity: 0.10 !important;
+}
+html[data-contrast="high"] [class*="blur-3xl"],
+html[data-contrast="high"] [class*="blur-[130px]"] {
+  opacity: 0.12 !important;
+}
+
+/* High Contrast Form Fields */
+html[data-contrast="high"] input,
+html[data-contrast="high"] select,
+html[data-contrast="high"] textarea {
+  border-color: var(--border) !important;
+  border-width: 1.5px !important;
+  color: var(--text) !important;
+  background-color: var(--surface) !important;
+}
+html[data-contrast="high"] input::placeholder,
+html[data-contrast="high"] textarea::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1 !important;
+  font-weight: 500;
+}
+html[data-contrast="high"] input:focus,
+html[data-contrast="high"] select:focus,
+html[data-contrast="high"] textarea:focus {
+  border-color: var(--border-hover) !important;
+  outline: 2.5px solid var(--border-hover) !important;
+  outline-offset: 1px !important;
+}
+
+/* High Contrast Focus Visibility (WCAG 2.2 Requirement) */
+html[data-contrast="high"] :focus-visible {
+  outline: 3px solid var(--border-hover) !important;
+  outline-offset: 2px !important;
+}
+
+/* High Contrast Status Badges */
+html[data-contrast="high"] [class*="rounded-full"][class*="border"] {
+  border-width: 1.5px !important;
+  font-weight: 700 !important;
+}
+
+/* High Contrast Icon Badges */
+html[data-contrast="high"] .icon-badge,
+html[data-contrast="high"] .icon-button {
+  border-width: 1.5px !important;
+  border-color: var(--border) !important;
+}
+
+/* =========================================================================
+   LIGHT THEME + HIGH CONTRAST COMPONENT ENHANCEMENTS
+   ========================================================================= */
+html:not(.dark)[data-contrast="high"],
+html[data-theme="light"][data-contrast="high"] {
+  background-color: #FFFFFF !important;
+}
+
+html:not(.dark)[data-contrast="high"] body,
+html[data-theme="light"][data-contrast="high"] body {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+/* Darker, high-contrast text overrides in Light High Contrast */
+html:not(.dark)[data-contrast="high"] .text-\[\#16A36A\],
+html[data-theme="light"][data-contrast="high"] .text-\[\#16A36A\] {
+  color: #0A663C !important;
+  font-weight: 700 !important;
+}
+
+html:not(.dark)[data-contrast="high"] .text-emerald-500,
+html:not(.dark)[data-contrast="high"] .text-emerald-600,
+html[data-theme="light"][data-contrast="high"] .text-emerald-500,
+html[data-theme="light"][data-contrast="high"] .text-emerald-600 {
+  color: #0A663C !important;
+  font-weight: 700 !important;
+}
+
+html:not(.dark)[data-contrast="high"] .text-amber-500,
+html:not(.dark)[data-contrast="high"] .text-amber-600,
+html[data-theme="light"][data-contrast="high"] .text-amber-500 {
+  color: #854D0E !important;
+  font-weight: 700 !important;
+}
+
+html:not(.dark)[data-contrast="high"] .text-rose-500,
+html:not(.dark)[data-contrast="high"] .text-rose-600,
+html[data-theme="light"][data-contrast="high"] .text-rose-500 {
+  color: #9F1239 !important;
+  font-weight: 700 !important;
+}
+
+html:not(.dark)[data-contrast="high"] .text-blue-500,
+html:not(.dark)[data-contrast="high"] .text-blue-600,
+html[data-theme="light"][data-contrast="high"] .text-blue-500 {
+  color: #1E40AF !important;
+  font-weight: 700 !important;
+}
+
+html:not(.dark)[data-contrast="high"] .text-slate-600,
+html:not(.dark)[data-contrast="high"] .text-slate-700,
+html[data-theme="light"][data-contrast="high"] .text-slate-600 {
+  color: #12261B !important;
+}
+
+html:not(.dark)[data-contrast="high"] .text-\[var\(--text-secondary\)\] {
+  color: #12261B !important;
+}
+
+html:not(.dark)[data-contrast="high"] .text-\[var\(--text-muted\)\] {
+  color: #234533 !important;
+}
+
+/* Light mode primary button with rich dark emerald background & bold white text */
+html:not(.dark)[data-contrast="high"] .btn-primary,
+html[data-theme="light"][data-contrast="high"] .btn-primary,
+html:not(.dark)[data-contrast="high"] button[class*="from-\[\#16A36A\]"] {
+  background: #0A663C !important;
+  color: #FFFFFF !important;
+  border: 2px solid #054326 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(10, 102, 60, 0.25) !important;
+}
+
+/* Light mode outline buttons */
+html:not(.dark)[data-contrast="high"] button[class*="border-\[var\(--border\)\]"],
+html[data-theme="light"][data-contrast="high"] button[class*="border-\[var\(--border\)\]"] {
+  border-color: #0B5E38 !important;
+  border-width: 1.5px !important;
+  color: #000000 !important;
+  background-color: #FFFFFF !important;
+  font-weight: 700 !important;
+}
+html:not(.dark)[data-contrast="high"] button[class*="border-\[var\(--border\)\]"]:hover,
+html[data-theme="light"][data-contrast="high"] button[class*="border-\[var\(--border\)\]"]:hover {
+  background-color: #E3EFE8 !important;
+  border-color: #053A23 !important;
+  color: #000000 !important;
+}
+
+/* Light mode card boundaries */
+html:not(.dark)[data-contrast="high"] [class*="border-\[var\(--border\)\]"],
+html[data-theme="light"][data-contrast="high"] [class*="border-\[var\(--border\)\]"] {
+  border-color: #0B5E38 !important;
+}
+
+html:not(.dark)[data-contrast="high"] [class*="border-\[var\(--border-subtle\)\]"],
+html[data-theme="light"][data-contrast="high"] [class*="border-\[var\(--border-subtle\)\]"] {
+  border-color: #147A4D !important;
+}
+
+/* Light mode navigation bars */
+html:not(.dark)[data-contrast="high"] .mobile-bottom-nav,
+html[data-theme="light"][data-contrast="high"] .mobile-bottom-nav {
+  background-color: #FFFFFF !important;
+  border-top: 2px solid #0B5E38 !important;
+}
+
+html:not(.dark)[data-contrast="high"] .mobile-bottom-nav-item,
+html[data-theme="light"][data-contrast="high"] .mobile-bottom-nav-item {
+  color: #12261B !important;
+}
+
+html:not(.dark)[data-contrast="high"] .mobile-bottom-nav-item.is-active,
+html[data-theme="light"][data-contrast="high"] .mobile-bottom-nav-item.is-active {
+  color: #0A663C !important;
+  font-weight: 800 !important;
+}
+
+html:not(.dark)[data-contrast="high"] aside,
+html[data-theme="light"][data-contrast="high"] aside {
+  background-color: #FFFFFF !important;
+  border-right: 2px solid #0B5E38 !important;
+}
+
+/* =========================================================================
+   DARK THEME + HIGH CONTRAST COMPONENT ENHANCEMENTS
+   ========================================================================= */
+html.dark[data-contrast="high"],
+html[data-theme="dark"][data-contrast="high"] {
+  background-color: #000000 !important;
+}
+
+html.dark[data-contrast="high"] body,
+html[data-theme="dark"][data-contrast="high"] body {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* Luminous text overrides in Dark High Contrast */
+html.dark[data-contrast="high"] .dark\:text-\[\#20C982\],
+html[data-theme="dark"][data-contrast="high"] .dark\:text-\[\#20C982\],
+html.dark[data-contrast="high"] .dark\:text-\[\#A3EAC1\],
+html[data-theme="dark"][data-contrast="high"] .dark\:text-\[\#A3EAC1\] {
+  color: #42F5AA !important;
+  font-weight: 700 !important;
+}
+
+html.dark[data-contrast="high"] .dark\:text-\[\#36D399\],
+html[data-theme="dark"][data-contrast="high"] .dark\:text-\[\#36D399\] {
+  color: #34D399 !important;
+  font-weight: 700 !important;
+}
+
+html.dark[data-contrast="high"] .dark\:text-\[\#FBBF24\],
+html[data-theme="dark"][data-contrast="high"] .dark\:text-\[\#FBBF24\] {
+  color: #FDE047 !important;
+  font-weight: 700 !important;
+}
+
+html.dark[data-contrast="high"] .dark\:text-\[\#FB7185\],
+html[data-theme="dark"][data-contrast="high"] .dark\:text-\[\#FB7185\] {
+  color: #FDA4AF !important;
+  font-weight: 700 !important;
+}
+
+html.dark[data-contrast="high"] .text-\[var\(--text-secondary\)\] {
+  color: #E2EDE6 !important;
+}
+
+html.dark[data-contrast="high"] .text-\[var\(--text-muted\)\] {
+  color: #B4CEBF !important;
+}
+
+/* Dark mode primary buttons */
+html.dark[data-contrast="high"] .btn-primary,
+html[data-theme="dark"][data-contrast="high"] .btn-primary,
+html.dark[data-contrast="high"] button[class*="from-\[\#16A36A\]"] {
+  background: linear-gradient(135deg, #10B981, #20E092) !important;
+  color: #000000 !important;
+  font-weight: 800 !important;
+  border: 2px solid #42F5AA !important;
+  box-shadow: 0 0 20px rgba(32, 224, 146, 0.40) !important;
+}
+
+/* Dark mode outline buttons */
+html.dark[data-contrast="high"] button[class*="border-\[var\(--border\)\]"],
+html[data-theme="dark"][data-contrast="high"] button[class*="border-\[var\(--border\)\]"] {
+  border-color: #34D399 !important;
+  border-width: 1.5px !important;
+  color: #FFFFFF !important;
+  background-color: #07150E !important;
+  font-weight: 700 !important;
+}
+html.dark[data-contrast="high"] button[class*="border-\[var\(--border\)\]"]:hover,
+html[data-theme="dark"][data-contrast="high"] button[class*="border-\[var\(--border\)\]"]:hover {
+  background-color: #143523 !important;
+  border-color: #2DFCE6 !important;
+  color: #FFFFFF !important;
+}
+
+/* Dark mode cards with luminous emerald boundaries */
+html.dark[data-contrast="high"] [class*="border-\[var\(--border\)\]"],
+html[data-theme="dark"][data-contrast="high"] [class*="border-\[var\(--border\)\]"] {
+  border-color: #34D399 !important;
+}
+
+html.dark[data-contrast="high"] [class*="border-\[var\(--border-subtle\)\]"],
+html[data-theme="dark"][data-contrast="high"] [class*="border-\[var\(--border-subtle\)\]"] {
+  border-color: rgba(52, 211, 153, 0.50) !important;
+}
+
+/* Dark mode navigation bars */
+html.dark[data-contrast="high"] .mobile-bottom-nav,
+html[data-theme="dark"][data-contrast="high"] .mobile-bottom-nav {
+  background-color: #000000 !important;
+  border-top: 2px solid #34D399 !important;
+}
+
+html.dark[data-contrast="high"] .mobile-bottom-nav-item,
+html[data-theme="dark"][data-contrast="high"] .mobile-bottom-nav-item {
+  color: #E2EDE6 !important;
+}
+
+html.dark[data-contrast="high"] .mobile-bottom-nav-item.is-active,
+html[data-theme="dark"][data-contrast="high"] .mobile-bottom-nav-item.is-active {
+  color: #20E092 !important;
+  font-weight: 800 !important;
+}
+
+html.dark[data-contrast="high"] aside,
+html[data-theme="dark"][data-contrast="high"] aside {
+  background-color: #000000 !important;
+  border-right: 2px solid #34D399 !important;
+}
+
+/* =========================================================================
+   RESPONSIVE MOBILE SAFEGUARD: NO ASIDE ON SCREENS < 768px
+   ========================================================================= */
+@media (max-width: 767px) {
+  aside,
+  html aside,
+  html[data-contrast="high"] aside,
+  html.dark aside,
+  html.dark[data-contrast="high"] aside {
+    display: none !important;
   }
 }

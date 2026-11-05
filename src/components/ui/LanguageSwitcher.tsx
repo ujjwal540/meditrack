@@ -128,7 +128,7 @@ export function LanguageSwitcher({
         onClick={() => setLanguage("en")}
         aria-pressed={language === "en"}
         className={cn(
-          "rounded-lg px-2.5 py-1 text-xs font-bold transition-all duration-180",
+          "rounded-lg px-2 xs:px-2.5 py-1 text-xs font-bold transition-all duration-180",
           language === "en"
             ? "bg-[#16A36A] text-white shadow-sm"
             : "text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-hover)]",
@@ -141,13 +141,14 @@ export function LanguageSwitcher({
         onClick={() => setLanguage("ne")}
         aria-pressed={language === "ne"}
         className={cn(
-          "rounded-lg px-2.5 py-1 text-xs font-bold transition-all duration-180",
+          "rounded-lg px-2 xs:px-2.5 py-1 text-xs font-bold transition-all duration-180",
           language === "ne"
             ? "bg-[#16A36A] text-white shadow-sm"
             : "text-[var(--text-secondary)] hover:text-[var(--text)] hover:bg-[var(--surface-hover)]",
         )}
       >
-        नेपाली
+        <span className="hidden xs:inline">नेपाली</span>
+        <span className="xs:hidden">ने</span>
       </button>
     </div>
   );

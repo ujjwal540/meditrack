@@ -1,4 +1,4 @@
-export type DoseStatus = "pending" | "taken" | "snoozed" | "not_confirmed";
+export type DoseStatus = "pending" | "taken" | "snoozed" | "not_confirmed" | "skipped" | "escalated";
 
 export interface Medicine {
   id: string;
@@ -21,6 +21,8 @@ export interface DoseLog {
   status: DoseStatus;
   recordedAt?: string;
   snoozedUntil?: string;
+  reason?: string;
+  escalated?: boolean;
 }
 
 export interface Dose {
@@ -36,6 +38,8 @@ export interface Dose {
   isDue: boolean;
   recordedAt?: string;
   snoozedUntil?: string;
+  reason?: string;
+  escalated?: boolean;
 }
 
 export type ConsentStatus = "invited" | "accepted" | "granted" | "revoked";
@@ -62,6 +66,8 @@ export interface AppSettings {
   soundEnabled: boolean;
   soundVolume: number;
   vibrationEnabled: boolean;
+  familyAlertsEnabled?: boolean;
+  repeatReminderInterval?: number; // interval in seconds for gentle alarm repeats
 }
 
 export interface HealthMeasurement {
