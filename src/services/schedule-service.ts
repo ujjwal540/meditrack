@@ -7,6 +7,7 @@ const SETTINGS_KEY = "meditrack.settings";
 export const DEFAULT_SETTINGS: AppSettings = {
   easyMode: false,
   voiceEnabled: true,
+  notificationPreference: "voice",
   snoozeMinutes: 10,
   graceMinutes: 30,
   notificationsEnabled: true,
@@ -35,6 +36,9 @@ export function getSettings(): AppSettings {
     voiceEnabled: typeof stored.voiceEnabled === "boolean"
       ? stored.voiceEnabled
       : DEFAULT_SETTINGS.voiceEnabled,
+    notificationPreference: ["voice", "ringtone", "vibration"].includes(stored.notificationPreference as string)
+      ? (stored.notificationPreference as "voice" | "ringtone" | "vibration")
+      : DEFAULT_SETTINGS.notificationPreference,
     snoozeMinutes: [5, 10, 15, 30].includes(stored.snoozeMinutes ?? -1)
       ? stored.snoozeMinutes!
       : DEFAULT_SETTINGS.snoozeMinutes,

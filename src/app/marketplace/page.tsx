@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import {
   ArrowLeft,
   Award,
@@ -9,22 +8,18 @@ import {
   Briefcase,
   Calendar,
   CheckCircle2,
-  Clock,
-  DollarSign,
-  Filter,
-  Heart,
   MapPin,
   Phone,
   Search,
   ShieldCheck,
   Star,
-  UserCheck,
   X,
 } from "lucide-react";
 import type { ProfessionalBooking, ProfessionalCaregiver, ProfessionalReview, UserRole } from "@/types";
 import { PageShell } from "@/components/layout/PageShell";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { CaregiverAvatar } from "@/components/marketplace/CaregiverAvatar";
 import {
   createBooking,
   getBookingsForUser,
@@ -33,8 +28,6 @@ import {
   updateBookingStatus,
 } from "@/services/professional-care-service";
 import { getActiveUser } from "@/lib/auth";
-import { formatTime } from "@/utils/date-utils";
-import Image from "next/image";
 import { useTranslation } from "@/i18n/LanguageContext";
 
 export default function MarketplacePage() {
@@ -273,76 +266,112 @@ export default function MarketplacePage() {
 
 
             {/* Caregivers Grid */}
-            <div className="grid gap-5 md:grid-cols-2">
-              {filteredCaregivers.map((pro) => (
-                <Card
-                  key={pro.id}
-                  interactive={true}
-                  className="p-6 flex flex-col justify-between"
-                >
-                  <div>
-                    {/* Header info */}
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-center gap-3.5">
-                        <div className="relative h-14 w-14 shrink-0 rounded-2xl bg-[#16A36A]/20 border border-[#20D6C2]/30 p-1 flex items-center justify-center overflow-hidden">
-                          {pro.avatarUrl ? (
-                            <Image src={pro.avatarUrl} alt={pro.fullName} width={48} height={48} className="object-cover rounded-xl" />
-                          ) : (
-                            <span className="font-display font-bold text-lg text-[#20D6C2]">
-                              {pro.fullName.substring(0, 2).toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <h3 className="font-display text-base font-bold text-[var(--text)]">
-                              {pro.fullName}
-                            </h3>
-                            {pro.verificationStatus === "verified" && (
-                              <BadgeCheck className="h-4 w-4 text-[#20D6C2] shrink-0" />
-                            )}
-                          </div>
-                          <p className="text-xs text-[#16A36A] dark:text-[#A3EAC1] font-semibold">
-                            {pro.qualifications}
-                          </p>
-                        </div>
+            {loading ? (
+              <div className="grid gap-5 md:grid-cols-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <Card key={i} className="p-6 animate-pulse space-y-4">
+                    <div className="flex gap-4">
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl bg-[var(--surface-elevated)] shrink-0" />
+                      <div className="flex-1 space-y-2 py-1">
+                        <div className="h-5 w-3/4 bg-[var(--surface-elevated)] rounded" />
+                        <div className="h-4 w-1/2 bg-[var(--surface-elevated)] rounded" />
+                        <div className="h-3 w-1/3 bg-[var(--surface-elevated)] rounded mt-2" />
                       </div>
+                    </div>
+                    <div className="h-10 bg-[var(--surface-elevated)] rounded-xl" />
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="grid gap-5 md:grid-cols-2">
+                {filteredCaregivers.map((pro) => (
+                  <Card
+                    key={pro.id}
+                    interactive={true}
+                    className="p-5 sm:p-6 flex flex-col justify-between transition-all duration-200 hover:border-[#16A36A]/50 dark:hover:border-[#20D6C2]/50 shadow-[var(--shadow-card)]"
+                  >
+                  <div>
+                    {/* Header info: Caregiver Avatar on the left, Name & Credentials beside, Hourly rate */}
+                    <div className="flex items-start gap-3.5 sm:gap-4">
+                      <CaregiverAvatar
+                        fullName={pro.fullName}
+                        avatarUrl={pro.avatarUrl}
+                        caregiverId={pro.id}
+                        userId={pro.userId}
+                        size="card"
+                      />
 
-                      <div className="text-right">
-                        <span className="font-mono text-xl font-bold text-[#20D6C2]">
-                          ${formatNumber(pro.hourlyRate)}
-                        </span>
-                        <span className="text-[10px] text-[var(--text-muted)] block">/ {t.marketplace.perHour}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <h3 className="font-display text-base sm:text-lg font-bold text-[var(--text)] truncate">
+                                {pro.fullName}
+                              </h3>
+                              {pro.verificationStatus === "verified" && (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#16A36A] dark:text-[#20D6C2] bg-[#16A36A]/10 dark:bg-[#20D6C2]/10 border border-[#16A36A]/25 dark:border-[#20D6C2]/30 px-2 py-0.5 rounded-full shrink-0">
+                                  <BadgeCheck className="h-3.5 w-3.5" />
+                                  <span>{isNepali ? "प्रमाणित" : "Verified Pro"}</span>
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-[#16A36A] dark:text-[#A3EAC1] font-semibold mt-0.5">
+                              {pro.qualifications}
+                            </p>
+                          </div>
+
+                          <div className="text-right shrink-0">
+                            <span className="font-mono text-lg sm:text-xl font-bold text-[#16A36A] dark:text-[#20D6C2] tabular-nums">
+                              ${formatNumber(pro.hourlyRate)}
+                            </span>
+                            <span className="text-[10px] text-[var(--text-muted)] block font-medium">/ {t.marketplace.perHour}</span>
+                          </div>
+                        </div>
+
+                        {/* Demo Profile Label & Availability */}
+                        <div className="mt-2 flex items-center gap-2 text-[11px] text-[var(--text-muted)]">
+                          <span className="inline-flex items-center gap-1 rounded bg-[var(--surface-elevated)] border border-[var(--border)] px-1.5 py-0.5 text-[10px] font-mono text-[var(--text-muted)]">
+                            Demo Profile
+                          </span>
+                          <span>&bull;</span>
+                          <span className="capitalize text-[var(--text-secondary)]">
+                            {pro.availability === "weekdays_and_weekends"
+                              ? (isNepali ? "हप्ताको ७ दिन उपलब्ध" : "7 Days / Wk")
+                              : pro.availability === "weekdays"
+                              ? (isNepali ? "सोम-शुक्र उपलब्ध" : "Mon–Fri")
+                              : (isNepali ? "सप्ताहन्त उपलब्ध" : "Weekends")}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
                     {/* Bio */}
-                    <p className="mt-3 text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
+                    <p className="mt-3.5 text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-2">
                       {pro.bio}
                     </p>
 
-                    {/* Meta badges */}
-                    <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[var(--text-muted)] font-mono">
-                      <span className="flex items-center gap-1 text-[var(--text)]">
-                        <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
-                        <strong className="text-[var(--text)]">{formatNumber(pro.rating.toFixed(2))}</strong> ({formatNumber(pro.reviewCount)} {isNepali ? "समीक्षाहरू" : "reviews"})
+                    {/* Meta badges: Ratings, Location, Experience */}
+                    <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-[var(--text-muted)] font-mono">
+                      <span className="flex items-center gap-1 text-[var(--text)] font-semibold">
+                        <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400 shrink-0" />
+                        <strong className="text-[var(--text)] tabular-nums">{formatNumber(pro.rating.toFixed(2))}</strong> ({formatNumber(pro.reviewCount)} {isNepali ? "समीक्षाहरू" : "reviews"})
                       </span>
                       <span className="flex items-center gap-1">
-                        <MapPin className="h-3.5 w-3.5 text-[#20D6C2]" /> {pro.serviceLocation}
+                        <MapPin className="h-3.5 w-3.5 text-[#16A36A] dark:text-[#20D6C2] shrink-0" /> {pro.serviceLocation}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Award className="h-3.5 w-3.5 text-[#16A36A]" /> {formatNumber(pro.yearsExperience)} {t.marketplace.yearsExp}
+                        <Award className="h-3.5 w-3.5 text-[#16A36A] dark:text-[#20C982] shrink-0" /> {formatNumber(pro.yearsExperience)} {t.marketplace.yearsExp}
                       </span>
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="mt-5 pt-4 border-t border-[var(--border-subtle)] flex items-center justify-between gap-3">
+                  {/* Actions: View Credentials / Profile and Book Caregiver */}
+                  <div className="mt-5 pt-3.5 border-t border-[var(--border-subtle)] grid grid-cols-2 gap-2 sm:gap-3">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => openProfile(pro)}
-                      className="text-xs"
+                      className="w-full text-xs font-semibold justify-center min-h-[38px]"
                     >
                       {t.marketplace.viewProfileBtn}
                     </Button>
@@ -353,7 +382,7 @@ export default function MarketplacePage() {
                         setBookingTarget(pro);
                         setSchedDate(new Date(Date.now() + 86400000).toISOString().split("T")[0]);
                       }}
-                      className="text-xs font-bold"
+                      className="w-full text-xs font-bold justify-center min-h-[38px]"
                     >
                       {t.marketplace.bookCaregiverBtn}
                     </Button>
@@ -361,8 +390,9 @@ export default function MarketplacePage() {
                 </Card>
               ))}
             </div>
+          )}
 
-            {filteredCaregivers.length === 0 && (
+          {!loading && filteredCaregivers.length === 0 && (
               <Card className="text-center p-12 border border-dashed border-[var(--border)]">
                 <Search className="mx-auto h-12 w-12 text-[var(--text-muted)] opacity-50" />
                 <h3 className="mt-3 font-display text-base font-bold text-[var(--text)]">{t.marketplace.noCaregiversMatch}</h3>
@@ -605,9 +635,13 @@ export default function MarketplacePage() {
                 >
                   <ArrowLeft className="h-4.5 w-4.5" />
                 </button>
-                <div className="h-10 w-10 rounded-xl bg-[#16A36A]/20 flex items-center justify-center text-[#20D6C2] shrink-0">
-                  <Calendar className="h-5 w-5" />
-                </div>
+                <CaregiverAvatar
+                  fullName={bookingTarget.fullName}
+                  avatarUrl={bookingTarget.avatarUrl}
+                  caregiverId={bookingTarget.id}
+                  userId={bookingTarget.userId}
+                  size="compact"
+                />
                 <div className="min-w-0">
                   <h3 className="font-display text-base sm:text-lg font-bold text-[var(--text)] truncate">
                     {isNepali ? `${bookingTarget.fullName} सँग हेरचाह तालिका बनाउनुहोस्` : `Schedule Care with ${bookingTarget.fullName}`}
@@ -681,6 +715,29 @@ export default function MarketplacePage() {
                     </div>
                   </div>
 
+                  {/* Duration Selector */}
+                  <div>
+                    <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
+                      {isNepali ? "समय अवधि (Duration)" : "Duration"}
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[30, 60, 90, 120].map((mins) => (
+                        <button
+                          key={mins}
+                          type="button"
+                          onClick={() => setDuration(mins)}
+                          className={`py-1.5 px-2 rounded-xl border text-center text-xs font-bold transition-all ${
+                            duration === mins
+                              ? "border-[#20D6C2] bg-[#16A36A]/15 text-[#20D6C2] shadow-xs"
+                              : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-secondary)] hover:text-[var(--text)]"
+                          }`}
+                        >
+                          {formatNumber(mins)}m
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {serviceType === "visit" ? (
                     <div>
                       <label className="block font-semibold uppercase tracking-wider text-[var(--text-secondary)] mb-1">
@@ -726,7 +783,9 @@ export default function MarketplacePage() {
 
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3 flex items-center justify-between">
                     <span className="text-[var(--text-secondary)]">{isNepali ? "अनुमानित कुल शुल्क:" : "Total Estimated Charge:"}</span>
-                    <strong className="font-mono text-base text-[#20D6C2]">${formatNumber(bookingTarget.hourlyRate)}.00</strong>
+                    <strong className="font-mono text-base text-[#20D6C2]">
+                      ${formatNumber((bookingTarget.hourlyRate * (duration / 60)).toFixed(2))}
+                    </strong>
                   </div>
 
                   <div className="pt-2 flex justify-end gap-2">
@@ -769,9 +828,13 @@ export default function MarketplacePage() {
                 >
                   <ArrowLeft className="h-4.5 w-4.5" />
                 </button>
-                <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-[#16A36A]/20 flex items-center justify-center text-[#20D6C2] font-display font-bold text-xl sm:text-2xl shrink-0">
-                  {profileDetail.fullName.substring(0, 2).toUpperCase()}
-                </div>
+                <CaregiverAvatar
+                  fullName={profileDetail.fullName}
+                  avatarUrl={profileDetail.avatarUrl}
+                  caregiverId={profileDetail.id}
+                  userId={profileDetail.userId}
+                  size="modal"
+                />
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
                     <h3 className="font-display text-base sm:text-lg font-bold text-[var(--text)] truncate">

@@ -647,3 +647,31 @@ html[data-theme="dark"][data-contrast="high"] aside {
     display: none !important;
   }
 }
+
+/* =========================================================================
+   RESPONSIVE DESIGN SYSTEM: UNIVERSAL VIEWPORT & OVERFLOW SAFEGUARDS
+   ========================================================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+img, svg, canvas, video {
+  max-width: 100%;
+}
+
+input, select, textarea {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  button, a, input, select {
+    touch-action: manipulation;
+  }
+}

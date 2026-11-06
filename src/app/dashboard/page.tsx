@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/Card";
 import { ProgressRing } from "@/components/ui/ProgressRing";
 import { NextMedicineCard } from "@/components/dashboard/NextMedicineCard";
 import { StatCards } from "@/components/dashboard/StatCards";
+import { NotificationModeSelector } from "@/components/dashboard/NotificationModeSelector";
 import { DoseList } from "@/components/reminders/DoseList";
 import { useMediTrack } from "@/components/reminders/ReminderProvider";
 import { useVoice } from "@/hooks/use-voice";
@@ -32,6 +33,7 @@ export default function DashboardPage() {
     nextDose,
     dueDoses,
     settings,
+    updateSettings,
     respond,
     notificationPermission,
     requestNotifications,
@@ -207,6 +209,13 @@ export default function DashboardPage() {
               </Button>
             </Card>
           )}
+
+          {/* Centralized Medication Reminder Mode Selector (Voice / Ringtone / Vibration) */}
+          <NotificationModeSelector
+            settings={settings}
+            updateSettings={updateSettings}
+            userName={userName}
+          />
 
           {/* Quick Metrics Statistics Strip */}
           <StatCards

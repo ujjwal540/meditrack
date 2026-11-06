@@ -88,18 +88,18 @@ export default function MedicinesPage() {
           ) : (
             <ul className="space-y-3.5">
               {medicines.map((m) => (
-                <li key={m.id}>
-                  <Card interactive={true} className="p-4 sm:p-6 transition-all duration-200">
+                <li key={m.id} className="min-w-0">
+                  <Card interactive={true} className="p-3.5 xs:p-4.5 sm:p-6 transition-all duration-200">
                     {/* Top Row: Pill icon, Title & Badges, Action Buttons */}
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3.5 sm:gap-4">
                       {/* Left: Icon & Medicine Info */}
-                      <div className="flex items-start gap-3.5 min-w-0 flex-1">
-                        <div className="grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl bg-[#16A36A]/10 border border-[#16A36A]/25 text-[#16A36A] dark:text-[#20C982] shadow-xs">
-                          <PillIcon type={m.type ?? "tablet"} size={36} />
+                      <div className="flex items-start gap-3 xs:gap-3.5 min-w-0 flex-1">
+                        <div className="grid h-11 w-11 xs:h-12 xs:w-12 sm:h-14 sm:w-14 shrink-0 place-items-center rounded-2xl bg-[#16A36A]/10 border border-[#16A36A]/25 text-[#16A36A] dark:text-[#20C982] shadow-xs">
+                          <PillIcon type={m.type ?? "tablet"} size={32} />
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-1.5 xs:gap-2">
                             <h3 className="font-display text-base sm:text-lg md:text-xl font-bold text-[var(--text)] break-words leading-tight">
                               {m.name}
                             </h3>
@@ -123,50 +123,50 @@ export default function MedicinesPage() {
                         </div>
                       </div>
 
-                      {/* Right: Quick Action Buttons (Always consistent & balanced) */}
-                      <div className="flex items-center justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-[var(--border-subtle)] shrink-0">
+                      {/* Right: Quick Action Buttons (Responsive 3-Column on Mobile, Inline on Desktop) */}
+                      <div className="grid grid-cols-3 gap-1.5 xs:gap-2 sm:flex sm:items-center sm:justify-end sm:gap-2 pt-3 sm:pt-0 border-t sm:border-t-0 border-[var(--border-subtle)] w-full sm:w-auto">
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => setDetailsId(detailsId === m.id ? null : m.id)}
-                          className="text-xs py-1.5 px-3 min-h-[36px]"
+                          className="w-full sm:w-auto text-[11px] xs:text-xs py-2 px-1.5 xs:px-2.5 sm:px-3 min-h-[38px] justify-center"
                         >
-                          <Eye className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>{detailsId === m.id ? t.common.hide : t.common.details}</span>
+                          <Eye className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                          <span className="truncate">{detailsId === m.id ? t.common.hide : t.common.details}</span>
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => setEditingId(m.id)}
-                          className="text-xs py-1.5 px-3 min-h-[36px]"
+                          className="w-full sm:w-auto text-[11px] xs:text-xs py-2 px-1.5 xs:px-2.5 sm:px-3 min-h-[38px] justify-center"
                         >
-                          <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>{t.common.edit}</span>
+                          <Pencil className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                          <span className="truncate">{t.common.edit}</span>
                         </Button>
                         <Button
                           size="sm"
                           variant="danger"
                           aria-label={`${t.common.delete} ${m.name}`}
                           onClick={() => remove(m.id, m.name)}
-                          className="text-xs py-1.5 px-3 min-h-[36px]"
+                          className="w-full sm:w-auto text-[11px] xs:text-xs py-2 px-1.5 xs:px-2.5 sm:px-3 min-h-[38px] justify-center"
                         >
-                          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-                          <span>{t.common.delete}</span>
+                          <Trash2 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                          <span className="truncate">{t.common.delete}</span>
                         </Button>
                       </div>
                     </div>
 
                     {/* Schedule & Duration Meta Strip */}
-                    <div className="mt-3.5 pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2.5 text-xs">
+                    <div className="mt-3.5 pt-3 border-t border-[var(--border-subtle)] flex flex-col xs:flex-row xs:items-center justify-between gap-2.5 text-xs">
                       {/* Reminder times chips */}
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mr-1">
+                      <div className="flex flex-wrap items-center gap-1.5 min-w-0">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--text-muted)] mr-1 shrink-0">
                           {isNepali ? "समय:" : "Times:"}
                         </span>
                         {m.times.map((time) => (
                           <span
                             key={time}
-                            className="inline-flex items-center gap-1 rounded-lg bg-[#16A36A]/10 border border-[#16A36A]/25 px-2.5 py-1 font-mono text-xs font-semibold text-[#16A36A] dark:text-[#A3EAC1]"
+                            className="inline-flex items-center gap-1 rounded-lg bg-[#16A36A]/10 border border-[#16A36A]/25 px-2 py-0.5 sm:px-2.5 sm:py-1 font-mono text-[11px] sm:text-xs font-semibold text-[#16A36A] dark:text-[#A3EAC1]"
                           >
                             <Clock3 className="h-3 w-3 shrink-0" />
                             <span>{formatTimeDisplay(time)}</span>
@@ -175,7 +175,7 @@ export default function MedicinesPage() {
                       </div>
 
                       {/* Course duration badge */}
-                      <div className="flex items-center gap-1.5 font-mono text-[11px] text-[var(--text-muted)] bg-[var(--surface-elevated)] px-2.5 py-1 rounded-lg border border-[var(--border)]">
+                      <div className="inline-flex items-center gap-1.5 font-mono text-[11px] text-[var(--text-muted)] bg-[var(--surface-elevated)] px-2.5 py-1 rounded-lg border border-[var(--border)] self-start xs:self-auto shrink-0">
                         <CalendarDays className="h-3.5 w-3.5 text-[#16A36A] dark:text-[#20C982] shrink-0" />
                         <span>
                           {m.startDate} {m.endDate ? `→ ${m.endDate}` : `(${t.medicines.ongoing})`}
@@ -185,8 +185,8 @@ export default function MedicinesPage() {
 
                     {/* Expandable Details Tray */}
                     {detailsId === m.id && (
-                      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4 sm:p-5 mt-4">
-                        <div className="grid gap-3.5 text-xs sm:grid-cols-2 lg:grid-cols-4">
+                      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-elevated)] p-3.5 sm:p-5 mt-3.5 sm:mt-4">
+                        <div className="grid gap-3 sm:gap-3.5 text-xs grid-cols-1 xs:grid-cols-2 lg:grid-cols-4">
                           <div className="flex items-start gap-2.5">
                             <Clock3 className="h-4 w-4 text-[#16A36A] dark:text-[#20C982] mt-0.5 shrink-0" aria-hidden="true" />
                             <div>

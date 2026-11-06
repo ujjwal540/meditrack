@@ -12,7 +12,8 @@ export function Card({ className, interactive = false, ...props }: CardProps) {
       className={cn(
         "rounded-2xl border border-[var(--border)]",
         "bg-[var(--surface)]/90 backdrop-blur-xl",
-        "p-5 sm:p-6 shadow-[var(--shadow-card)]",
+        "w-full max-w-full min-w-0",
+        "p-4 xs:p-5 sm:p-6 shadow-[var(--shadow-card)]",
         "transition-all duration-250 ease-out",
         interactive
           ? "cursor-pointer hover:-translate-y-1 hover:border-[#20D6C2] hover:bg-[var(--surface-hover)] hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.7),0_0_22px_-2px_rgba(32,214,194,0.28),0_0_0_1px_#20D6C2] active:translate-y-0"

@@ -56,10 +56,13 @@ export interface CaregiverConnection {
 
 export type SupportedLanguage = "en" | "ne";
 
+export type NotificationPreference = "voice" | "ringtone" | "vibration";
+
 export interface AppSettings {
   language?: SupportedLanguage;
   easyMode: boolean;
   voiceEnabled: boolean;
+  notificationPreference: NotificationPreference;
   snoozeMinutes: number;
   graceMinutes: number; // how long a dose may stay unconfirmed before a caregiver alert
   notificationsEnabled: boolean;

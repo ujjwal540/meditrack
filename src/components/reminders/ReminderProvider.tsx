@@ -21,6 +21,7 @@ export function ReminderProvider({ children }: { children: ReactNode }) {
         remaining={value.dueDoses.length}
         snoozeMinutes={value.settings.snoozeMinutes}
         userName={value.userName}
+        settings={value.settings}
         onRespond={value.respond}
       />
     </ReminderContext.Provider>

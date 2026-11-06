@@ -44,15 +44,15 @@ export function CaregiverCard({
   const statusInfo = statusLabel[c.consentStatus];
 
   return (
-    <Card interactive={true} className="flex flex-wrap items-center justify-between gap-4 p-5">
-      <div className="flex items-center gap-3.5 min-w-0 flex-1 basis-56">
+    <Card interactive={true} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 p-4 xs:p-5">
+      <div className="flex items-center gap-3.5 min-w-0 flex-1">
         <div
-          className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-tr from-[#16A36A] to-[#20C982] font-display text-sm font-bold text-white shadow-sm"
+          className="grid h-11 w-11 xs:h-12 xs:w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-tr from-[#16A36A] to-[#20C982] font-display text-sm font-bold text-white shadow-sm"
           aria-hidden="true"
         >
           {initials}
         </div>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate font-display text-base font-bold text-[var(--text)]">
             {c.caregiverName || c.caregiverEmail}
           </p>
@@ -68,7 +68,7 @@ export function CaregiverCard({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 shrink-0">
+      <div className="flex flex-wrap items-center gap-2 pt-2.5 sm:pt-0 border-t sm:border-t-0 border-[var(--border-subtle)] w-full sm:w-auto justify-end">
         {isIncoming && c.consentStatus === "invited" && onAccept && (
           <Button size="sm" variant="primary" onClick={() => onAccept(c.id)}>
             <CheckCircle2 className="h-3.5 w-3.5" /> {isNepali ? "निमन्त्रणा स्वीकार्नुहोस्" : "Accept Invitation"}

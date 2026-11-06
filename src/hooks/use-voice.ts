@@ -104,26 +104,43 @@ export function useVoice() {
 }
 
 /**
+ * Wakes up speech synthesis on user interaction to bypass browser autoplay blocks
+ */
+export function warmUpSpeech(): void {
+  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+    try {
+      window.speechSynthesis.getVoices();
+      const u = new SpeechSynthesisUtterance("");
+      u.volume = 0;
+      window.speechSynthesis.speak(u);
+    } catch {}
+  }
+}
+
+/**
  * Builds the canonical MediTrack voice announcement text
  */
 export function buildMedicineVoicePrompt({
   medicineName,
   dosage,
+  instructions,
   userName,
   isNepali,
 }: {
   medicineName: string;
   dosage?: string;
+  instructions?: string;
   userName?: string;
   isNepali: boolean;
 }): string {
-  const doseText = dosage ? ` ${dosage}` : "";
+  const doseText = dosage ? `, ${dosage}` : "";
+  const instText = instructions ? ` ${instructions}.` : "";
 
   if (isNepali) {
     const greeting = userName ? `नमस्ते ${userName} ज्यू!` : "नमस्ते!";
-    return `${greeting} तपाईंको औषधि खाने समय भयो: ${medicineName}${doseText}। कृपया आफ्नो तालिका अनुसार औषधि खानुहोस्।`;
+    return `${greeting} तपाईंको औषधि खाने समय भयो: ${medicineName}${doseText}।${instText} कृपया तालिका अनुसार औषधि खानुहोस्।`;
   }
 
-  const greeting = userName ? `Namaste ${userName}!` : "Namaste!";
-  return `${greeting} It is time to take your medicine, ${medicineName}${doseText}. Please take your scheduled medicine.`;
+  const greeting = userName ? `Hello ${userName}.` : "Hello.";
+  return `${greeting} It is time to take your scheduled medication, ${medicineName}${doseText}.${instText} Please follow your prescribed dosage.`;
 }

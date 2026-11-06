@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getActiveUser } from "@/lib/auth";
 import { LogoutConfirmDialog } from "@/components/profile/LogoutConfirmDialog";
+import { NotificationModeSelector } from "@/components/dashboard/NotificationModeSelector";
 import type { UserRole } from "@/types";
 
 export default function SettingsPage() {
@@ -290,6 +291,13 @@ export default function SettingsPage() {
             </select>
           </label>
         </Card>
+
+        {/* Global Medication Reminder Mode (Voice, Ringtone, Vibration) */}
+        <NotificationModeSelector
+          settings={settings}
+          updateSettings={updateSettings}
+          userName={currentUser?.name}
+        />
 
         {/* Reminder Modalities & Hardware Tests */}
         <Card className="p-6">

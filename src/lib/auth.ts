@@ -196,6 +196,41 @@ export async function signIn(email: string, password: string): Promise<AuthResul
 }
 
 /**
+ * Initiates Google OAuth authentication via Supabase Auth
+ * Enables any legitimate Gmail account to register and sign in
+ */
+export async function signInWithGoogle(): Promise<{ ok: boolean; error?: string }> {
+  if (!supabase) {
+    // In local demo mode, create an isolated Google demo user session
+    const demoGoogleUser = {
+      id: "demo-google-" + Math.random().toString(36).substring(2, 9),
+      name: "Google Account User",
+      email: "user@gmail.com",
+      role: "patient" as UserRole,
+      preferredLanguage: "en" as const,
+    };
+    try {
+      localStorage.setItem(USER_SESSION_KEY, JSON.stringify(demoGoogleUser));
+    } catch {}
+    return { ok: true };
+  }
+
+  const redirectUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/dashboard`
+    : undefined;
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: redirectUrl,
+    },
+  });
+
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+/**
  * Audit & Fix Data Isolation on Sign Out:
  * Explicitly clears cached user data, session keys, and signs out of Supabase
  */

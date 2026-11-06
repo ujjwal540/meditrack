@@ -7,6 +7,24 @@ const BOOKINGS_KEY = "meditrack.pro_bookings";
 const REVIEWS_KEY = "meditrack.pro_reviews";
 
 // Verified Initial Professional Caregivers for the marketplace
+export const CAREGIVER_PORTRAITS: Record<string, string> = {
+  "pro-1": "/images/caregivers/elena-rostova.jpg",
+  "user-pro-1": "/images/caregivers/elena-rostova.jpg",
+  "Elena Rostova, RN": "/images/caregivers/elena-rostova.jpg",
+
+  "pro-2": "/images/caregivers/marcus-holloway.jpg",
+  "user-pro-2": "/images/caregivers/marcus-holloway.jpg",
+  "Marcus Holloway, CNA": "/images/caregivers/marcus-holloway.jpg",
+
+  "pro-3": "/images/caregivers/ananya-sharma.jpg",
+  "user-pro-3": "/images/caregivers/ananya-sharma.jpg",
+  "Dr. Ananya Sharma, PT": "/images/caregivers/ananya-sharma.jpg",
+
+  "pro-4": "/images/caregivers/david-chen.jpg",
+  "user-pro-4": "/images/caregivers/david-chen.jpg",
+  "David Chen, LPN": "/images/caregivers/david-chen.jpg",
+};
+
 const SEED_PROFESSIONALS: ProfessionalCaregiver[] = [
   {
     id: "pro-1",
@@ -24,7 +42,7 @@ const SEED_PROFESSIONALS: ProfessionalCaregiver[] = [
     rating: 4.95,
     reviewCount: 42,
     availability: "weekdays_and_weekends",
-    avatarUrl: "/images/illustrations/health-wellness.png",
+    avatarUrl: "/images/caregivers/elena-rostova.jpg",
     createdAt: "2026-01-15T08:00:00Z",
   },
   {
@@ -43,7 +61,7 @@ const SEED_PROFESSIONALS: ProfessionalCaregiver[] = [
     rating: 4.88,
     reviewCount: 29,
     availability: "weekdays",
-    avatarUrl: "/images/illustrations/family-care.png",
+    avatarUrl: "/images/caregivers/marcus-holloway.jpg",
     createdAt: "2026-02-10T09:00:00Z",
   },
   {
@@ -62,7 +80,7 @@ const SEED_PROFESSIONALS: ProfessionalCaregiver[] = [
     rating: 5.00,
     reviewCount: 38,
     availability: "weekdays_and_weekends",
-    avatarUrl: "/images/illustrations/health-wellness.png",
+    avatarUrl: "/images/caregivers/ananya-sharma.jpg",
     createdAt: "2026-01-05T10:00:00Z",
   },
   {
@@ -81,7 +99,7 @@ const SEED_PROFESSIONALS: ProfessionalCaregiver[] = [
     rating: 4.90,
     reviewCount: 19,
     availability: "weekends",
-    avatarUrl: "/images/illustrations/elderly-couple.png",
+    avatarUrl: "/images/caregivers/david-chen.jpg",
     createdAt: "2026-03-01T11:00:00Z",
   },
 ];
@@ -95,24 +113,30 @@ export async function getProfessionalCaregivers(): Promise<ProfessionalCaregiver
         .order("rating", { ascending: false });
 
       if (!error && data && data.length > 0) {
-        return data.map((row) => ({
-          id: row.id,
-          userId: row.user_id,
-          fullName: row.full_name,
-          phone: row.phone,
-          bio: row.bio,
-          qualifications: row.qualifications,
-          yearsExperience: row.years_experience,
-          languages: row.languages || ["English"],
-          serviceLocation: row.service_location,
-          hourlyRate: Number(row.hourly_rate),
-          verificationStatus: row.verification_status,
-          rating: Number(row.rating),
-          reviewCount: row.review_count,
-          availability: row.availability,
-          avatarUrl: row.avatar_url,
-          createdAt: row.created_at,
-        }));
+        return data.map((row) => {
+          let resolvedAvatar = row.avatar_url;
+          if (!resolvedAvatar || resolvedAvatar.includes("/images/illustrations/")) {
+            resolvedAvatar = CAREGIVER_PORTRAITS[row.id] || CAREGIVER_PORTRAITS[row.user_id] || CAREGIVER_PORTRAITS[row.full_name] || resolvedAvatar;
+          }
+          return {
+            id: row.id,
+            userId: row.user_id,
+            fullName: row.full_name,
+            phone: row.phone,
+            bio: row.bio,
+            qualifications: row.qualifications,
+            yearsExperience: row.years_experience,
+            languages: row.languages || ["English"],
+            serviceLocation: row.service_location,
+            hourlyRate: Number(row.hourly_rate),
+            verificationStatus: row.verification_status,
+            rating: Number(row.rating),
+            reviewCount: row.review_count,
+            availability: row.availability,
+            avatarUrl: resolvedAvatar,
+            createdAt: row.created_at,
+          };
+        });
       }
     } catch {}
   }
@@ -123,7 +147,16 @@ export async function getProfessionalCaregivers(): Promise<ProfessionalCaregiver
     writeJSON(PROS_KEY, SEED_PROFESSIONALS);
     return SEED_PROFESSIONALS;
   }
-  return local;
+  // Upgrade any legacy stored profiles with the new realistic photo URLs
+  const upgraded = local.map((p) => {
+    if (!p.avatarUrl || p.avatarUrl.includes("/images/illustrations/")) {
+      const newUrl = CAREGIVER_PORTRAITS[p.id] || CAREGIVER_PORTRAITS[p.userId] || CAREGIVER_PORTRAITS[p.fullName] || p.avatarUrl;
+      return { ...p, avatarUrl: newUrl };
+    }
+    return p;
+  });
+  writeJSON(PROS_KEY, upgraded);
+  return upgraded;
 }
 
 export async function getBookingsForUser(userId: string): Promise<ProfessionalBooking[]> {

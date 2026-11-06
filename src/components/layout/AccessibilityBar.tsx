@@ -60,7 +60,7 @@ function Toggle({
 export function AccessibilityBar({
   user,
   onUserUpdated,
-  hideUtilityControls = false,
+  hideUtilityControls = true,
   className,
 }: {
   user?: { id: string; name?: string; email?: string; role: UserRole } | null;

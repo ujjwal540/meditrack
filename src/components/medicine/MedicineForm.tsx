@@ -90,7 +90,7 @@ export function MedicineForm({
     ) : null;
 
   return (
-    <Card className="relative overflow-hidden border border-[#16A36A]/25 bg-[var(--surface)] p-6 sm:p-8 backdrop-blur-xl shadow-[var(--shadow-card)]">
+    <Card className="relative overflow-hidden border border-[#16A36A]/25 bg-[var(--surface)] p-4 xs:p-5 sm:p-8 backdrop-blur-xl shadow-[var(--shadow-card)]">
       {onCancel && (
         <button
           type="button"

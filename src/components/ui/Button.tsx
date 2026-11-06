@@ -32,9 +32,9 @@ export function Button({
         "inline-flex items-center justify-center gap-2.5 rounded-xl font-semibold tracking-wide transition-all duration-200 ease-out",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#20D6C2] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-app)]",
         "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none",
-        size === "sm" && "min-h-10 px-4 text-sm",
-        size === "md" && "min-h-12 px-5 text-base",
-        size === "xl" && "min-h-14 w-full px-6 text-lg font-bold",
+        size === "sm" && "min-h-10 px-3 xs:px-4 text-xs xs:text-sm",
+        size === "md" && "min-h-12 px-4 xs:px-5 text-sm xs:text-base",
+        size === "xl" && "min-h-14 w-full px-5 xs:px-6 text-base xs:text-lg font-bold",
         styles[variant],
         className,
       )}

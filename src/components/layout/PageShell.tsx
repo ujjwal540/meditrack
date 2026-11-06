@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { AccessibilityBar } from "@/components/layout/AccessibilityBar";
 import { Navbar } from "@/components/layout/Navbar";
@@ -37,6 +37,8 @@ export function PageShell({
   children: ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const isDashboard = pathname === "/dashboard" || pathname === "/";
   const { isNepali } = useTranslation();
   const [currentUser, setCurrentUser] = useState<{
     id: string;
@@ -110,23 +112,23 @@ export function PageShell({
               )
             )}
 
-            {/* Title & Subtitle + Status Badge Block */}
-            <div className="flex flex-col justify-center min-w-0">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <h1 className="font-display text-base sm:text-lg md:text-xl font-bold tracking-tight text-[var(--text)] whitespace-nowrap">
+            {/* Title & Subtitle + Status Badge Block - Full Width on Non-Dashboard Pages */}
+            <div className="flex flex-col justify-center min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <h1 className="font-display text-base sm:text-lg md:text-xl font-bold tracking-tight text-[var(--text)] break-words">
                   {title || (isNepali ? "ड्यासबोर्ड" : "Dashboard")}
                 </h1>
 
-                {/* Status Badge: Displayed directly beside page title when space permits */}
+                {/* Status Badge: Displayed directly beside page title */}
                 {action && (
-                  <div className="hidden xs:inline-flex items-center shrink-0">
+                  <div className="inline-flex items-center shrink-0">
                     {action}
                   </div>
                 )}
               </div>
 
               {subtitle && (
-                <p className="text-[11px] sm:text-xs text-[var(--text-secondary)] font-normal tracking-normal truncate max-w-[190px] xs:max-w-[280px] sm:max-w-md">
+                <p className="text-[11px] sm:text-xs text-[var(--text-secondary)] font-normal tracking-normal leading-tight mt-0.5 max-w-2xl">
                   {subtitle}
                 </p>
               )}
@@ -134,16 +136,19 @@ export function PageShell({
           </div>
 
           {/* Right Zone: Controls (Language Selector + Theme Toggle + Profile Avatar) */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <LanguageSwitcher variant="toggle" showIcon={false} />
-            <ThemeToggle showLabel={false} />
-            <ProfileDropdown
-              user={currentUser}
-              compact={true}
-              direction="down"
-              onUserUpdated={setCurrentUser}
-            />
-          </div>
+          {/* CRITICAL REQUIREMENT: Rendered ONLY on Dashboard page (/dashboard). On all other pages (Medicines, Health, Family, Care Pros, Settings, etc.), completely hidden. */}
+          {isDashboard && (
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <LanguageSwitcher variant="toggle" showIcon={false} />
+              <ThemeToggle showLabel={false} />
+              <ProfileDropdown
+                user={currentUser}
+                compact={true}
+                direction="down"
+                onUserUpdated={setCurrentUser}
+              />
+            </div>
+          )}
         </header>
 
         <main className="animate-rise mx-auto max-w-5xl px-3 xs:px-4 sm:px-6 md:px-8 pb-28 pt-3 sm:pt-5 md:pb-16">
@@ -153,9 +158,6 @@ export function PageShell({
             onUserUpdated={setCurrentUser}
             hideUtilityControls={true}
           />
-
-          {/* On ultra-compact screens (<360px), display status badge here if hidden in header */}
-          {action && <div className="mb-3 xs:hidden">{action}</div>}
 
           {children}
         </main>

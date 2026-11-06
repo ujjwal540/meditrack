@@ -114,7 +114,7 @@ export function NextMedicineCard({
       </div>
 
       {/* Actions */}
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      <div className="mt-5 sm:mt-6 grid grid-cols-1 xs:grid-cols-2 sm:flex sm:items-center gap-2.5 sm:gap-3">
         <Button
           size="md"
           variant="primary"
@@ -123,7 +123,7 @@ export function NextMedicineCard({
             setDone(true);
             setTimeout(() => setDone(false), 2200);
           }}
-          className="flex-1 sm:flex-initial"
+          className="w-full sm:w-auto justify-center min-h-[44px]"
         >
           <Check className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
           <span>{t.dashboard.markTakenBtn}</span>
@@ -133,7 +133,7 @@ export function NextMedicineCard({
           size="md"
           variant="outline"
           onClick={() => onLater(dose.key)}
-          className="flex-1 sm:flex-initial"
+          className="w-full sm:w-auto justify-center min-h-[44px]"
         >
           <Clock3 className="h-4 w-4" aria-hidden="true" />
           <span>

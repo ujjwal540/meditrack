@@ -17,7 +17,6 @@ import {
   Sparkles,
   User,
   UserCheck,
-  Volume2,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -60,8 +59,6 @@ export function AccountManagementModal({
     requestNotifications,
     testSound,
     speak,
-    soundSupported,
-    voiceSupported,
     medicines,
     logs,
   } = useMediTrack();
