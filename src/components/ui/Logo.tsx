@@ -83,11 +83,12 @@ export function Logo({
       <div className="flex flex-col text-left">
         <span
           className={cn(
-            "font-display font-extrabold tracking-tight text-[var(--text)] leading-none",
+            "font-display font-extrabold tracking-tight text-[var(--text)] leading-none whitespace-nowrap",
             dim.text,
           )}
         >
-          Medi<span className="text-[#16A36A] dark:text-[#20C982]">Track</span>
+          Aushadhi{" "}
+          <span className="text-[#16A36A] dark:text-[#20C982]">Sathi</span>
         </span>
         <span
           className={cn(

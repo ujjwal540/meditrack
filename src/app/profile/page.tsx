@@ -284,7 +284,7 @@ function ProfileContent() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `meditrack-health-backup-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `aushadhi-sathi-health-backup-${new Date().toISOString().split("T")[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1409,7 +1409,7 @@ function ProfileContent() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4">
                 <div className="space-y-0.5">
                   <span className="text-xs font-bold text-[var(--text)]">
-                    Complete MediTrack Health Archive
+                    Complete Aushadhi Sathi Health Archive
                   </span>
                   <p className="text-[11px] text-[var(--text-secondary)] font-mono">
                     Includes {medicines.length} prescriptions · {totalLogsCount} dose records · Care circle links
@@ -1437,8 +1437,8 @@ function ProfileContent() {
               </div>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                 {isNepali
-                  ? "मेडीट्रयाक केवल सम्झाउने र सूचना आदान-प्रदान गर्ने प्लेटफर्म हो। यसले चिकित्सकको सल्लाह, उपचार वा औषधि परिवर्तनको विकल्पको रूपमा काम गर्दैन। कुनै पनि स्वास्थ्य सम्बन्धी निर्णय लिनु अघि सधैं इजाजतपत्र प्राप्त डाक्टर वा फर्मासिस्टसँग परामर्श गर्नुहोस्।"
-                  : "MediTrack is designed as a personal reminder and caregiver communication aid. It does not provide medical diagnoses, alter prescriptions, or substitute for professional medical judgment. Always consult a licensed healthcare professional regarding health concerns."}
+                  ? "औषधि साथी केवल सम्झाउने र सूचना आदान-प्रदान गर्ने प्लेटफर्म हो। यसले चिकित्सकको सल्लाह, उपचार वा औषधि परिवर्तनको विकल्पको रूपमा काम गर्दैन। कुनै पनि स्वास्थ्य सम्बन्धी निर्णय लिनु अघि सधैं इजाजतपत्र प्राप्त डाक्टर वा फर्मासिस्टसँग परामर्श गर्नुहोस्।"
+                  : "Aushadhi Sathi is designed as a personal reminder and caregiver communication aid. It does not provide medical diagnoses, alter prescriptions, or substitute for professional medical judgment. Always consult a licensed healthcare professional regarding health concerns."}
               </p>
             </Card>
           </div>

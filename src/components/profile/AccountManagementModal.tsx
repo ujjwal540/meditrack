@@ -116,7 +116,7 @@ export function AccountManagementModal({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `meditrack-health-records-${new Date().toISOString().split("T")[0]}.json`;
+    a.download = `aushadhi-sathi-health-records-${new Date().toISOString().split("T")[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -486,7 +486,7 @@ export function AccountManagementModal({
                   <div>
                     <h4 className="font-semibold text-[var(--text)]">Data Isolation &amp; Privacy Shield</h4>
                     <p className="mt-1 text-[11px] text-[var(--text-secondary)] leading-relaxed">
-                      Every query in MediTrack enforces strict user identity boundaries. Prescriptions, doses, caregiver records, and health trends cannot be accessed by other members without explicit patient consent.
+                      Every query in Aushadhi Sathi enforces strict user identity boundaries. Prescriptions, doses, caregiver records, and health trends cannot be accessed by other members without explicit patient consent.
                     </p>
                   </div>
                 </div>
@@ -540,9 +540,9 @@ export function AccountManagementModal({
                 <div className="flex items-start gap-3">
                   <Sparkles className="h-5 w-5 text-[#A78BFA] shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-[var(--text)]">MediTrack Clinical Guidance Notice</h4>
+                    <h4 className="font-semibold text-[var(--text)]">Aushadhi Sathi Clinical Guidance Notice</h4>
                     <p className="mt-1 text-[11px] text-[var(--text-secondary)] leading-relaxed">
-                      MediTrack is designed as an adherence reminder and caregiver communication platform. It does not provide medical diagnoses, alter prescriptions, or substitute for consultation with licensed medical doctors or pharmacists.
+                      Aushadhi Sathi is designed as an adherence reminder and caregiver communication platform. It does not provide medical diagnoses, alter prescriptions, or substitute for consultation with licensed medical doctors or pharmacists.
                     </p>
                   </div>
                 </div>

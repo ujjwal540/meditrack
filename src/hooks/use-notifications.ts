@@ -171,7 +171,7 @@ export function useNotifications({
   const testNotification = useCallback(() => {
     if (typeof Notification === "undefined" || Notification.permission !== "granted") return false;
     try {
-      new Notification("MediTrack test notification", {
+      new Notification("Aushadhi Sathi test notification", {
         body: "Browser notifications are enabled.",
         icon: "/logo.svg",
         tag: "meditrack-test",

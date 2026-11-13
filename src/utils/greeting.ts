@@ -51,14 +51,14 @@ export function getPersonalizedGreeting(
         greeting: `नमस्ते ${cleanName} ज्यू, ${timeGreeting}!`,
         headline: `${timeGreeting}, ${cleanName} ज्यू`,
         timeGreeting,
-        subtitle: "मेडीट्रयाकमा पुनः स्वागत छ। आज पनि समयमै औषधि खानुहोला।",
+        subtitle: "औषधि साथीमा पुनः स्वागत छ। आज पनि समयमै औषधि खानुहोला।",
         hasName: true,
         name: `${cleanName} ज्यू`,
       };
     }
     return {
-      greeting: "मेडीट्रयाकमा स्वागत छ",
-      headline: `${timeGreeting}! मेडीट्रयाकमा स्वागत छ`,
+      greeting: "औषधि साथीमा स्वागत छ",
+      headline: `${timeGreeting}! औषधि साथीमा स्वागत छ`,
       timeGreeting,
       subtitle: "तपाईंको हेरचाह खातामा स्वागत छ। आज पनि आफ्नो स्वास्थ्यको राम्रो ख्याल राख्नुहोस्।",
       hasName: false,
@@ -71,15 +71,15 @@ export function getPersonalizedGreeting(
       greeting: `${timeGreeting}, ${cleanName}!`,
       headline: `${timeGreeting}, ${cleanName}`,
       timeGreeting,
-      subtitle: "Welcome back to MediTrack. Let's take care of your health today.",
+      subtitle: "Welcome back to Aushadhi Sathi. Let's take care of your health today.",
       hasName: true,
       name: cleanName,
     };
   }
 
   return {
-    greeting: "Welcome to MediTrack",
-    headline: `${timeGreeting}! Welcome to MediTrack`,
+    greeting: "Welcome to Aushadhi Sathi",
+    headline: `${timeGreeting}! Welcome to Aushadhi Sathi`,
     timeGreeting,
     subtitle: "Welcome back to your healthcare space. Let's take care of your health today.",
     hasName: false,

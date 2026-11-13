@@ -53,7 +53,7 @@ export function LogoutConfirmDialog({
           </div>
           <div>
             <h2 id="logout-dialog-title" className="font-display text-base font-bold text-[var(--text)]">
-              {isNepali ? "मेडीट्रयाकबाट बाहिरिनुहुन्छ?" : "Sign Out of MediTrack?"}
+              {isNepali ? "औषधि साथीबाट बाहिरिनुहुन्छ?" : "Sign Out of Aushadhi Sathi?"}
             </h2>
             <p className="text-[11px] text-[var(--text-secondary)]">
               {isNepali ? "सत्र सुरक्षा पुष्टि" : "Session Security Confirmation"}

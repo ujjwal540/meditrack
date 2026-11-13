@@ -5,11 +5,11 @@ import { LanguageProvider } from "@/i18n/LanguageContext";
 import { ReminderProvider } from "@/components/reminders/ReminderProvider";
 
 export const metadata: Metadata = {
-  title: "MediTrack - Smart Medicine Reminder & Family Care",
+  title: "Aushadhi Sathi - Smart Medicine Reminder & Family Care",
   description: "Never miss a dose. Precision medicine scheduling, adherence tracking, and consent-based family caregiver coordination.",
   icons: { icon: "/logo.svg" },
   openGraph: {
-    title: "MediTrack - Smart Medicine Reminder & Family Care",
+    title: "Aushadhi Sathi - Smart Medicine Reminder & Family Care",
     description: "Never miss a dose. Precision medicine scheduling, adherence tracking, and consent-based family caregiver coordination.",
   },
 };

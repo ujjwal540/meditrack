@@ -2,7 +2,7 @@ self.addEventListener("push", (event) => {
   if (!event.data) return;
   const data = event.data.json();
   event.waitUntil(
-    self.registration.showNotification(data.title || "MediTrack reminder", {
+    self.registration.showNotification(data.title || "Aushadhi Sathi reminder", {
       body: data.body || "It is time to check your medicine schedule.",
       icon: "/logo.svg",
       badge: "/logo.svg",

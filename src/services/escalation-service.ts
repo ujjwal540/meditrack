@@ -95,7 +95,7 @@ export async function checkAndTriggerEscalations(
     if (elapsedMinutes >= graceMinutes && !escalatedKeys.has(dose.key)) {
       // Trigger escalation alert to authorized family caregivers
       for (const caregiver of authorizedCaregivers) {
-        const alertMessage = `MediTrack Family Care Alert: Your connected family member, ${patientName}, has not confirmed taking their scheduled medicine, ${dose.medicineName} (${dose.dosage}), scheduled at ${dose.time}. Please contact them to check.`;
+        const alertMessage = `Aushadhi Sathi Family Care Alert: Your connected family member, ${patientName}, has not confirmed taking their scheduled medicine, ${dose.medicineName} (${dose.dosage}), scheduled at ${dose.time}. Please contact them to check.`;
 
         const alert: FamilyAlert = {
           id: uid(),
@@ -118,7 +118,7 @@ export async function checkAndTriggerEscalations(
         // Deliver browser alert if caregiver has page open
         if (typeof Notification !== "undefined" && Notification.permission === "granted") {
           try {
-            new Notification("MediTrack Family Care Escalation", {
+            new Notification("Aushadhi Sathi Family Care Escalation", {
               body: alertMessage,
               icon: "/logo.svg",
               tag: `family-alert-${dose.key}`,

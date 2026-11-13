@@ -39,7 +39,7 @@ export default function NotFound() {
         </div>
 
         <p className="text-xs text-[var(--text-muted)]">
-          MediTrack &bull; Intelligent Medicine Reminder &amp; Care
+          Aushadhi Sathi &bull; Intelligent Medicine Reminder &amp; Care
         </p>
       </div>
     </div>

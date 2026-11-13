@@ -105,7 +105,7 @@ export function PageShell({
                 <Link
                   href="/dashboard"
                   className="flex items-center gap-2 md:hidden transition-transform hover:scale-105 shrink-0"
-                  aria-label="MediTrack Dashboard"
+                  aria-label="Aushadhi Sathi Dashboard"
                 >
                   <Logo variant="icon" size="sm" glow={true} />
                 </Link>

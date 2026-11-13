@@ -65,8 +65,9 @@ export default function Home() {
             {/* Ultra-compact logo for small screens under 640px */}
             <div className="flex items-center gap-2 sm:hidden">
               <Logo variant="icon" size="sm" glow={true} />
-              <span className="font-display font-extrabold text-base tracking-tight text-[var(--text)] leading-none">
-                Medi<span className="text-[#16A36A] dark:text-[#20C982]">Track</span>
+              <span className="font-display font-extrabold text-base tracking-tight text-[var(--text)] leading-none whitespace-nowrap">
+                Aushadhi{" "}
+                <span className="text-[#16A36A] dark:text-[#20C982]">Sathi</span>
               </span>
             </div>
             {/* Full logo for screens 640px and above */}
@@ -314,7 +315,7 @@ export default function Home() {
                   <div className="h-3 w-3 rounded-full bg-rose-500/80" />
                   <div className="h-3 w-3 rounded-full bg-amber-500/80" />
                   <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
-                  <span className="ml-2 font-mono text-[11px] text-[var(--text-secondary)]">meditrack.app/dashboard</span>
+                  <span className="ml-2 font-mono text-[11px] text-[var(--text-secondary)]">aushadhisathi.app/dashboard</span>
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-[#16A36A] dark:text-[#20C982]">
                   <span className="h-2 w-2 rounded-full bg-[#20C982] animate-pulse" />
@@ -466,7 +467,7 @@ export default function Home() {
               </div>
               <h3 className="mt-6 font-display text-xl font-bold text-[var(--text)]">Easy Mode &amp; Senior Friendly</h3>
               <p className="mt-2 text-xs leading-relaxed text-[var(--text-secondary)]">
-                Large high-contrast text, clear buttons, speech synthesis, and zero confusing menus make MediTrack effortless for all ages.
+                Large high-contrast text, clear buttons, speech synthesis, and zero confusing menus make Aushadhi Sathi effortless for all ages.
               </p>
             </div>
 
@@ -501,7 +502,7 @@ export default function Home() {
           <div className="text-center max-w-xl mx-auto">
             <span className="text-xs font-semibold uppercase tracking-wider text-[#16A36A] dark:text-[#20C982]">Simple Process</span>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-extrabold text-[var(--text)]">
-              How MediTrack Works
+              How Aushadhi Sathi Works
             </h2>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">Three simple steps to stress-free medication management.</p>
           </div>
@@ -548,7 +549,7 @@ export default function Home() {
                 Care is closer than you think.
               </h2>
               <p className="mt-3 text-sm sm:text-base leading-relaxed text-[var(--text-secondary)]">
-                Caring for a parent or family member from afar should not be stressful. With MediTrack, caregivers see a calm summary of whether daily medicines were confirmed, without constant phone calls or invasion of privacy.
+                Caring for a parent or family member from afar should not be stressful. With Aushadhi Sathi, caregivers see a calm summary of whether daily medicines were confirmed, without constant phone calls or invasion of privacy.
               </p>
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
@@ -576,7 +577,7 @@ export default function Home() {
             <Sparkles className="h-6 w-6" />
           </div>
           <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-[var(--text)]">
-            Meet Your MediTrack AI Companion
+            Meet Your Aushadhi Sathi AI Companion
           </h2>
           <p className="mt-3 text-sm text-[var(--text-secondary)] max-w-xl mx-auto">
             Available 24/7 in the lower right corner of every page. Ask questions about timing your doses with meals, handling snoozed medicines, or setting up family access.
@@ -602,7 +603,7 @@ export default function Home() {
             Ready to simplify your daily medicine routine?
           </h2>
           <p className="mt-4 text-base text-[var(--text-secondary)]">
-            Join thousands of patients and caregivers who trust MediTrack for daily wellness.
+            Join thousands of patients and caregivers who trust Aushadhi Sathi for daily wellness.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
@@ -637,9 +638,9 @@ export default function Home() {
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-4">
-            <p>&copy; {new Date().getFullYear()} MediTrack Platform. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Aushadhi Sathi Platform. All rights reserved.</p>
             <p className="text-[11px] text-[var(--text-muted)] max-w-md">
-              Medical Notice: MediTrack is a clinical adherence companion and timetable tracker. It does not provide medical diagnoses or modify prescriptions. Consult your physician for medical advice.
+              Medical Notice: Aushadhi Sathi is a clinical adherence companion and timetable tracker. It does not provide medical diagnoses or modify prescriptions. Consult your physician for medical advice.
             </p>
           </div>
         </div>

@@ -76,8 +76,8 @@ const SUGGESTED_TOPICS: SuggestedTopic[] = [
     titleNe: "पारिवारिक हेरचाह",
     descEn: "How consent-based family sharing protects your privacy",
     descNe: "गोपनीयता र हेरचाहकर्तासँग साझेदारीको नियम",
-    promptEn: "How does consent-based family sharing work in MediTrack?",
-    promptNe: "मेडीट्रयाकमा पारिवारिक हेरचाहकर्तासँग औषधि विवरण कसरी सुरक्षित हुन्छ?",
+    promptEn: "How does consent-based family sharing work in Aushadhi Sathi?",
+    promptNe: "औषधि साथीमा पारिवारिक हेरचाहकर्तासँग औषधि विवरण कसरी सुरक्षित हुन्छ?",
   },
 ];
 
@@ -93,15 +93,15 @@ function getAssistantResponse(prompt: string, userName?: string, isNepali?: bool
       return `खानासँग खानुपर्ने औषधिहरू पेटको सुरक्षा गर्न र राम्ररी पच्नका लागि खाना खाइसकेपछि वा खाँदै गर्दा खानुपर्छ। डाक्टरले अन्यथा नभनेसम्म सधैं एक गिलास सफा पानीसँग ट्याब्लेट खानुहोस्।`;
     }
     if (lower.includes("परिवार") || lower.includes("हेरचाह") || lower.includes("साझेदारी") || lower.includes("गोपनीयता") || lower.includes("family") || lower.includes("caregiver")) {
-      return `मेडीट्रयाकमा पूर्ण सहमतिमा आधारित गोपनीयता हुन्छ${namePrefix}। तपाईंले पारिवारिक सदस्यलाई आमन्त्रण गरेपछि तपाईंले अनुमति नदिएसम्म उहाँहरूले औषधिको स्थिति देख्न पाउनुहुन्न। तपाईंले जुनसुकै बेला पहुँच बन्द गर्न सक्नुहुन्छ।`;
+      return `औषधि साथीमा पूर्ण सहमतिमा आधारित गोपनीयता हुन्छ${namePrefix}। तपाईंले पारिवारिक सदस्यलाई आमन्त्रण गरेपछि तपाईंले अनुमति नदिएसम्म उहाँहरूले औषधिको स्थिति देख्न पाउनुहुन्न। तपाईंले जुनसुकै बेला पहुँच बन्द गर्न सक्नुहुन्छ।`;
     }
     if (lower.includes("बानी") || lower.includes("तालिका") || lower.includes("समय") || lower.includes("routine") || lower.includes("tips") || lower.includes("habit")) {
-      return `नियमित औषधि खानको लागि दैनिक कामसँग समय मिलाउनुहोस्—जस्तै बिहानको चिया, दाँत माझ्ने वा राति सुत्ने समय। साथै मेडीट्रयाकको नेपाली बोली (आवाज) र घण्टी सेटिङ्सबाट चालु गर्न सक्नुहुन्छ!`;
+      return `नियमित औषधि खानको लागि दैनिक कामसँग समय मिलाउनुहोस्—जस्तै बिहानको चिया, दाँत माझ्ने वा राति सुत्ने समय। साथै औषधि साथीको नेपाली बोली (आवाज) र घण्टी सेटिङ्सबाट चालु गर्न सक्नुहुन्छ!`;
     }
     if (lower.includes("समस्या") || lower.includes("दुख्यो") || lower.includes("असर") || lower.includes("side effect") || lower.includes("emergency") || lower.includes("doctor")) {
-      return `यदि तपाईंलाई गम्भीर लक्षण वा असजिलो महसुस भएको छ भने${namePrefix}, तुरुन्तै नजिकको अस्पताल वा आफ्नो चिकित्सकसँग सम्पर्क गर्नुहोस्। मेडीट्रयाक एआईले आपत्कालीन उपचार वा औषधिको मात्रा तोक्न सक्दैन।`;
+      return `यदि तपाईंलाई गम्भीर लक्षण वा असजिलो महसुस भएको छ भने${namePrefix}, तुरुन्तै नजिकको अस्पताल वा आफ्नो चिकित्सकसँग सम्पर्क गर्नुहोस्। औषधि साथी एआईले आपत्कालीन उपचार वा औषधिको मात्रा तोक्न सक्दैन।`;
     }
-    return `राम्रो प्रश्न गर्नुभयो${namePrefix}! औषधिको सहि सेवनका लागि सधैं डाक्टर वा औषधिको बट्टामा लेखिएको निर्देशन पालना गर्नुहोस्। मेडीट्रयाकमा तपाईंले औषधि तालिका, अनुस्मारक र परिवारलाई सजिलै जोड्न सक्नुहुन्छ।`;
+    return `राम्रो प्रश्न गर्नुभयो${namePrefix}! औषधिको सहि सेवनका लागि सधैं डाक्टर वा औषधिको बट्टामा लेखिएको निर्देशन पालना गर्नुहोस्। औषधि साथीमा तपाईंले औषधि तालिका, अनुस्मारक र परिवारलाई सजिलै जोड्न सक्नुहुन्छ।`;
   }
 
   // English fallback
@@ -112,15 +112,15 @@ function getAssistantResponse(prompt: string, userName?: string, isNepali?: bool
     return "Medicines marked 'with food' are usually meant to be taken during or right after a meal or snack to protect your stomach lining or improve absorption. Always take oral tablets with a full glass of water unless your doctor instructed otherwise.";
   }
   if (lower.includes("family") || lower.includes("caregiver") || lower.includes("sharing") || lower.includes("consent") || lower.includes("privacy")) {
-    return `MediTrack uses strict consent-based sharing${namePrefix}. When you invite a family member or caregiver, they cannot see your dose activity until you explicitly tap 'Allow them to see my doses'. You can revoke access at any time from the Family page.`;
+    return `Aushadhi Sathi uses strict consent-based sharing${namePrefix}. When you invite a family member or caregiver, they cannot see your dose activity until you explicitly tap 'Allow them to see my doses'. You can revoke access at any time from the Family page.`;
   }
   if (lower.includes("routine") || lower.includes("schedule") || lower.includes("remember") || lower.includes("tips") || lower.includes("habit")) {
-    return `Welcome back${namePrefix}! Pairing medicine times with daily anchors—such as morning breakfast, brushing teeth, or evening bedtime—creates strong habits. You can also turn on MediTrack browser notifications and voice announcements in Settings!`;
+    return `Welcome back${namePrefix}! Pairing medicine times with daily anchors—such as morning breakfast, brushing teeth, or evening bedtime—creates strong habits. You can also turn on Aushadhi Sathi browser notifications and voice announcements in Settings!`;
   }
   if (lower.includes("side effect") || lower.includes("pain") || lower.includes("emergency") || lower.includes("doctor")) {
-    return `If you are experiencing severe symptoms, unusual side effects, or an emergency${namePrefix}, please contact your doctor or local emergency services immediately. MediTrack AI cannot provide diagnostic opinions or adjust dosages.`;
+    return `If you are experiencing severe symptoms, unusual side effects, or an emergency${namePrefix}, please contact your doctor or local emergency services immediately. Aushadhi Sathi AI cannot provide diagnostic opinions or adjust dosages.`;
   }
-  return `That's a helpful question${namePrefix}! For specific treatment guidelines, always follow your prescription label. In MediTrack, you can record custom doctor instructions, configure reminder intervals, and invite caregivers to stay in the loop.`;
+  return `That's a helpful question${namePrefix}! For specific treatment guidelines, always follow your prescription label. In Aushadhi Sathi, you can record custom doctor instructions, configure reminder intervals, and invite caregivers to stay in the loop.`;
 }
 
 export function AIAssistantWidget() {
@@ -214,14 +214,14 @@ export function AIAssistantWidget() {
             );
             setIsOpen(true);
           }}
-          aria-label={isNepali ? "मेडीट्रयाक एआई साथी खोल्नुहोस्" : "Open MediTrack AI Assistant"}
+          aria-label={isNepali ? "औषधि साथी एआई खोल्नुहोस्" : "Open Aushadhi Sathi AI Assistant"}
           className="group relative flex items-center gap-2.5 rounded-full border border-emerald-500/40 bg-[var(--surface-elevated)] px-3.5 sm:px-4 py-2.5 sm:py-3 text-[var(--text)] shadow-[0_8px_30px_rgba(22,163,106,0.35)] backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:border-[#20D6C2] active:scale-95"
         >
           <div className="relative grid h-7 w-7 sm:h-8 sm:w-8 place-items-center rounded-full bg-gradient-to-tr from-[#16A36A] via-[#10B981] to-[#20D6C2] text-white">
             <Sparkles className="h-4 w-4" />
           </div>
           <span className="hidden sm:inline text-xs font-bold tracking-wide">
-            {isNepali ? "स्वास्थ्य साथी (AI)" : "MediTrack AI"}
+            {isNepali ? "औषधि साथी (AI)" : "Aushadhi Sathi AI"}
           </span>
           <span className="absolute -top-1 -right-1 flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#20D6C2] opacity-75" />
@@ -235,7 +235,7 @@ export function AIAssistantWidget() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={isNepali ? "मेडीट्रयाक स्वास्थ्य साथी" : "MediTrack AI Assistant"}
+          aria-label={isNepali ? "औषधि साथी एआई सहायक" : "Aushadhi Sathi AI Assistant"}
           className="flex h-[35rem] max-h-[calc(100dvh-6.5rem)] sm:max-h-[38rem] w-[calc(100vw-1.5rem)] sm:w-[25.5rem] md:w-[27rem] flex-col rounded-3xl border border-emerald-500/30 dark:border-emerald-500/30 bg-[var(--surface)] text-[var(--text)] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65),0_0_0_1px_rgba(32,214,194,0.2)] overflow-hidden transition-all animate-in fade-in zoom-in-95 duration-200"
         >
           {/* Section 1: Header */}
@@ -273,7 +273,7 @@ export function AIAssistantWidget() {
               </div>
               <div className="min-w-0">
                 <h2 className="font-display text-xs sm:text-sm font-bold tracking-tight text-[var(--text)] truncate">
-                  {isNepali ? "मेडीट्रयाक स्वास्थ्य साथी" : "MediTrack AI Assistant"}
+                  {isNepali ? "औषधि साथी स्वास्थ्य सहायक" : "Aushadhi Sathi AI Assistant"}
                 </h2>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] text-[#16A36A] dark:text-[#20C982] font-semibold">
@@ -327,8 +327,8 @@ export function AIAssistantWidget() {
                   </span>
                   <h3 className="text-sm sm:text-base font-bold text-[var(--text)] leading-snug">
                     {isNepali
-                      ? "नमस्ते! मेडीट्रयाकमा स्वागत छ। आज म तपाईंको स्वास्थ्यमा के सहयोग गर्न सक्छु?"
-                      : "Hello! Welcome to MediTrack. How can I help you with your health today?"}
+                      ? "नमस्ते! औषधि साथीमा स्वागत छ। आज म तपाईंको स्वास्थ्यमा के सहयोग गर्न सक्छु?"
+                      : "Hello! Welcome to Aushadhi Sathi. How can I help you with your health today?"}
                   </h3>
                   <p className="text-[11px] sm:text-xs text-[var(--text-secondary)] leading-relaxed pt-1">
                     {isNepali
@@ -441,7 +441,7 @@ export function AIAssistantWidget() {
                     <span className="inline-block h-2 w-2 rounded-full bg-[#20C982] animate-bounce [animation-delay:0.2s]" />
                     <span className="inline-block h-2 w-2 rounded-full bg-[#20D6C2] animate-bounce [animation-delay:0.4s]" />
                     <span className="text-[11px] text-[var(--text-muted)] ml-1 font-medium">
-                      {isNepali ? "स्वास्थ्य सल्लाहकारले उत्तर तयार गर्दैछ..." : "MediTrack AI is thinking..."}
+                      {isNepali ? "स्वास्थ्य सल्लाहकारले उत्तर तयार गर्दैछ..." : "Aushadhi Sathi AI is thinking..."}
                     </span>
                   </div>
                 )}

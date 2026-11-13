@@ -172,7 +172,7 @@ export default function SettingsPage() {
               <span>
                 {isNepali
                   ? "गाढा रङ (High Contrast) सक्रिय छ। सबै पृष्ठहरूमा स्पष्टता बढेको छ।"
-                  : "High Contrast Mode is active across all MediTrack views."}
+                  : "High Contrast Mode is active across all Aushadhi Sathi views."}
               </span>
             </p>
           )}
@@ -435,7 +435,7 @@ export default function SettingsPage() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => speak(isNepali ? "यो मेडीट्रयाक आवाज परीक्षण हो। तपाईंको आवाज सहायता राम्ररी काम गर्दैछ।" : "This is a MediTrack voice assistance test.")}
+              onClick={() => speak(isNepali ? "यो औषधि साथी आवाज परीक्षण हो। तपाईंको आवाज सहायता राम्ररी काम गर्दैछ।" : "This is an Aushadhi Sathi voice assistance test.")}
               disabled={!voiceSupported || !settings.voiceEnabled}
               className="text-xs"
             >

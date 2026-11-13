@@ -141,7 +141,7 @@ export default function DashboardPage() {
                       {isNepali ? (
                         <>
                           <span className="text-[#16A36A] dark:text-[#A3EAC1]">
-                            मेडीट्रयाक
+                            औषधि साथी
                           </span>
                           मा स्वागत छ
                         </>
@@ -149,7 +149,7 @@ export default function DashboardPage() {
                         <>
                           Welcome to{" "}
                           <span className="text-[#16A36A] dark:text-[#A3EAC1]">
-                            MediTrack
+                            Aushadhi Sathi
                           </span>
                         </>
                       )}

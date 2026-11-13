@@ -10,13 +10,13 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("MediTrack page error", error);
+    console.error("Aushadhi Sathi page error", error);
   }, [error]);
 
   return (
     <main className="grid min-h-screen place-items-center bg-slate-50 px-6">
       <section className="max-w-md rounded-2xl border border-red-200 bg-white p-6 text-center shadow-sm">
-        <h1 className="text-2xl font-bold text-slate-900">MediTrack could not load this page</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Aushadhi Sathi could not load this page</h1>
         <p className="mt-3 text-slate-600">Your reminder data is safe. Reload the page or try again.</p>
         <button
           type="button"

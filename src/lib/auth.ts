@@ -29,7 +29,7 @@ export interface ProfessionalRegisterData {
 const NOT_CONFIGURED: AuthResult = {
   ok: false,
   demo: true,
-  error: "Supabase is not configured yet, so MediTrack is running in local demo mode.",
+  error: "Supabase is not configured yet, so Aushadhi Sathi is running in local demo mode.",
 };
 
 const USER_SESSION_KEY = "meditrack.current_user";
